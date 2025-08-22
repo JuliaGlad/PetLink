@@ -2,6 +2,7 @@ package petlink.android.petlink.ui.main.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -14,6 +15,7 @@ import petlink.android.petlink.di.DaggerAppComponent
 import petlink.android.petlink.ui.cicerone.AppNavigationCoordinator
 import petlink.android.petlink.ui.cicerone.Presenter
 import petlink.android.petlink.ui.cicerone.screen.main.BottomScreen
+import petlink.android.petlink.ui.cicerone.screen.main.MainScreen
 import petlink.android.petlink.ui.main.activity.di.DaggerMainActivityComponent
 import petlink.android.petlink.ui.profile.achievement.AchievementActivity
 import petlink.android.petlink.ui.profile.create_account.activity.CreateAccountActivity
@@ -43,18 +45,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        initBottomBar()
         if (savedInstanceState == null) {
             val rootFragment = if (viewModel.isAuthenticated()) {
                 binding.bottomNav.selectedItemId = R.id.action_community
                 BottomScreen.community()
-            }
-            else {
+            } else {
                 binding.bottomNav.selectedItemId = R.id.action_profile
                 BottomScreen.auth()
             }
             presenter.setupRootFragment(rootFragment)
+            presenter.navigateTo(rootFragment)
         }
+        initBottomBar()
     }
 
     override fun onResumeFragments() {
@@ -67,13 +69,19 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
     }
 
-    private fun initBottomBar(){
+    private fun initBottomBar() {
         binding.bottomNav.setOnItemSelectedListener { item ->
             val screen: Screen? = when (item.itemId) {
                 R.id.action_community -> BottomScreen.community()
                 R.id.action_calendar -> BottomScreen.calendar()
                 R.id.action_map -> BottomScreen.map()
-                R.id.action_profile -> BottomScreen.auth()
+                R.id.action_profile ->
+                    if (viewModel.isAuthenticated()) {
+                        MainScreen.profile()
+                    } else {
+                        BottomScreen.auth()
+                    }
+
                 else -> null
             }
             screen?.let { presenter.navigateTo(it) }
@@ -81,32 +89,32 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun openCreateAccountActivity(launcher: ActivityResultLauncher<Intent>){
+    fun openCreateAccountActivity(launcher: ActivityResultLauncher<Intent>) {
         val intent = Intent(this, CreateAccountActivity::class.java)
         launcher.launch(intent)
     }
 
-    fun openAchievementActivity(){
+    fun openAchievementActivity() {
         val intent = Intent(this, AchievementActivity::class.java)
         startActivity(intent)
     }
 
-    fun openSettingsActivity(){
+    fun openSettingsActivity() {
         val intent = Intent(this, SettingsActivity::class.java)
         startActivity(intent)
     }
 
-    fun openFriendsActivity(){
+    fun openFriendsActivity() {
         val intent = Intent(this, FriendActivity::class.java)
         startActivity(intent)
     }
 
-    fun openMyDataActivity(){
+    fun openMyDataActivity() {
         val intent = Intent(this, MyDataActivity::class.java)
         startActivity(intent)
     }
 
-    fun openEditActivity(){
+    fun openEditActivity() {
         val intent = Intent(this, EditActivity::class.java)
         startActivity(intent)
     }

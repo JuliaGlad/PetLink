@@ -63,7 +63,7 @@ class ProfileFragment : MviBaseFragment<
     private val binding get() = _binding!!
     private var addCoverImageLauncher: ActivityResultLauncher<Intent>? = null
     private val mainAdapter: MainAdapter = MainAdapter()
-    private lateinit var items: MutableList<DelegateItem>
+    private val items: MutableList<DelegateItem> = mutableListOf()
 
     @Inject
     lateinit var localDI: ProfileLocalDI
@@ -80,7 +80,7 @@ class ProfileFragment : MviBaseFragment<
         super.onCreate(savedInstanceState)
         val appComponent = DaggerAppComponent.factory().create(requireContext())
         DaggerProfileComponent.factory().create(appComponent).inject(this)
-        initCoverImageLauncher()
+        addCoverImageLauncher = initCoverImageLauncher()
     }
 
     private fun initCoverImageLauncher() = registerForActivityResult<Intent, ActivityResult>(
@@ -138,6 +138,7 @@ class ProfileFragment : MviBaseFragment<
                 with(binding) {
                     loadingScreen.root.visibility = GONE
                     errorScreen.root.visibility = VISIBLE
+                    Log.i("ProfileError", state.value.throwable.message.toString())
                     errorScreen.button.setOnClickListener { store.sendIntent(ProfileIntent.LoadUserData) }
                 }
             }
@@ -164,7 +165,6 @@ class ProfileFragment : MviBaseFragment<
 
     private fun initMainAdapter(){
         mainAdapter.apply {
-            addDelegate(ToolbarDelegate())
             addDelegate(ProfileAvatarsDelegate())
             addDelegate(TabDelegate())
             addDelegate(DescriptionButtonDelegate())
@@ -175,16 +175,6 @@ class ProfileFragment : MviBaseFragment<
     private fun initRecycler(petData: PetMainDataUi, ownerData: OwnerMainDataUi) {
         items.addAll(
             listOf(
-                ToolbarDelegateItem(
-                    ToolbarModel(
-                        rightIcon = ResourcesCompat.getDrawable(
-                            resources,
-                            R.drawable.ic_add_image,
-                            context?.theme
-                        ),
-                        title = getString(R.string.profile),
-                        rightIconClick = { initImagePicker() }
-                    )),
                 ProfileAvatarsDelegateItem(
                     ProfileAvatarsModel(
                         petName = petData.petName,
@@ -226,79 +216,83 @@ class ProfileFragment : MviBaseFragment<
                     )
                 )
             ))
+        items.addAll(getManagementButtons())
         binding.recyclerView.adapter = mainAdapter
         mainAdapter.submitList(items)
     }
 
-    private fun addManagementButtons() {
-        val newItems = listOf<DelegateItem>(
-            DescriptionButtonDelegateItem(
-                DescriptionButtonModel(
-                    title = getString(R.string.my_data),
-                    description = getString(R.string.data_descriptiond),
-                    icon = ResourcesCompat.getDrawable(
-                        resources,
-                        R.drawable.ic_account,
-                        context?.theme
-                    ),
-                    click = { store.sendEffect(ProfileEffect.NavigateToMyData) }
-                )
-            ),
-            DescriptionButtonDelegateItem(
-                DescriptionButtonModel(
-                    title = getString(R.string.my_friends),
-                    description = getString(R.string.friends_description),
-                    icon = ResourcesCompat.getDrawable(
-                        resources,
-                        R.drawable.ic_friends,
-                        context?.theme
-                    ),
-                    click = { store.sendEffect(ProfileEffect.NavigateToFriends) }
-                )
-            ),
-            DescriptionButtonDelegateItem(
-                DescriptionButtonModel(
-                    title = getString(R.string.edit),
-                    description = getString(R.string.edit_description),
-                    icon = ResourcesCompat.getDrawable(
-                        resources,
-                        R.drawable.ic_edit,
-                        context?.theme
-                    ),
-                    click = { store.sendEffect(ProfileEffect.NavigateToEdit) }
-                )
-            ),
-            DescriptionButtonDelegateItem(
-                DescriptionButtonModel(
-                    title = getString(R.string.achievements),
-                    description = getString(R.string.achivments_description),
-                    icon = ResourcesCompat.getDrawable(
-                        resources,
-                        R.drawable.ic_crown,
-                        context?.theme
-                    ),
-                    click = { store.sendEffect(ProfileEffect.NavigateToAchievements) }
-                )
-            ),
-            DescriptionButtonDelegateItem(
-                DescriptionButtonModel(
-                    title = getString(R.string.settings),
-                    description = getString(R.string.settings_description),
-                    icon = ResourcesCompat.getDrawable(
-                        resources,
-                        R.drawable.ic_settings,
-                        context?.theme
-                    ),
-                    click = { store.sendEffect(ProfileEffect.NavigateToSettings) }
-                )
+    private fun getManagementButtons() = listOf<DelegateItem>(
+        DescriptionButtonDelegateItem(
+            DescriptionButtonModel(
+                title = getString(R.string.my_data),
+                description = getString(R.string.data_descriptiond),
+                icon = ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.ic_account,
+                    context?.theme
+                ),
+                click = { store.sendEffect(ProfileEffect.NavigateToMyData) }
+            )
+        ),
+        DescriptionButtonDelegateItem(
+            DescriptionButtonModel(
+                title = getString(R.string.my_friends),
+                description = getString(R.string.friends_description),
+                icon = ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.ic_community,
+                    context?.theme
+                ),
+                click = { store.sendEffect(ProfileEffect.NavigateToFriends) }
+            )
+        ),
+        DescriptionButtonDelegateItem(
+            DescriptionButtonModel(
+                title = getString(R.string.edit),
+                description = getString(R.string.edit_description),
+                icon = ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.ic_edit,
+                    context?.theme
+                ),
+                click = { store.sendEffect(ProfileEffect.NavigateToEdit) }
+            )
+        ),
+        DescriptionButtonDelegateItem(
+            DescriptionButtonModel(
+                title = getString(R.string.achievements),
+                description = getString(R.string.achivments_description),
+                icon = ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.ic_trophey,
+                    context?.theme
+                ),
+                click = { store.sendEffect(ProfileEffect.NavigateToAchievements) }
+            )
+        ),
+        DescriptionButtonDelegateItem(
+            DescriptionButtonModel(
+                title = getString(R.string.settings),
+                description = getString(R.string.settings_description),
+                icon = ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.ic_settings,
+                    context?.theme
+                ),
+                click = { store.sendEffect(ProfileEffect.NavigateToSettings) }
             )
         )
+    )
+
+    private fun addManagementButtons() {
+        val newItems = getManagementButtons()
         val itemsToRemove = mutableListOf<DelegateItem>()
         var startRemoveIndex: Int = -1
         for (delegate in items) {
             if (delegate is PrimaryButtonVariantDelegateItem) {
                 if (startRemoveIndex == -1) startRemoveIndex = items.indexOf(delegate)
-            } else if (items.indexOf(delegate) > startRemoveIndex){
+                itemsToRemove.add(delegate)
+            } else if (items.indexOf(delegate) > startRemoveIndex && startRemoveIndex != -1){
                 itemsToRemove.add(delegate)
             }
         }
