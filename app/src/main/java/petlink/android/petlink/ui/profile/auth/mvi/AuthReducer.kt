@@ -11,7 +11,11 @@ class AuthReducer: MviReducer<AuthPartialState, AuthMviState> {
             is AuthPartialState.Error -> updateError(prevState, partialState.exception)
             AuthPartialState.SignedIn -> updateSignedIn(prevState)
             AuthPartialState.Loading -> updateLoading(prevState)
+            AuthPartialState.Authenticated -> updateAuthenticated(prevState)
         }
+
+    private fun updateAuthenticated(prevState: AuthMviState) =
+        prevState.copy(state = AuthState.Authenticated)
 
     private fun updateLoading(prevState: AuthMviState) =
         prevState.copy(state = AuthState.Loading)

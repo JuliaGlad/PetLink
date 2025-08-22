@@ -6,6 +6,8 @@
         <item name="android:fontFamily">@font/roboto_bold</item>
     </style>
 
+
+
     <style name="BottomNavTextInactive">
         <item name="android:textSize">12sp</item>
         <item name="fontFamily">@font/roboto_regular</item>

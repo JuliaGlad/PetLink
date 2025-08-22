@@ -45,14 +45,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         initBottomBar()
         if (savedInstanceState == null) {
-            val rootFragment = if (viewModel.isAuthenticated()) {
-                binding.bottomNav.selectedItemId = R.id.action_community
-                BottomScreen.community()
-            }
-            else {
-                binding.bottomNav.selectedItemId = R.id.action_profile
-                BottomScreen.auth()
-            }
+            val rootFragment = BottomScreen.auth()
+            binding.bottomNav.selectedItemId = R.id.action_profile
             presenter.setupRootFragment(rootFragment)
         }
     }
