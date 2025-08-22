@@ -36,6 +36,7 @@ class DescriptionButtonDelegate : AdapterDelegate {
                 icon = model.icon
                 descriptionText = model.description
                 titleText = model.title
+                setOnClickListener { model.click() }
             }
         }
     }
