@@ -1,0 +1,8 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.PetLink" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:textColorHint">@color/medium_green</item>
+    </style>
+
+    <style name="Theme.PetLink" parent="Base.Theme.PetLink" />
+</resources>

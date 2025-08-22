@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1026985374395",
+    "project_id": "petlink-688c4",
+    "storage_bucket": "petlink-688c4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1026985374395:android:2dc05dc0bafa958397af9e",
+        "android_client_info": {
+          "package_name": "petlink.android.petlink"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1-jiXwjh6LaQ45CvQ90U_senB3hgy4PM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

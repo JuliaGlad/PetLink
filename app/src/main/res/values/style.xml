@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="BottomNavTextActive">
+        <item name="android:textSize">12sp</item>
+        <item name="fontFamily">@font/roboto_bold</item>
+        <item name="android:fontFamily">@font/roboto_bold</item>
+    </style>
+
+    <style name="BottomNavTextInactive">
+        <item name="android:textSize">12sp</item>
+        <item name="fontFamily">@font/roboto_regular</item>
+        <item name="android:fontFamily">@font/roboto_regular</item>
+    </style>
+
+    <style name="Widget.Material3.BottomNavigationView.ActiveIndicator.PetLink" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/transparent</item>
+    </style>
+
+    <style name="GreenDatePickerDialogTheme" parent="Theme.MaterialComponents.Light.Dialog">
+        <item name="colorPrimary">@color/medium_green</item>
+        <item name="colorOnPrimary">@color/icon_color</item>
+        <item name="colorPrimaryVariant">@color/dark_green_variant</item>
+        <item name="colorAccent">@color/medium_green</item>
+    </style>
+
+    <style name="GreenDialogActionButton"
+        parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/icon_color</item>
+    </style>
+
+    <style name="DateTextAppearance.PetLink" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textColor">@color/black</item>
+        <item name="fontFamily">@font/roboto_bold</item>
+        <item name="android:fontFamily">@font/roboto_bold</item>
+    </style>
+    
+</resources>

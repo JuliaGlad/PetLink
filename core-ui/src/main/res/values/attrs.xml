@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="DescriptionButton">
+        <attr name="description" format="string"/>
+        <attr name="title" format="string"/>
+        <attr name="icon"/>
+    </declare-styleable>
+
+    <declare-styleable name="IconButton">
+        <attr name="android:drawable"/>
+        <attr name="android:text"/>
+        <attr name="mode" format="enum">
+            <enum name="normal" value="1"/>
+            <enum name="red" value="2"/>
+        </attr>
+    </declare-styleable>
+
+
+    <declare-styleable name="FlexboxLayout">
+        <attr name="flexbox_alignment" format="integer">
+            <enum name="left" value="1"/>
+            <enum name="right" value="2"/>
+        </attr>
+    </declare-styleable>
+
+    <declare-styleable name="FlexboxItemView">
+        <attr name="android:text"/>
+        <attr name="android:textSize"/>
+        <attr name="android:textColor"/>
+    </declare-styleable>
+
+    <declare-styleable name="ShapableImageView">
+        <attr name="android:background"/>
+    </declare-styleable>
+
+    <declare-styleable name="ChooserView">
+        <attr name="chooser_1_text" format="string"/>
+        <attr name="chooser_2_text" format="string"/>
+        <attr name="android:textSize"/>
+        <attr name="chooser_1_selected_icon" format="reference"/>
+        <attr name="chooser_1_unselected_icon" format="reference"/>
+        <attr name="chooser_2_selected_icon" format="reference"/>
+        <attr name="chooser_2_unselected_icon" format="reference"/>
+    </declare-styleable>
+
+    <declare-styleable name="ChooserItemView">
+        <attr name="android:text"/>
+        <attr name="android:textSize"/>
+        <attr name="selected_icon" format="reference"/>
+        <attr name="unselected_icon" format="reference"/>
+        <attr name="item_alignment" format="integer">
+            <enum name="left" value="1"/>
+            <enum name="right" value="2"/>
+        </attr>
+    </declare-styleable>
+</resources>

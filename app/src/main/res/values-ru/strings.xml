@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="community">Сообщество</string>
+    <string name="update_password">Обновить пароль</string>
+    <string name="cancel">Отмена</string>
+    <string name="update">Обновить</string>
+    <string name="this_field_cannot_be_empty">Это поле не может быть пустым!</string>
+    <string name="calendar">Календарь</string>
+    <string name="map">Карта</string>
+    <string name="profile">Профиль</string>
+    <string name="useful">Полезный</string>
+    <string name="news">Новости</string>
+    <string name="ask_question">Задать вопрос</string>
+    <string name="pet_photos">Фото питомцев</string>
+    <string name="chats">Чаты</string>
+    <string name="friends">Друзья</string>
+    <string name="news_group">Новостное сообщество</string>
+    <string name="questions_and_advices">Вопросы и ответы</string>
+    <string name="asked_a_question">Задала вопрос</string>
+    <string name="write_a_comment">Написать комментарий</string>
+    <string name="this_post_doesnt_have_any_comments_yet_be_the_first_one_to_comment_it">У этого поста пока что нет комментариев! Оставьте первый комментарий под этой записью</string>
+    <string name="there_is_no_answer_for_this_question_yet">На этот вопрос пока что никто не ответил!</string>
+    <string name="create">Создать</string>
+    <string name="success">Успешно</string>
+    <string name="ok">Ок</string>
+    <string name="my_groups">Мои сообщества</string>
+    <string name="owner">Владелец</string>
+    <string name="not_subscribed_to_any_news_groups_yet">Пока что вы не подписаны на новостные сообщества!</string>
+    <string name="search">Поиск…</string>
+    <string name="nothing_found_for_query">По запросу ничего не найдено:</string>
+    <string name="about_group">О сообществе</string>
+    <string name="subscribe">Подписаться</string>
+    <string name="subscribed_in_group">Подписан(-а)</string>
+    <string name="edit">Редактировать</string>
+    <string name="make_a_post">Создать пост</string>
+    <string name="description">Описание</string>
+    <string name="title">Название</string>
+    <string name="post_creation">Создание поста</string>
+    <string name="post_description">Описание поста</string>
+    <string name="load_picture">Загрузить изображение</string>
+    <string name="owners">Авторы</string>
+    <string name="admin">Админ</string>
+    <string name="subscribers">Подписчики</string>
+    <string name="it_is_your_account">Это ваш аккаунт!</string>
+    <string name="group_picture">Аватарка</string>
+    <string name="cover">Обложка</string>
+    <string name="add_people">Добавить участников</string>
+    <string name="save">Сохранить</string>
+    <string name="add_person">Добавить участника</string>
+    <string name="my_discussion">Мои обсуждения</string>
+    <string name="not_subscribed_to_any_discussions_yet">Пока что вы не подписаны на обсуждения!</string>
+    <string name="about_discussion">Об обсуждении</string>
+    <string name="question">Вопросы</string>
+    <string name="Photos">Фотографии</string>
+    <string name="my_photo_groups">Мои фото-группы</string>
+    <string name="not_subscribed_to_any_photo_groups_yet">Пока что вы не подписаны на фото-группы!</string>
+    <string name="add_photo">Добавить фото</string>
+    <string name="my_chats">Мои чаты</string>
+    <string name="you_dont_have_any_chats_yet">Пока что вы не являетесь участником чата!</string>
+    <string name="reply">Ответить</string>
+    <string name="reaction">Реакция</string>
+    <string name="delete">Удалить</string>
+    <string name="join">Присоединиться</string>
+    <string name="leave_chat">Выйти из чата</string>
+    <string name="other_people">Другие пользователи</string>
+    <string name="you_dont_have_friends_yet">У вас пока что нет друзей!</string>
+    <string name="add_friend">Добавить в друзья</string>
+    <string name="frinds">В друзьях</string>
+    <string name="care_calendar">Календарь ухода</string>
+    <string name="monday">Понедельник</string>
+    <string name="tuesday">Вторник</string>
+    <string name="wednesday">Среда</string>
+    <string name="thursday">Четверг</string>
+    <string name="friday">Пятница</string>
+    <string name="saturday">Суббота</string>
+    <string name="sunday">Воскресенье</string>
+    <string name="history">История</string>
+    <string name="history_description">Здесь вы можете посмотреть свои прошлые события</string>
+    <string name="calendar_description">Откройте календарь, чтобы добавить и посмотреть свои события</string>
+    <string name="birthday">День рождения</string>
+    <string name="events_history">История событий</string>
+    <string name="you_dont_have_any_events_yet">У вас пока что нет событий</string>
+    <string name="date">Дата</string>
+    <string name="change_date">Сменить дату</string>
+    <string name="event_theme">Тема события</string>
+    <string name="notifications">Уведомления</string>
+    <string name="choose_owner_birthday">Выбери свою дату рождения</string>
+    <string name="choose_pet_birthday">Выберу дату рождения своего питомца</string>
+    <string name="turned_on">включены</string>
+    <string name="turned_off">выключены</string>
+    <string name="change_sound">Изменить звук</string>
+    <string name="notification_souns">Звук уведомления</string>
+    <string name="even_details">Детали события</string>
+    <string name="all">Все</string>
+    <string name="my_marks">Мои метки</string>
+    <string name="google_marks">Google-метки</string>
+    <string name="email">Почта</string>
+    <string name="password">Пароль</string>
+    <string name="sign_in">Войти</string>
+    <string name="dont_have_an_account">Пока что нет аккаунта? Создайте!</string>
+    <string name="enter_mail">Ввести почту</string>
+    <string name="enter_password">Ввести пароль</string>
+    <string name="forgot_password">Забыли пароль</string>
+    <string name="sign_up">Регистрация</string>
+    <string name="next">Далее</string>
+    <string name="pet_name">Имя питомца</string>
+    <string name="enter_name">Введите имя</string>
+    <string name="enter_date_of_birth">Введите дату рождения</string>
+    <string name="gender">Пол</string>
+    <string name="pet_type">Тип животного</string>
+    <string name="cat">Кошки</string>
+    <string name="dog">Собаки</string>
+    <string name="fish">Рыбы</string>
+    <string name="bird">Птицы</string>
+    <string name="rodent">Грызуны</string>
+    <string name="lizard">Ящерицы</string>
+    <string name="snake">Змеи</string>
+    <string name="turtles">Черепахи</string>
+    <string name="amphibian">Амфибии</string>
+    <string name="aquatic_inhabitant">Водные обитатели</string>
+    <string name="exotic">Экзотические</string>
+    <string name="other">Другое</string>
+    <string name="female">Женский</string>
+    <string name="male">Мужской</string>
+    <string name="name">Имя</string>
+    <string name="surname">Фамилия</string>
+    <string name="enter_surname">Введите фамилию</string>
+    <string name="city">Город проживания</string>
+    <string name="choose_city">Выберите город</string>
+    <string name="posts">Посты</string>
+    <string name="my_data">Мои данные</string>
+    <string name="my_friends">Мои друзья</string>
+    <string name="achievements">Достижения</string>
+    <string name="send">Отправить</string>
+    <string name="we_will_send_a_verification_link">Мы отправим ссылку для восстановления пароля на вашу почту</string>
+    <string name="settings">Настройки</string>
+    <string name="data_descriptiond">Просматривайте информацию о себе и вашем питомце, которую видят другие пользователи</string>
+    <string name="friends_description">Список пользователей, которых вы добавили в друзья</string>
+    <string name="edit_description">Изменяйте и дополняйте данные о себе и вашем питомцев</string>
+    <string name="achivments_description">Просматривайте свои достижения, основанные на вашей активности в приложении</string>
+    <string name="settings_description">Управление аккаунтом, параметры входа, выход из приложения</string>
+    <string name="management">Управление</string>
+    <string name="pet_data">Даннные питомца</string>
+    <string name="pet_birthday">День рождения питомца</string>
+    <string name="looks_like_something_went_wrong">Похоже что-то пошло не так! Пожалуйста, попробуйте еще раз позже</string>
+    <string name="owner_data">Данные владельца</string>
+    <string name="about_pet">О питомце</string>
+    <string name="write_about_your_pet">Опишите вашего питомца</string>
+    <string name="favorite_games">Любимые игры</string>
+    <string name="enter_favorite_games">Введите любимые игры</string>
+    <string name="favorite_places">Любимые места</string>
+    <string name="enter_favorite_places">Введите любимые места</string>
+    <string name="enter_favorite_food">Введите любимую еду</string>
+    <string name="favorite_food">Любимая еда</string>
+    <string name="enter_new_password">Enter new password</string>
+    <string name="change_email">Сменить почту</string>
+    <string name="change_password">Сменить пароль</string>
+    <string name="log_out">Выйти из аккаунта</string>
+    <string name="delete_account">Удалить аккаунта</string>
+    <string-array name="pet_types">
+        <item>Кошка</item>
+        <item>Собака</item>
+        <item>Рыба</item>
+        <item>Птица</item>
+        <item>Грызун</item>
+        <item>Ящерица</item>
+        <item>Змея</item>
+        <item>Черепаха</item>
+        <item>Амфибия</item>
+        <item>Водный обитатель</item>
+        <item>Экзотические</item>
+        <item>Другие</item>
+    </string-array>
+</resources>

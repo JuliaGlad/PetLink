@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error">Ошибка!</string>
+    <string name="looks_like_something_went_wrong">Похоже что-то пошло не так! Пожалуйста, повторите попытку позже</string>
+    <string name="try_again">Повторить</string>
+    <string name="profile">Профиль</string>
+</resources>

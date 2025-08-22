@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <application
+        android:name=".App"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.PetLink"
+        tools:targetApi="31">
+        <activity
+            android:name=".ui.profile.my_data.MyDataActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.profile.settings.SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.profile.friends.FriendActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.profile.edit.EditActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.profile.achievement.AchievementActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.profile.create_account.activity.CreateAccountActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.main.activity.MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

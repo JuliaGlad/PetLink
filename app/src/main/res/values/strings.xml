@@ -1,0 +1,174 @@
+<resources>
+    <string name="app_name" translatable="false">PetLink</string>
+    <string name="update_password">Update password</string>
+    <string name="send">Send</string>
+    <string name="success">Success</string>
+    <string name="ok">Ok</string>
+    <string name="looks_like_something_went_wrong">Looks like something went wrong! Please, try again later</string>
+    <string name="we_will_send_a_verification_link">We`ll send a link to your email to reset your password</string>
+    <string name="cancel">Cancel</string>
+    <string name="update">Update</string>
+    <string name="this_field_cannot_be_empty">This field cannot be empty!</string>
+    <string name="community">Community</string>
+    <string name="calendar">Calendar</string>
+    <string name="map">Map</string>
+    <string name="profile">Profile</string>
+    <string name="useful">Useful</string>
+    <string name="news">News</string>
+    <string name="ask_question">Ask question</string>
+    <string name="pet_photos">Pet photos</string>
+    <string name="chats">Chats</string>
+    <string name="friends">Friends</string>
+    <string name="news_group">News groups</string>
+    <string name="questions_and_advices">Questions and advices</string>
+    <string name="asked_a_question">Ask a question</string>
+    <string name="write_a_comment">Write comment</string>
+    <string name="this_post_doesnt_have_any_comments_yet_be_the_first_one_to_comment_it">This post doesn`t have any comments, yet! Be the first one to comment it!</string>
+    <string name="there_is_no_answer_for_this_question_yet">No one has answered to this question, yet!</string>
+    <string name="create">Create</string>
+    <string name="my_groups">My groups</string>
+    <string name="owner">Owner</string>
+    <string name="not_subscribed_to_any_news_groups_yet">You are not subscribed to any groups yet!</string>
+    <string name="search">Search…</string>
+    <string name="nothing_found_for_query">Nothing found for query:</string>
+    <string name="about_group">About group</string>
+    <string name="subscribe">Subscribe</string>
+    <string name="subscribed_in_group">Subscribed</string>
+    <string name="edit">Edit</string>
+    <string name="make_a_post">Create post</string>
+    <string name="description">Description</string>
+    <string name="title">Title</string>
+    <string name="post_creation">Post creation</string>
+    <string name="post_description">Post description</string>
+    <string name="load_picture">Load picture</string>
+    <string name="owners">Owners</string>
+    <string name="admin">Admin</string>
+    <string name="subscribers">Subscribers</string>
+    <string name="it_is_your_account">It`s your account!</string>
+    <string name="group_picture">Group picture</string>
+    <string name="cover">Cover</string>
+    <string name="add_people">Add people</string>
+    <string name="save">Save</string>
+    <string name="add_person">Add person</string>
+    <string name="my_discussion">My discussions</string>
+    <string name="not_subscribed_to_any_discussions_yet">You are not subscribed to any discussions, yet!</string>
+    <string name="about_discussion">About discussion</string>
+    <string name="question">Questions</string>
+    <string name="Photos">Photos</string>
+    <string name="my_photo_groups">My photo-groups</string>
+    <string name="not_subscribed_to_any_photo_groups_yet">You are not subscribed to any photo groups, yet!</string>
+    <string name="add_photo">Add photo</string>
+    <string name="my_chats">My chats</string>
+    <string name="you_dont_have_any_chats_yet">You don`t have any chats, yet!</string>
+    <string name="reply">Reply</string>
+    <string name="reaction">Reaction</string>
+    <string name="delete">Delete</string>
+    <string name="join">Join</string>
+    <string name="leave_chat">Leave chat</string>
+    <string name="other_people">Other people</string>
+    <string name="you_dont_have_friends_yet">You don`t have any friends, yet!</string>
+    <string name="add_friend">Add friend</string>
+    <string name="frinds">Friends</string>
+    <string name="care_calendar">Care calendar</string>
+    <string name="monday">Monday</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="wednesday">Wednesday</string>
+    <string name="thursday">Thursday</string>
+    <string name="friday">Friday</string>
+    <string name="saturday">Saturday</string>
+    <string name="sunday">Sunday</string>
+    <string name="history">History</string>
+    <string name="history_description">Here you can view all your previous events</string>
+    <string name="calendar_description">Open calendar to view and add your events</string>
+    <string name="birthday">Birthday</string>
+    <string name="events_history">Events history</string>
+    <string name="you_dont_have_any_events_yet">You don`t have any events, yet!</string>
+    <string name="date">Date</string>
+    <string name="change_date">Change date</string>
+    <string name="event_theme">Event theme</string>
+    <string name="notifications">Notifications</string>
+    <string name="turned_on">turned on</string>
+    <string name="turned_off">turned off</string>
+    <string name="change_sound">change sound</string>
+    <string name="notification_souns">Notification sound</string>
+    <string name="even_details">Event details</string>
+    <string name="all">All</string>
+    <string name="my_marks">My marks</string>
+    <string name="google_marks">Google-marks</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="sign_in">Sign in</string>
+    <string name="dont_have_an_account">Don`t have an account? Create!</string>
+    <string name="enter_mail">Enter email</string>
+    <string name="enter_password">Enter password</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="sign_up">Sign up</string>
+    <string name="next">Next</string>
+    <string name="pet_name">Pet`s name</string>
+    <string name="enter_name">enter name</string>
+    <string name="pet_birthday">Pet birthday</string>
+    <string name="enter_date_of_birth">Enter date of birth</string>
+    <string name="gender">Gender</string>
+    <string name="pet_type">Pet type</string>
+    <string name="cat">Cat</string>
+    <string name="dog">Dog</string>
+    <string name="fish">Fish</string>
+    <string name="bird">Bird</string>
+    <string name="rodent">Rodent</string>
+    <string name="lizard">Lizard</string>
+    <string name="snake">Snake</string>
+    <string name="turtles">Turtle</string>
+    <string name="amphibian">Amphibian</string>
+    <string name="aquatic_inhabitant">Aquatic inhabitant</string>
+    <string name="exotic">Exotic</string>
+    <string name="other">Other</string>
+    <string name="female">Female</string>
+    <string name="male">Male</string>
+    <string name="name">Name</string>
+    <string name="surname">Surname</string>
+    <string name="enter_surname">Enter surname</string>
+    <string name="city">City</string>
+    <string name="choose_city">Choose city</string>
+    <string name="posts">Posts</string>
+    <string name="my_data">My data</string>
+    <string name="my_friends">My friends</string>
+    <string name="achievements">Achievements</string>
+    <string name="settings">Settings</string>
+    <string name="data_descriptiond">View info about you and your pet which other people can see</string>
+    <string name="friends_description">View people who you have added to "Friends"</string>
+    <string name="edit_description">Update and add information about you and your pet</string>
+    <string name="achivments_description">View your achievements based on your activity in the app.</string>
+    <string name="settings_description">Account management, login options, and exiting the app</string>
+    <string name="management">Management</string>
+    <string name="pet_data">Pet`s data</string>
+    <string name="choose_owner_birthday">Choose your birthday</string>
+    <string name="choose_pet_birthday">Choose your pet`s birthday</string>
+    <string name="owner_data">Owner`s data</string>
+    <string name="about_pet">About pet</string>
+    <string name="write_about_your_pet">Write info about your pet</string>
+    <string name="favorite_games">Favorite games</string>
+    <string name="enter_favorite_games">Enter your favorite games</string>
+    <string name="favorite_places">Favorite places</string>
+    <string name="enter_favorite_places">Enter favorite places</string>
+    <string name="enter_favorite_food">Enter favorite food</string>
+    <string name="enter_new_password">Enter new password</string>
+    <string name="favorite_food">Favorite food</string>
+    <string name="change_email">Change email</string>
+    <string name="change_password">Change password</string>
+    <string name="log_out">Log out</string>
+    <string name="delete_account">Delete account</string>
+    <string-array name="pet_types">
+        <item>Cat</item>
+        <item>Dog</item>
+        <item>Fish</item>
+        <item>Bird</item>
+        <item>Rodent</item>
+        <item>Lizard</item>
+        <item>Snake</item>
+        <item>Turtle</item>
+        <item>Amphibian</item>
+        <item>Aquatic inhabitant</item>
+        <item>Exotic</item>
+        <item>Other</item>
+    </string-array>
+</resources>

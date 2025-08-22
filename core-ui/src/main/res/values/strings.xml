@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error">Error!</string>
+    <string name="looks_like_something_went_wrong">Looks like something went wrong, please, try again later!</string>
+    <string name="try_again">Try again</string>
+    <string name="profile">Profile</string>
+</resources>
