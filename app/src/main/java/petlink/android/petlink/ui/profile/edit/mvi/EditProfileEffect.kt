@@ -1,0 +1,15 @@
+package petlink.android.petlink.ui.profile.edit.mvi
+
+import androidx.activity.result.ActivityResult
+import petlink.android.core_mvi.MviEffect
+
+sealed interface EditProfileEffect: MviEffect {
+
+    data object FinishActivity: EditProfileEffect
+
+    data object FinishActivityWithResultOK: EditProfileEffect
+
+    class LaunchImagePicker(val avatarId: Int): EditProfileEffect
+
+    class ShowDataPickerDialog(val itemId: Int): EditProfileEffect
+}

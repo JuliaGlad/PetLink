@@ -10,20 +10,20 @@ import petlink.android.petlink.data.local_database.entity.UserEntity
 @Dao
 interface UserDao {
     @Query("SELECT * FROM users")
-    fun getUsers(): List<UserEntity>
+    suspend fun getUsers(): List<UserEntity>
 
     @Insert
-    fun insertUser(user: UserEntity)
+    suspend fun insertUser(user: UserEntity)
 
     @Update
-    fun updateOwnerData(user: UserEntity)
+    suspend fun updateOwnerData(user: UserEntity)
 
     @Update
-    fun updatePetData(user: UserEntity)
+    suspend fun updatePetData(user: UserEntity)
 
     @Query("DELETE FROM users")
-    fun deleteAll()
+    suspend fun deleteAll()
 
     @Delete
-    fun deleteUser(user: UserEntity)
+    suspend fun deleteUser(user: UserEntity)
 }

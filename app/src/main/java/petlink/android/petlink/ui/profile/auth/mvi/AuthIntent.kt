@@ -6,6 +6,8 @@ sealed interface AuthIntent: MviIntent {
 
     class SignIn(val email: String, val password: String): AuthIntent
 
+    data object CheckAuth: AuthIntent
+
     data object Loading: AuthIntent
 
 }

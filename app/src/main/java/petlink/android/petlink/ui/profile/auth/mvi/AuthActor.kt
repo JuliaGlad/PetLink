@@ -5,6 +5,7 @@ import com.google.firebase.auth.FirebaseAuthException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import petlink.android.core_mvi.MviActor
+import petlink.android.petlink.domain.usecase.user_auth.CheckIsAuthenticatedUseCase
 import petlink.android.petlink.domain.usecase.user_auth.SignInUseCase
 import petlink.android.petlink.domain.usecase.user_auth.UpdatePasswordUseCase
 import petlink.android.petlink.ui.main.runCatchingNonCancellation
@@ -12,6 +13,7 @@ import java.io.IOException
 
 class AuthActor(
     private val signInUseCase: SignInUseCase,
+    private val checkAuthUseCase: CheckIsAuthenticatedUseCase,
     private val updatePasswordUseCase: UpdatePasswordUseCase
 ) : MviActor<
         AuthPartialState,
@@ -29,7 +31,21 @@ class AuthActor(
             )
 
             AuthIntent.Loading -> updateLoading()
+            AuthIntent.CheckAuth -> checkAuth()
         }
+
+    private fun checkAuth() = flow<AuthPartialState> {
+        runCatching {
+            checkAuthUseCase.invoke()
+        }.fold(
+            onSuccess ={ value ->
+                if (value){
+                    emit(AuthPartialState.Authenticated)
+                }
+            },
+            onFailure = { throwable -> emit(checkAuthError(throwable)) }
+        )
+    }
 
     private fun updateLoading() = flow<AuthPartialState> { emit(AuthPartialState.Loading) }
 

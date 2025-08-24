@@ -60,6 +60,7 @@ import petlink.android.petlink.ui.profile.create_account.activity.CreateAccountA
 import petlink.android.petlink.ui.profile.create_account.di.flow.DaggerCreateAccountComponent
 import petlink.android.petlink.ui.profile.create_account.fragment.mvi.CreateAccountEffect
 import petlink.android.petlink.ui.profile.create_account.fragment.mvi.CreateAccountIntent
+import petlink.android.petlink.ui.profile.create_account.fragment.mvi.CreateAccountIntent.*
 import petlink.android.petlink.ui.profile.create_account.fragment.mvi.CreateAccountLocalDI
 import petlink.android.petlink.ui.profile.create_account.fragment.mvi.CreateAccountMviState
 import petlink.android.petlink.ui.profile.create_account.fragment.mvi.CreateAccountPartialState
@@ -168,9 +169,9 @@ class CreateAccountFragment : MviBaseFragment<
 
                         CreateAccountScreenArg.OwnerDataArg -> {
                             with((activity as CreateAccountActivity).viewModel) {
-                                store.sendIntent(CreateAccountIntent.Loading)
+                                store.sendIntent(Loading)
                                 store.sendIntent(
-                                    CreateAccountIntent.CreateUser(
+                                    CreateUser(
                                         mainData,
                                         ownerData,
                                         petData
@@ -183,6 +184,18 @@ class CreateAccountFragment : MviBaseFragment<
                             (activity as CreateAccountActivity).presenter.navigateTo(
                                 CreateAccountScreen.createAccount(CreateAccountScreenArg.OwnerDataArg)
                             )
+                    }
+                }
+            }
+
+            CreateAccountEffect.LaunchImagePicker -> initImagePicker()
+            CreateAccountEffect.ShowDataDialog -> {
+                showDialog { date ->
+                    updateDateTextInputLayout(date, mainAdapter)
+                    if (screenArg == CreateAccountScreenArg.PetDataArg) {
+                        (activity as CreateAccountActivity).viewModel.petData.birthday = date
+                    } else if (screenArg == CreateAccountScreenArg.OwnerDataArg) {
+                        (activity as CreateAccountActivity).viewModel.ownerData.birthday = date
                     }
                 }
             }
@@ -236,7 +249,7 @@ class CreateAccountFragment : MviBaseFragment<
                         R.drawable.add_image_icon,
                         context?.theme
                     ),
-                    clickListener = { initImagePicker() }
+                    clickListener = { store.sendEffect(CreateAccountEffect.LaunchImagePicker) }
                 )),
             TitleTextDelegateItem(TitleTextModel(title = getString(R.string.name))),
             TextInputLayoutDelegateItem(
@@ -271,12 +284,7 @@ class CreateAccountFragment : MviBaseFragment<
                 TextGradientModel(
                     text = getString(R.string.change_date),
                     textAlignment = View.TEXT_ALIGNMENT_VIEW_START,
-                    clickListener = {
-                        showDialog { date ->
-                            updateDateTextInputLayout(date, mainAdapter)
-                            (activity as CreateAccountActivity).viewModel.ownerData.birthday = date
-                        }
-                    }
+                    clickListener = { store.sendEffect(CreateAccountEffect.ShowDataDialog) }
                 )),
             TitleTextDelegateItem(TitleTextModel(title = getString(R.string.birthday))),
             ChooserViewDelegateItem(
@@ -391,7 +399,7 @@ class CreateAccountFragment : MviBaseFragment<
                         R.drawable.add_image_icon,
                         context?.theme
                     ),
-                    clickListener = { initImagePicker() }
+                    clickListener = { store.sendEffect(CreateAccountEffect.LaunchImagePicker) }
                 )
             ),
             TitleTextDelegateItem(TitleTextModel(title = getString(R.string.pet_name))),
@@ -416,12 +424,7 @@ class CreateAccountFragment : MviBaseFragment<
                 TextGradientModel(
                     text = getString(R.string.change_date),
                     textAlignment = View.TEXT_ALIGNMENT_VIEW_START,
-                    clickListener = {
-                        showDialog { date ->
-                            updateDateTextInputLayout(date, mainAdapter)
-                            (activity as CreateAccountActivity).viewModel.petData.birthday = date
-                        }
-                    }
+                    clickListener = { store.sendEffect(CreateAccountEffect.ShowDataDialog) }
                 )),
             TitleTextDelegateItem(TitleTextModel(title = getString(R.string.pet_type))),
             FlexboxDelegateItem(
