@@ -5,4 +5,6 @@ import petlink.android.core_mvi.MviEffect
 sealed interface CreateAccountEffect: MviEffect {
     data object NavigateToNextScreen: CreateAccountEffect
     data object NavigateBack: CreateAccountEffect
+    data object ShowDataDialog: CreateAccountEffect
+    data object LaunchImagePicker: CreateAccountEffect
 }

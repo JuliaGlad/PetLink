@@ -32,12 +32,28 @@ class TabDelegate : AdapterDelegate {
         RecyclerView.ViewHolder(binding.root) {
         fun bind(model: TabModel){
             model.tabs.forEach {
-                val tab = TabLayout.Tab().apply {
+                val tab = binding.tabs.newTab().apply {
                     text = it.title
                     id = it.id
                 }
                 binding.tabs.addTab(tab)
-                binding.tabs.addOnTabSelectedListener(model.tabSelectedListener)
+            }
+            binding.tabs.addOnTabSelectedListener(model.tabSelectedListener)
+            with(binding.tabs) {
+                val marginInPx = (8 * resources.displayMetrics.density).toInt()
+
+                val tabStrip = getChildAt(0) as ViewGroup
+
+                for (i in 0 until tabStrip.childCount) {
+                    val tab = tabStrip.getChildAt(i)
+                    val params = tab.layoutParams as ViewGroup.MarginLayoutParams
+
+                    params.marginStart = marginInPx
+                    params.marginEnd = marginInPx
+
+                    tab.layoutParams = params
+                    tab.requestLayout()
+                }
             }
         }
     }

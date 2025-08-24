@@ -8,7 +8,7 @@ import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KMutableProperty0
 
 class UserProvider {
-    fun getUser(userId: String): UserEntity? {
+    suspend fun getUser(userId: String): UserEntity? {
         var entity: UserEntity? = null
         val users = app.database.userDao().getUsers()
         for (item in users){
@@ -20,7 +20,7 @@ class UserProvider {
         return entity
     }
 
-    fun updateOwnerData(
+    suspend fun updateOwnerData(
         userId: String,
         imageUri: String?,
         name: String?,
@@ -46,7 +46,7 @@ class UserProvider {
         }
     }
 
-    fun updatePetData(
+    suspend fun updatePetData(
         userId: String,
         imageUri: String?,
         name: String?,
@@ -78,7 +78,7 @@ class UserProvider {
         }
     }
 
-    fun insertUser(
+    suspend fun insertUser(
         userId: String,
         pet: PetLocalDb,
         owner: OwnerLocalDb
@@ -92,7 +92,7 @@ class UserProvider {
         )
     }
 
-    fun deleteUser(userId: String) {
+    suspend fun deleteUser(userId: String) {
         val dao = app.database.userDao()
         val tracks = dao.getUsers()
         for (item in tracks){
@@ -103,7 +103,7 @@ class UserProvider {
         }
     }
 
-    fun deleteAll() {
+    suspend fun deleteAll() {
         app.database.userDao().deleteAll()
     }
 

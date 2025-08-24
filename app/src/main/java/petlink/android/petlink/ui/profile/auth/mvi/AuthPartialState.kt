@@ -8,6 +8,8 @@ sealed interface AuthPartialState: MviPartialState {
 
     data object Loading: AuthPartialState
 
+    data object Authenticated: AuthPartialState
+
     class Error(val exception: AuthError): AuthPartialState
 
 }
