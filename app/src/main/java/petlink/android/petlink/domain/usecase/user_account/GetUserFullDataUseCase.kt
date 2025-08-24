@@ -5,7 +5,7 @@ import petlink.android.petlink.domain.mapper.user.user_account.toDomain
 import petlink.android.petlink.domain.model.user.user_account.UserDomain
 import javax.inject.Inject
 
-class GetUserDomainUseCase @Inject constructor(
+class GetUserFullDataUseCase @Inject constructor(
     private val repository: UserAccountRepository
 ) {
     suspend fun invoke(): UserDomain = repository.getUserData()!!.toDomain()
