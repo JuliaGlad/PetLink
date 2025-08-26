@@ -14,8 +14,6 @@ sealed interface ProfileEffect: MviEffect {
 
     data object NavigateToSettings: ProfileEffect
 
-    data object LaunchImagePicker: ProfileEffect
-
     data object ShowPosts: ProfileEffect
 
 }
