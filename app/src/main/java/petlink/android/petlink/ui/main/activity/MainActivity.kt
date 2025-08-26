@@ -114,9 +114,9 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    fun openEditActivity() {
+    fun openEditActivity(launcher: ActivityResultLauncher<Intent>) {
         val intent = Intent(this, EditActivity::class.java)
-        startActivity(intent)
+        launcher.launch(intent)
     }
 
     override fun onDestroy() {

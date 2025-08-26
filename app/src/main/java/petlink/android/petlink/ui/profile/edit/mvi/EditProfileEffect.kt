@@ -9,7 +9,7 @@ sealed interface EditProfileEffect: MviEffect {
 
     data object FinishActivityWithResultOK: EditProfileEffect
 
-    class LaunchImagePicker(val avatarId: Int): EditProfileEffect
+    data object LaunchImagePicker: EditProfileEffect
 
     class ShowDataPickerDialog(val itemId: Int): EditProfileEffect
 }

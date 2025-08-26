@@ -4,10 +4,10 @@ import kotlin.random.Random
 
 data class ProfileAvatarsModel(
     val id: Int = Random.nextInt(),
-    val petName: String,
-    val ownerName: String,
-    val petImage: String? = null,
-    val ownerImage: String? = null,
+    var petName: String,
+    var ownerName: String,
+    var petImage: String? = null,
+    var ownerImage: String? = null,
     var backgroundImage: String? = null,
     val addImageClickListener: () -> Unit
 )
