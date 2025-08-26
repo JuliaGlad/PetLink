@@ -2,6 +2,7 @@ package petlink.android.petlink.ui.profile.edit
 
 import android.app.Activity
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,7 +10,9 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.viewModels
 import com.github.dhaval2404.imagepicker.ImagePicker
@@ -17,14 +20,13 @@ import org.json.JSONArray
 import petlink.android.core_mvi.MviBaseFragment
 import petlink.android.core_mvi.MviStore
 import petlink.android.core_ui.custom_view.LayoutAlignment
+import petlink.android.core_ui.delegates.items.autocomple_text_view.AutoCompleteTextDelegate
 import petlink.android.core_ui.delegates.items.autocomple_text_view.AutoCompleteTextDelegateItem
 import petlink.android.core_ui.delegates.items.autocomple_text_view.AutoCompleteTextModel
 import petlink.android.core_ui.delegates.items.avatar.AvatarDelegate
 import petlink.android.core_ui.delegates.items.avatar.AvatarDelegateItem
 import petlink.android.core_ui.delegates.items.avatar.AvatarModel
 import petlink.android.core_ui.delegates.items.button_primary.PrimaryButtonDelegate
-import petlink.android.core_ui.delegates.items.button_primary.PrimaryButtonDelegateItem
-import petlink.android.core_ui.delegates.items.button_primary.PrimaryButtonModel
 import petlink.android.core_ui.delegates.items.chooser.ChooserViewDelegate
 import petlink.android.core_ui.delegates.items.chooser.ChooserViewDelegateItem
 import petlink.android.core_ui.delegates.items.chooser.ChooserViewModel
@@ -76,7 +78,7 @@ class EditFragment : MviBaseFragment<
     private var _binding: FragmentEditBinding? = null
     private val binding: FragmentEditBinding get() = _binding!!
 
-    private lateinit var photoPickerActivityResultLauncher: ActivityResultLauncher<Int>
+    private lateinit var photoPickerActivityResultLauncher: ActivityResultLauncher<Intent>
     private val mainAdapter: MainAdapter = MainAdapter()
 
     @Inject
@@ -95,30 +97,38 @@ class EditFragment : MviBaseFragment<
         photoPickerActivityResultLauncher = initPhotoPickerActivityResultLauncher()
     }
 
-    private fun initPhotoPickerActivityResultLauncher() = registerForActivityResult(
-        ImagePickerActivityResultContractWithId()
-    ) { result ->
-        if (result.uri != null && result.avatarId != -1) {
-            for (i in recyclerItems) {
-                if (i is AvatarDelegateItem) {
-                    val content = i.content() as AvatarModel
-                    if (content.id == result.avatarId) {
-                        content.uri = result.uri.toString()
+    private fun initPhotoPickerActivityResultLauncher() =
+        registerForActivityResult<Intent, ActivityResult>(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val uri = result.data?.data.toString()
+                for (i in recyclerItems) {
+                    if (i is AvatarDelegateItem) {
+                        val content = i.content() as AvatarModel
+                        if (content.isUpdating == true) {
+                            with(content) {
+                                this.uri = uri
+                                isUpdating = false
+                                if (id == PET_AVATAR_ID) updatedUser.petEditModel.petImageUri = uri
+                                else if (id == OWNER_AVATAR_ID) updatedUser.ownerEditModel.ownerImageUri =
+                                    uri
+                            }
+                        }
+                        mainAdapter.notifyItemChanged(recyclerItems.indexOf(i))
+                        break
                     }
                 }
             }
         }
-    }
 
-    private fun initImagePicker(avatarId: Int) {
+    private fun initImagePicker() {
         ImagePicker.with(this)
             .crop()
             .compress(512)
             .maxResultSize(512, 512)
             .createIntent { intent ->
-                {
-                    photoPickerActivityResultLauncher.launch(avatarId)
-                }
+                photoPickerActivityResultLauncher.launch(intent)
             }
     }
 
@@ -129,6 +139,11 @@ class EditFragment : MviBaseFragment<
     ): View? {
         _binding = FragmentEditBinding.inflate(layoutInflater)
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        store.sendIntent(EditProfileIntent.LoadUserData)
     }
 
     override fun render(state: EditMviState) {
@@ -144,6 +159,7 @@ class EditFragment : MviBaseFragment<
                             ownerEditModel = ownerEditModel
                         )
                     }
+                    initSaveButton()
                 }
             }
 
@@ -201,6 +217,26 @@ class EditFragment : MviBaseFragment<
         }
     }
 
+    private fun initSaveButton() {
+        binding.saveButton.setOnClickListener {
+            with(updatedUser.petEditModel) {
+                store.sendIntent(
+                    EditProfileIntent.UpdatePetData(
+                        petBirthday = petBirthday,
+                        petFood = petFood,
+                        petType = petType,
+                        petName = petName,
+                        petGames = petGames,
+                        petPlaces = petPlaces,
+                        petGender = petGender,
+                        petDescription = petDescription,
+                        petImageUri = petImageUri
+                    )
+                )
+            }
+        }
+    }
+
     private fun initRecycler(petEditModel: PetEditModel, ownerEditModel: OwnerEditModel) {
         val mainAdapter = initAdapter()
         val petDataItems: List<DelegateItem> = getPetRecyclerItems(petEditModel)
@@ -219,30 +255,6 @@ class EditFragment : MviBaseFragment<
         )
         recyclerItems.addAll(petDataItems)
         recyclerItems.addAll(ownerDataItems)
-        recyclerItems.add(
-            PrimaryButtonDelegateItem(
-                PrimaryButtonModel(
-                    title = getString(R.string.save),
-                    click = {
-                        with(updatedUser.petEditModel) {
-                            store.sendIntent(
-                                EditProfileIntent.UpdatePetData(
-                                    petBirthday = petBirthday,
-                                    petFood = petFood,
-                                    petType = petType,
-                                    petName = petName,
-                                    petGames = petGames,
-                                    petPlaces = petPlaces,
-                                    petGender = petGender,
-                                    petDescription = petDescription,
-                                    petImageUri = petImageUri
-                                )
-                            )
-                        }
-                    }
-                )
-            )
-        )
         binding.recyclerView.adapter = mainAdapter
         mainAdapter.submitList(recyclerItems)
     }
@@ -261,11 +273,15 @@ class EditFragment : MviBaseFragment<
                     context?.theme
                 ),
                 clickListener = {
-                    store.sendEffect(
-                        EditProfileEffect.LaunchImagePicker(
-                            OWNER_AVATAR_ID
-                        )
-                    )
+                    for (i in recyclerItems) {
+                        if (i is AvatarDelegateItem) {
+                            val content = (i.content() as AvatarModel)
+                            if (content.id == OWNER_AVATAR_ID) {
+                                content.isUpdating = true
+                            }
+                        }
+                    }
+                    store.sendEffect(EditProfileEffect.LaunchImagePicker)
                 }
             )),
         TitleTextDelegateItem(TitleTextModel(title = getString(R.string.name))),
@@ -274,7 +290,7 @@ class EditFragment : MviBaseFragment<
                 hint = getString(R.string.enter_name),
                 defaultValue = ownerData.ownerName.toString(),
                 textChangedListener = { char, p0, p1, p2 ->
-                    ownerData.ownerName = char.toString()
+                    updatedUser.ownerEditModel.ownerName = char.toString()
                 }
             )),
         TitleTextDelegateItem(TitleTextModel(title = getString(R.string.surname))),
@@ -283,14 +299,14 @@ class EditFragment : MviBaseFragment<
                 hint = getString(R.string.enter_surname),
                 defaultValue = ownerData.ownerSurname.toString(),
                 textChangedListener = { char, p0, p1, p2 ->
-                    ownerData.ownerSurname = char.toString()
+                    updatedUser.ownerEditModel.ownerSurname = char.toString()
                 }
             )),
         TitleTextDelegateItem(TitleTextModel(title = getString(R.string.birthday))),
         TextInputLayoutDelegateItem(
             TextInputLayoutModel(
                 id = OWNER_DATE_TEXT_INPUT,
-                defaultValue = ownerData.ownerBirthday.toString(),
+                defaultValue = updatedUser.ownerEditModel.ownerBirthday.toString(),
                 hint = getString(R.string.enter_date_of_birth),
                 editable = false
             )
@@ -334,7 +350,7 @@ class EditFragment : MviBaseFragment<
                     context?.theme
                 ),
                 clickListener = { value ->
-                    ownerData.ownerGender = value
+                    updatedUser.ownerEditModel.ownerGender = value
                 }
             )
         ),
@@ -345,7 +361,7 @@ class EditFragment : MviBaseFragment<
                 values = getCities(),
                 defaultValue = ownerData.ownerCity.toString(),
                 textChangedListener = { char, p0, p1, p2 ->
-                    ownerData.ownerCity = char.toString()
+                    updatedUser.ownerEditModel.ownerCity = char.toString()
                 }
             ))
     )
@@ -363,7 +379,17 @@ class EditFragment : MviBaseFragment<
                     R.drawable.add_image_icon,
                     context?.theme
                 ),
-                clickListener = { store.sendEffect(EditProfileEffect.LaunchImagePicker(PET_AVATAR_ID)) }
+                clickListener = {
+                    for (i in recyclerItems) {
+                        if (i is AvatarDelegateItem) {
+                            val content = (i.content() as AvatarModel)
+                            if (content.id == PET_AVATAR_ID) {
+                                content.isUpdating = true
+                            }
+                        }
+                    }
+                    store.sendEffect(EditProfileEffect.LaunchImagePicker)
+                }
             )
         ),
         TitleTextDelegateItem(TitleTextModel(title = getString(R.string.pet_name))),
@@ -493,6 +519,7 @@ class EditFragment : MviBaseFragment<
 
     private fun initAdapter(): MainAdapter =
         mainAdapter.apply {
+            addDelegate(AutoCompleteTextDelegate())
             addDelegate(ToolbarDelegate())
             addDelegate(PrimaryButtonDelegate())
             addDelegate(TextInputLayoutDelegate())
@@ -508,17 +535,23 @@ class EditFragment : MviBaseFragment<
         when (effect) {
             EditProfileEffect.FinishActivity -> activity?.finish()
             EditProfileEffect.FinishActivityWithResultOK -> {
-                activity?.setResult(Activity.RESULT_OK)
+                val data = Intent().apply {
+                    putExtra(OWNER_IMAGE, updatedUser.ownerEditModel.ownerImageUri)
+                    putExtra(OWNER_NAME, updatedUser.ownerEditModel.ownerName)
+                    putExtra(PET_IMAGE, updatedUser.petEditModel.petImageUri)
+                    putExtra(PET_NAME, updatedUser.petEditModel.petName)
+                }
+                activity?.setResult(Activity.RESULT_OK, data)
                 activity?.finish()
             }
 
-            is EditProfileEffect.LaunchImagePicker -> initImagePicker(effect.avatarId)
+            is EditProfileEffect.LaunchImagePicker -> initImagePicker()
             is EditProfileEffect.ShowDataPickerDialog -> {
                 showDialog { date ->
                     updateDateTextInputLayout(effect.itemId, date, mainAdapter)
-                    if (effect.itemId == PET_DATE_TEXT_INPUT){
+                    if (effect.itemId == PET_DATE_TEXT_INPUT) {
                         updatedUser.petEditModel.petBirthday = date
-                    } else if (effect.itemId == OWNER_DATE_TEXT_INPUT){
+                    } else if (effect.itemId == OWNER_DATE_TEXT_INPUT) {
                         updatedUser.ownerEditModel.ownerBirthday = date
                     }
                 }
@@ -589,7 +622,10 @@ class EditFragment : MviBaseFragment<
         const val EDIT_PROFILE_FRAGMENT_TAG = "EditProfileFragmentTag"
         const val PET_AVATAR_ID = 1
         const val OWNER_AVATAR_ID = 2
-        const val AVATAR_ID = "AvatarIdExtra"
+        const val OWNER_IMAGE = "OwnerImageExtra"
+        const val PET_IMAGE = "PetImageExtra"
+        const val PET_NAME = "PetNameExtra"
+        const val OWNER_NAME = "OwnerNameExtra"
         const val NAME = "name"
         private const val OWNER_DATE_TEXT_INPUT = 3
         private const val PET_DATE_TEXT_INPUT = 4

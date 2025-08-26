@@ -32,9 +32,6 @@ import petlink.android.core_ui.delegates.items.tabs.TabDelegate
 import petlink.android.core_ui.delegates.items.tabs.TabDelegateItem
 import petlink.android.core_ui.delegates.items.tabs.TabItemModel
 import petlink.android.core_ui.delegates.items.tabs.TabModel
-import petlink.android.core_ui.delegates.items.toolbar.ToolbarDelegate
-import petlink.android.core_ui.delegates.items.toolbar.ToolbarDelegateItem
-import petlink.android.core_ui.delegates.items.toolbar.ToolbarModel
 import petlink.android.core_ui.delegates.main.DelegateItem
 import petlink.android.core_ui.delegates.main.MainAdapter
 import petlink.android.petlink.R
@@ -52,6 +49,7 @@ import petlink.android.petlink.ui.profile.profile.mvi.ProfilePartialState
 import petlink.android.petlink.ui.profile.profile.mvi.ProfileState
 import petlink.android.petlink.ui.profile.profile.mvi.ProfileStoreFactory
 import javax.inject.Inject
+import kotlin.reflect.KMutableProperty1
 
 class ProfileFragment : MviBaseFragment<
         ProfilePartialState,
@@ -64,6 +62,8 @@ class ProfileFragment : MviBaseFragment<
     private var addCoverImageLauncher: ActivityResultLauncher<Intent>? = null
     private val mainAdapter: MainAdapter = MainAdapter()
     private val items: MutableList<DelegateItem> = mutableListOf()
+
+    private lateinit var editProfileActivityResultLauncher: ActivityResultLauncher<Intent>
 
     @Inject
     lateinit var localDI: ProfileLocalDI
@@ -81,8 +81,41 @@ class ProfileFragment : MviBaseFragment<
         val appComponent = DaggerAppComponent.factory().create(requireContext())
         DaggerProfileComponent.factory().create(appComponent).inject(this)
         addCoverImageLauncher = initCoverImageLauncher()
+        editProfileActivityResultLauncher = initEditProfileImageLauncher()
     }
 
+    private fun initEditProfileImageLauncher() = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+            val userUpdatedData = result.data!!
+            val ownerImage = userUpdatedData.getStringExtra(OWNER_IMAGE)
+            val ownerName = userUpdatedData.getStringExtra(OWNER_NAME)
+            val petName = userUpdatedData.getStringExtra(PET_NAME)
+            val petImage = userUpdatedData.getStringExtra(PET_IMAGE)
+            updatedUiAfterEdit(petName, petImage, ownerImage, ownerName)
+        }
+    }
+
+    private fun updatedUiAfterEdit(
+        petName: String?,
+        petImage: String?,
+        ownerImage: String?,
+        ownerName: String?
+    ) {
+        val updatedItem = (items[0] as ProfileAvatarsDelegateItem).content() as ProfileAvatarsModel
+        updateIfChanged(petName, updatedItem, ProfileAvatarsModel::petName)
+        updateIfChanged(petImage, updatedItem, ProfileAvatarsModel::petImage)
+        updateIfChanged(ownerImage, updatedItem, ProfileAvatarsModel::ownerImage)
+        updateIfChanged(ownerName, updatedItem, ProfileAvatarsModel::ownerName)
+        mainAdapter.notifyItemChanged(0)
+    }
+
+    private fun <R, T> updateIfChanged(newValue: T?, receiver: R, property: KMutableProperty1<R, T>) {
+        if (newValue != null && property.get(receiver) != newValue) {
+            property.set(receiver, newValue)
+        }
+    }
     private fun initCoverImageLauncher() = registerForActivityResult<Intent, ActivityResult>(
         ActivityResultContracts.StartActivityForResult()
     ) { result: ActivityResult ->
@@ -155,15 +188,19 @@ class ProfileFragment : MviBaseFragment<
     override fun resolveEffect(effect: ProfileEffect) {
         when (effect) {
             ProfileEffect.NavigateToAchievements -> (activity as MainActivity).openAchievementActivity()
-            ProfileEffect.NavigateToEdit -> (activity as MainActivity).openEditActivity()
+            ProfileEffect.NavigateToEdit -> (activity as MainActivity).openEditActivity(
+                editProfileActivityResultLauncher
+            )
+
             ProfileEffect.NavigateToFriends -> (activity as MainActivity).openFriendsActivity()
             ProfileEffect.NavigateToMyData -> (activity as MainActivity).openMyDataActivity()
             ProfileEffect.NavigateToSettings -> (activity as MainActivity).openSettingsActivity()
             ProfileEffect.ShowPosts -> showPosts()
+            ProfileEffect.LaunchImagePicker -> initImagePicker()
         }
     }
 
-    private fun initMainAdapter(){
+    private fun initMainAdapter() {
         mainAdapter.apply {
             addDelegate(ProfileAvatarsDelegate())
             addDelegate(TabDelegate())
@@ -181,7 +218,7 @@ class ProfileFragment : MviBaseFragment<
                         petImage = petData.imageUri,
                         ownerName = ownerData.ownerName,
                         ownerImage = ownerData.imageUri,
-                        addImageClickListener = { initImagePicker() }
+                        addImageClickListener = { store.sendEffect(ProfileEffect.LaunchImagePicker) }
                     )
                 ),
                 TabDelegateItem(
@@ -292,7 +329,7 @@ class ProfileFragment : MviBaseFragment<
             if (delegate is PrimaryButtonVariantDelegateItem) {
                 if (startRemoveIndex == -1) startRemoveIndex = items.indexOf(delegate)
                 itemsToRemove.add(delegate)
-            } else if (items.indexOf(delegate) > startRemoveIndex && startRemoveIndex != -1){
+            } else if (items.indexOf(delegate) > startRemoveIndex && startRemoveIndex != -1) {
                 itemsToRemove.add(delegate)
             }
         }
@@ -334,6 +371,10 @@ class ProfileFragment : MviBaseFragment<
     companion object {
         const val POSTS_ID = 1
         const val MANAGEMENT_ID = 2
+        const val OWNER_IMAGE = "OwnerImageExtra"
+        const val PET_IMAGE = "PetImageExtra"
+        const val PET_NAME = "PetNameExtra"
+        const val OWNER_NAME = "OwnerNameExtra"
     }
 
 }

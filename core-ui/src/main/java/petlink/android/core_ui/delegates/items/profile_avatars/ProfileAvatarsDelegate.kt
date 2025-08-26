@@ -1,12 +1,10 @@
 package petlink.android.core_ui.delegates.items.profile_avatars
 
-import android.app.ActionBar.LayoutParams
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import petlink.android.core_ui.R
 import petlink.android.core_ui.databinding.DelegateProfileAvatarsBinding
 import petlink.android.core_ui.delegates.main.AdapterDelegate
@@ -39,7 +37,7 @@ class ProfileAvatarsDelegate : AdapterDelegate {
                 petName.text = model.petName
                 ownerName.text = model.ownerName
                 if (model.petImage != null) {
-                    petImage.setImageUri(model.petImage.toUri())
+                    petImage.setImageUri(model.petImage?.toUri())
                 } else {
                     petImage.setDrawableImage(
                         ResourcesCompat.getDrawable(
@@ -50,7 +48,7 @@ class ProfileAvatarsDelegate : AdapterDelegate {
                     )
                 }
                 if (model.ownerImage != null) {
-                    ownerImage.setImageUri(model.ownerImage.toUri())
+                    ownerImage.setImageUri(model.ownerImage?.toUri())
                 } else {
                     ownerImage.setDrawableImage(
                         ResourcesCompat.getDrawable(

@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatImageView
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.content.withStyledAttributes
 import com.bumptech.glide.Glide
 import petlink.android.core_ui.R
@@ -33,7 +32,7 @@ class ShapeableImageView @JvmOverloads constructor(
         scaleType = ScaleType.CENTER_CROP
     }
 
-    fun setImageUri(uri: Uri){
+    fun setImageUri(uri: Uri?){
         Glide.with(context)
             .load(uri)
             .override(LayoutParams.WRAP_CONTENT)

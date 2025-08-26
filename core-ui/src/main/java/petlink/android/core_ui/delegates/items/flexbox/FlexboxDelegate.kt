@@ -43,6 +43,7 @@ class FlexboxDelegate : AdapterDelegate {
         RecyclerView.ViewHolder(binding.root) {
         fun bind(model: FlexboxModel) {
             binding.flexboxLayout.alignment = model.alignment
+            binding.flexboxLayout.removeAllViews()
             model.items.forEach {
                 val isChosen = model.defaultValue.contains(it)
                 binding.flexboxLayout.addFlexItem(

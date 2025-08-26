@@ -1,17 +1,12 @@
 package petlink.android.core_ui.delegates.items.text_input_layout
 
-import android.graphics.Typeface
-import android.text.InputType
 import android.text.method.PasswordTransformationMethod
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputLayout
-import petlink.android.core_ui.R
 import petlink.android.core_ui.databinding.DelegateTextInputLayoutBinding
-import petlink.android.core_ui.delegates.items.text.gradient.TextGradientDelegateItem
 import petlink.android.core_ui.delegates.main.AdapterDelegate
 import petlink.android.core_ui.delegates.main.DelegateItem
 

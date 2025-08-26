@@ -1,5 +1,6 @@
 package petlink.android.petlink.data.repository.user.user_account
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -178,15 +179,13 @@ class UserAccountRepositoryImpl @javax.inject.Inject constructor(
         }
     }
 
-    private fun updateUserDataFields(userId: String, updates: Map<String, Any?>) {
-        val filteredUpdates: Map<String, Any> =
-            updates.filterValues { it != null } as Map<String, Any>
+    private suspend fun updateUserDataFields(userId: String, updates: Map<String, Any?>) {
+        val filteredUpdates = updates.filterValues { it != null }.mapValues { it.value!! }
 
-        if (filteredUpdates.isNotEmpty()) {
-            store.collection(USER_COLLECTION)
-                .document(userId)
-                .update(filteredUpdates)
-        }
+        store.collection(USER_COLLECTION)
+            .document(userId)
+            .update(filteredUpdates)
+            .await()
     }
 
     private fun DocumentSnapshot.getStringOrEmpty(field: String): String =

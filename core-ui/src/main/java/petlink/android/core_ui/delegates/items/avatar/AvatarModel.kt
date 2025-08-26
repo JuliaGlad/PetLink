@@ -7,5 +7,6 @@ data class AvatarModel(
     val id: Int = Random.nextInt(),
     var uri: String? = null,
     var drawable: Drawable? = null,
+    var isUpdating: Boolean = false,
     val clickListener: (() -> Unit)? = null
 )
