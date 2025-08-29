@@ -3,7 +3,6 @@ package petlink.android.petlink.ui.profile.auth
 import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +10,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import petlink.android.core_mvi.MviBaseFragment
 import petlink.android.core_mvi.MviStore
@@ -34,8 +34,6 @@ import petlink.android.petlink.di.DaggerAppComponent
 import petlink.android.petlink.ui.cicerone.screen.main.MainScreen
 import petlink.android.petlink.ui.main.activity.MainActivity
 import petlink.android.petlink.ui.profile.auth.di.DaggerAuthComponent
-import petlink.android.petlink.ui.profile.auth.dialog.forgot_password.ForgotPasswordDialogFragment
-import petlink.android.petlink.ui.profile.auth.dialog.password_success_updated.PasswordUpdatedDialogFragment
 import petlink.android.petlink.ui.profile.auth.mvi.AuthEffect
 import petlink.android.petlink.ui.profile.auth.mvi.AuthIntent
 import petlink.android.petlink.ui.profile.auth.mvi.AuthLocalDI
@@ -43,6 +41,7 @@ import petlink.android.petlink.ui.profile.auth.mvi.AuthMviState
 import petlink.android.petlink.ui.profile.auth.mvi.AuthPartialState
 import petlink.android.petlink.ui.profile.auth.mvi.AuthState
 import petlink.android.petlink.ui.profile.auth.mvi.AuthStoreFactory
+import petlink.android.petlink.ui.profile.dialog.update_password.UpdatePasswordDialogFragment
 import javax.inject.Inject
 
 class AuthFragment : MviBaseFragment<
@@ -93,12 +92,11 @@ class AuthFragment : MviBaseFragment<
         when (state.state) {
             AuthState.Authenticated -> (activity as MainActivity).presenter.navigateTo(MainScreen.profile())
             is AuthState.Error -> {
-                binding.errorLayout.root.visibility = View.VISIBLE
                 binding.loader.visibility = View.GONE
+                showSnackBar()
             }
             AuthState.InitialState -> {
                 binding.loader.visibility = View.GONE
-                binding.errorLayout.root.visibility = View.GONE
                 initMainAdapter()
                 initRecyclerView()
                 initButton()
@@ -107,9 +105,16 @@ class AuthFragment : MviBaseFragment<
 
             AuthState.Loading ->{
                 binding.loader.visibility = View.VISIBLE
-                binding.errorLayout.root.visibility = View.GONE
             }
         }
+    }
+
+    private fun showSnackBar() {
+        Snackbar.make(
+            requireView(),
+            getString(R.string.looks_like_something_went_wrong),
+            Snackbar.LENGTH_LONG
+        ).show()
     }
 
     private fun setResultLauncher() =
@@ -145,21 +150,12 @@ class AuthFragment : MviBaseFragment<
         when (effect) {
             AuthEffect.CreateAccount -> launcher?.let {  (activity as MainActivity).openCreateAccountActivity(it) }
             AuthEffect.ForgotPassword -> {
-                val dialogFragment = ForgotPasswordDialogFragment()
+                val dialogFragment = UpdatePasswordDialogFragment()
                 activity?.supportFragmentManager?.let {
                     dialogFragment.show(
                         it,
                         FORGOT_PASSWORD_DIALOG
                     )
-                }
-                dialogFragment.dialogDismissedListener = {
-                    val successDialog = PasswordUpdatedDialogFragment()
-                    activity?.supportFragmentManager?.let {
-                        successDialog.show(
-                            it,
-                            PASSWORD_UPDATED_DIALOG
-                        )
-                    }
                 }
             }
 

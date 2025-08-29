@@ -34,6 +34,7 @@ class IconButtonDelegate : AdapterDelegate {
                 mode = model.mode
                 titleText = model.title
                 icon = model.icon
+                setOnClickListener { model.click() }
             }
         }
     }

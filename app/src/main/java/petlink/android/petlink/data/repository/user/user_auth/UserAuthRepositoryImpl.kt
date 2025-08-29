@@ -48,9 +48,9 @@ class UserAuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updatePassword(email: String) {
+    override suspend fun updatePassword() {
         withContext(Dispatchers.IO) {
-            val user = auth.currentUser
+            val email = auth.currentUser?.email.toString()
             auth.sendPasswordResetEmail(email).await()
         }
     }

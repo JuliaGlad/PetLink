@@ -1,4 +1,4 @@
-package petlink.android.petlink.ui.profile.auth.dialog.forgot_password.di
+package petlink.android.petlink.ui.profile.settings.dialog.update_email.di
 
 import dagger.Binds
 import dagger.Module
@@ -8,13 +8,13 @@ import petlink.android.petlink.data.source.local.user.UserLocalSource
 import petlink.android.petlink.data.source.local.user.UserLocalSourceImpl
 
 @Module
-interface ForgotPasswordModule {
+interface UpdateEmailModule {
 
-    @ForgotPasswordScope
+    @UpdateEmailScope
     @Binds
     fun bindUserAuthRepository(authRepositoryImpl: UserAuthRepositoryImpl): UserAuthRepository
 
-    @ForgotPasswordScope
+    @UpdateEmailScope
     @Binds
     fun bindUserLocalSource(userLocalSourceImpl: UserLocalSourceImpl): UserLocalSource
 }

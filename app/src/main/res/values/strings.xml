@@ -1,11 +1,15 @@
 <resources>
     <string name="app_name" translatable="false">PetLink</string>
     <string name="update_password">Update password</string>
+    <string name="enter_new_email">Enter new email</string>
+    <string name="are_you_sure_you_want_to_delete_your_account">Are you sure you want to delete your account? You won`t be able to restore it</string>
+    <string name="we_ll_send_you_a_link_to_your_email_to_change_your_password">We`ll send a link to your email to change your password</string>
     <string name="send">Send</string>
     <string name="success">Success</string>
     <string name="ok">Ok</string>
     <string name="looks_like_something_went_wrong">Looks like something went wrong! Please, try again later</string>
-    <string name="we_will_send_a_verification_link">We`ll send a link to your email to reset your password</string>
+    <string name="we_will_send_a_verification_link">We have sent a link to your email to reset your password</string>
+    <string name="your_email_was_successfully_updated">Your email was successfully updated</string>
     <string name="cancel">Cancel</string>
     <string name="update">Update</string>
     <string name="this_field_cannot_be_empty">This field cannot be empty!</string>
@@ -157,6 +161,8 @@
     <string name="change_password">Change password</string>
     <string name="log_out">Log out</string>
     <string name="delete_account">Delete account</string>
+    <string name="are_you_sure">Are you sure?</string>
+    <string name="are_you_sure_you_want_to_log_out">Are you sure you want to logout?</string>
     <string-array name="pet_types">
         <item>Cat</item>
         <item>Dog</item>

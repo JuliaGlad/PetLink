@@ -117,5 +117,4 @@ class IconButton @JvmOverloads constructor(
             setTextColor(ResourcesCompat.getColor(resources, textColor, context.theme))
         }
     }
-
 }

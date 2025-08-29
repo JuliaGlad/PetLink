@@ -99,9 +99,9 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    fun openSettingsActivity() {
+    fun openSettingsActivity(launcher: ActivityResultLauncher<Intent>) {
         val intent = Intent(this, SettingsActivity::class.java)
-        startActivity(intent)
+        launcher.launch(intent)
     }
 
     fun openFriendsActivity() {

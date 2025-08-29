@@ -7,7 +7,7 @@ import kotlin.random.Random
 data class IconButtonModel(
     val id: Int = Random.nextInt(),
     val title: String,
-    val icon: Drawable,
+    val icon: Drawable?,
     val mode: Int,
     val click: () -> Unit
 )

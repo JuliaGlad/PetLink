@@ -8,7 +8,6 @@
         android:id="@+id/button_icon_view"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        app:tint="@color/icon_color"
         android:background="@color/transparent"/>
 
     <TextView

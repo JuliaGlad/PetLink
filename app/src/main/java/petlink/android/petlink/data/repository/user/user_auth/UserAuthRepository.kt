@@ -12,7 +12,7 @@ interface UserAuthRepository {
 
     suspend fun signOut()
 
-    suspend fun updatePassword(email: String)
+    suspend fun updatePassword()
 
     suspend fun updateEmail(password: String, newEmail: String)
 }

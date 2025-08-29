@@ -37,6 +37,7 @@ import petlink.android.core_ui.delegates.main.MainAdapter
 import petlink.android.petlink.R
 import petlink.android.petlink.databinding.FragmentProfileBinding
 import petlink.android.petlink.di.DaggerAppComponent
+import petlink.android.petlink.ui.cicerone.screen.main.BottomScreen
 import petlink.android.petlink.ui.main.activity.MainActivity
 import petlink.android.petlink.ui.profile.profile.di.DaggerProfileComponent
 import petlink.android.petlink.ui.profile.profile.model.OwnerMainDataUi
@@ -64,6 +65,7 @@ class ProfileFragment : MviBaseFragment<
     private val items: MutableList<DelegateItem> = mutableListOf()
 
     private lateinit var editProfileActivityResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var settingsActivityResultLauncher: ActivityResultLauncher<Intent>
 
     @Inject
     lateinit var localDI: ProfileLocalDI
@@ -82,6 +84,15 @@ class ProfileFragment : MviBaseFragment<
         DaggerProfileComponent.factory().create(appComponent).inject(this)
         addCoverImageLauncher = initCoverImageLauncher()
         editProfileActivityResultLauncher = initEditProfileImageLauncher()
+        settingsActivityResultLauncher = initSettingLauncher()
+    }
+
+    private fun initSettingLauncher(): ActivityResultLauncher<Intent> = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK){
+            (activity as MainActivity).presenter.navigateTo(BottomScreen.auth())
+        }
     }
 
     private fun initEditProfileImageLauncher() = registerForActivityResult(
@@ -194,7 +205,7 @@ class ProfileFragment : MviBaseFragment<
 
             ProfileEffect.NavigateToFriends -> (activity as MainActivity).openFriendsActivity()
             ProfileEffect.NavigateToMyData -> (activity as MainActivity).openMyDataActivity()
-            ProfileEffect.NavigateToSettings -> (activity as MainActivity).openSettingsActivity()
+            ProfileEffect.NavigateToSettings -> (activity as MainActivity).openSettingsActivity(settingsActivityResultLauncher)
             ProfileEffect.ShowPosts -> showPosts()
             ProfileEffect.LaunchImagePicker -> initImagePicker()
         }
