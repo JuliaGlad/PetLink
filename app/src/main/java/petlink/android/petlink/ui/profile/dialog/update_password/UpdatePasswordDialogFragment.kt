@@ -15,7 +15,7 @@ import javax.inject.Inject
 class UpdatePasswordDialogFragment: DialogFragment() {
 
     @Inject
-    lateinit var viewModelFactory: MainViewModel.Factory
+    lateinit var viewModelFactory: UpdatePasswordViewModel.Factory
 
     private val viewModel: UpdatePasswordViewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[UpdatePasswordViewModel::class.java]
