@@ -31,6 +31,7 @@
     <color name="icon_color">#2E732E</color>
     <color name="black">#044D04</color>
     <color name="light_red">#FFDCDC</color>
+    <color name="tonal_red">#FFC4C4</color>
     <color name="medium_red">#FD7C7C</color>
     <color name="bright_red">#FF1313</color>
     <color name="red">#C30000</color>
@@ -48,7 +49,7 @@
     <color name="light_pink">#FFECFD</color>
     <color name="dark_pink">#A6429C</color>
     <color name="light_coral">#FBF9FF</color>
-    <color name="dark_coral">#E66F6F</color>
+    <color name="dark_coral">#E06C6C</color>
     <color name="light_orange">#FFFBF6</color>
     <color name="bright_orange">#FFAB45</color>
     <color name="dark_orange">#C28547</color>

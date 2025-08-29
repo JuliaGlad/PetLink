@@ -6,7 +6,7 @@ import javax.inject.Inject
 class UpdatePasswordUseCase @Inject constructor(
     private val repository: UserAuthRepository
 ) {
-    suspend fun invoke(email: String){
-        repository.updatePassword(email = email)
+    suspend fun invoke(){
+        repository.updatePassword()
     }
 }

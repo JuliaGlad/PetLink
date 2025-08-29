@@ -28,6 +28,7 @@
     <color name="black">#044D04</color>
     <color name="light_red">#FFDCDC</color>
     <color name="medium_red">#FD7C7C</color>
+    <color name="tonal_red">#FFC4C4</color>
     <color name="bright_red">#FF1313</color>
     <color name="red">#C30000</color>
     <color name="bright_blue">#26F1FF</color>

@@ -1,5 +1,6 @@
 package petlink.android.petlink.data.repository.user.user_auth
 
+import android.util.Log
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
@@ -48,9 +49,9 @@ class UserAuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updatePassword(email: String) {
+    override suspend fun updatePassword() {
         withContext(Dispatchers.IO) {
-            val user = auth.currentUser
+            val email = auth.currentUser?.email.toString()
             auth.sendPasswordResetEmail(email).await()
         }
     }
@@ -60,7 +61,7 @@ class UserAuthRepositoryImpl @Inject constructor(
             val user = auth.currentUser
             val credential = user?.email?.let { EmailAuthProvider.getCredential(it, password) }
             user?.reauthenticate(credential!!)?.await()
-            user?.updateEmail(newEmail)
+            user?.verifyBeforeUpdateEmail(newEmail)
         }
     }
 }

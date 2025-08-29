@@ -1,8 +1,8 @@
-package petlink.android.petlink.ui.profile.auth.dialog.forgot_password.di
+package petlink.android.petlink.ui.profile.dialog.update_password.di
 
 import dagger.Component
 import petlink.android.petlink.di.AppComponent
-import petlink.android.petlink.ui.profile.auth.dialog.forgot_password.ForgotPasswordDialogFragment
+import petlink.android.petlink.ui.profile.dialog.update_password.UpdatePasswordDialogFragment
 import javax.inject.Scope
 
 @ForgotPasswordScope
@@ -15,7 +15,7 @@ import javax.inject.Scope
 )
 interface ForgotPasswordComponent {
 
-    fun inject(dialogFragment: ForgotPasswordDialogFragment)
+    fun inject(dialogFragment: UpdatePasswordDialogFragment)
 
     @Component.Factory
     interface Factory {
