@@ -39,6 +39,7 @@ import petlink.android.petlink.databinding.FragmentProfileBinding
 import petlink.android.petlink.di.DaggerAppComponent
 import petlink.android.petlink.ui.cicerone.screen.main.BottomScreen
 import petlink.android.petlink.ui.main.activity.MainActivity
+import petlink.android.petlink.ui.profile.my_data.MyDataBottomSheetFragment
 import petlink.android.petlink.ui.profile.profile.di.DaggerProfileComponent
 import petlink.android.petlink.ui.profile.profile.model.OwnerMainDataUi
 import petlink.android.petlink.ui.profile.profile.model.PetMainDataUi
@@ -177,7 +178,6 @@ class ProfileFragment : MviBaseFragment<
                     initRecycler(petData, ownerData)
                 }
             }
-
             is LceState.Error -> {
                 with(binding) {
                     loadingScreen.root.visibility = GONE
@@ -186,7 +186,6 @@ class ProfileFragment : MviBaseFragment<
                     errorScreen.button.setOnClickListener { store.sendIntent(ProfileIntent.LoadUserData) }
                 }
             }
-
             LceState.Loading -> {
                 with(binding) {
                     loadingScreen.root.visibility = VISIBLE
@@ -202,9 +201,10 @@ class ProfileFragment : MviBaseFragment<
             ProfileEffect.NavigateToEdit -> (activity as MainActivity).openEditActivity(
                 editProfileActivityResultLauncher
             )
-
             ProfileEffect.NavigateToFriends -> (activity as MainActivity).openFriendsActivity()
-            ProfileEffect.NavigateToMyData -> (activity as MainActivity).openMyDataActivity()
+            ProfileEffect.NavigateToMyData -> {
+                activity?.supportFragmentManager?.let { MyDataBottomSheetFragment().show(it, MY_DATA_BOTTOM_SHEET) }
+            }
             ProfileEffect.NavigateToSettings -> (activity as MainActivity).openSettingsActivity(settingsActivityResultLauncher)
             ProfileEffect.ShowPosts -> showPosts()
             ProfileEffect.LaunchImagePicker -> initImagePicker()
@@ -382,6 +382,7 @@ class ProfileFragment : MviBaseFragment<
     companion object {
         const val POSTS_ID = 1
         const val MANAGEMENT_ID = 2
+        const val MY_DATA_BOTTOM_SHEET = "MyDataBottomSheetTAG"
         const val OWNER_IMAGE = "OwnerImageExtra"
         const val PET_IMAGE = "PetImageExtra"
         const val PET_NAME = "PetNameExtra"

@@ -54,9 +54,9 @@ import petlink.android.petlink.R
 import petlink.android.petlink.databinding.FragmentEditBinding
 import petlink.android.petlink.di.DaggerAppComponent
 import petlink.android.petlink.ui.profile.edit.di.DaggerEditProfileComponent
-import petlink.android.petlink.ui.profile.edit.model.OwnerEditModel
-import petlink.android.petlink.ui.profile.edit.model.PetEditModel
-import petlink.android.petlink.ui.profile.edit.model.UserEditModel
+import petlink.android.petlink.ui.profile.model.OwnerFullModel
+import petlink.android.petlink.ui.profile.model.PetFullModel
+import petlink.android.petlink.ui.profile.model.UserFullModel
 import petlink.android.petlink.ui.profile.edit.mvi.EditMviState
 import petlink.android.petlink.ui.profile.edit.mvi.EditPartialState
 import petlink.android.petlink.ui.profile.edit.mvi.EditProfileEffect
@@ -84,7 +84,7 @@ class EditFragment : MviBaseFragment<
     @Inject
     lateinit var localDI: EditProfileLocalDI
 
-    private lateinit var updatedUser: UserEditModel
+    private lateinit var updatedUser: UserFullModel
     private val recyclerItems: MutableList<DelegateItem> = mutableListOf()
 
     override val store: MviStore<EditPartialState, EditProfileIntent, EditMviState, EditProfileEffect>
@@ -110,8 +110,8 @@ class EditFragment : MviBaseFragment<
                             with(content) {
                                 this.uri = uri
                                 isUpdating = false
-                                if (id == PET_AVATAR_ID) updatedUser.petEditModel.petImageUri = uri
-                                else if (id == OWNER_AVATAR_ID) updatedUser.ownerEditModel.ownerImageUri =
+                                if (id == PET_AVATAR_ID) updatedUser.petFullModel.petImageUri = uri
+                                else if (id == OWNER_AVATAR_ID) updatedUser.ownerFullModel.ownerImageUri =
                                     uri
                             }
                         }
@@ -148,15 +148,15 @@ class EditFragment : MviBaseFragment<
 
     override fun render(state: EditMviState) {
         when (state.value) {
-            is EditState.DataLoaded<UserEditModel> -> {
+            is EditState.DataLoaded<UserFullModel> -> {
                 with(binding) {
                     loadingScreen.root.visibility = GONE
                     errorScreen.root.visibility = GONE
                     with(state.value.data) {
                         updatedUser = this
                         initRecycler(
-                            petEditModel = petEditModel,
-                            ownerEditModel = ownerEditModel
+                            petFullModel = petFullModel,
+                            ownerFullModel = ownerFullModel
                         )
                     }
                     initSaveButton()
@@ -183,7 +183,7 @@ class EditFragment : MviBaseFragment<
             }
 
             EditState.OwnerDataUpdated -> {
-                with(updatedUser.petEditModel) {
+                with(updatedUser.petFullModel) {
                     store.sendIntent(
                         EditProfileIntent.UpdatePetData(
                             petBirthday = petBirthday,
@@ -201,7 +201,7 @@ class EditFragment : MviBaseFragment<
             }
 
             EditState.PetDataUpdated -> {
-                with(updatedUser.ownerEditModel) {
+                with(updatedUser.ownerFullModel) {
                     store.sendIntent(
                         EditProfileIntent.UpdateOwnerData(
                             ownerImageUri = ownerImageUri,
@@ -219,7 +219,7 @@ class EditFragment : MviBaseFragment<
 
     private fun initSaveButton() {
         binding.saveButton.setOnClickListener {
-            with(updatedUser.petEditModel) {
+            with(updatedUser.petFullModel) {
                 store.sendIntent(
                     EditProfileIntent.UpdatePetData(
                         petBirthday = petBirthday,
@@ -237,10 +237,10 @@ class EditFragment : MviBaseFragment<
         }
     }
 
-    private fun initRecycler(petEditModel: PetEditModel, ownerEditModel: OwnerEditModel) {
+    private fun initRecycler(petFullModel: PetFullModel, ownerFullModel: OwnerFullModel) {
         val mainAdapter = initAdapter()
-        val petDataItems: List<DelegateItem> = getPetRecyclerItems(petEditModel)
-        val ownerDataItems: List<DelegateItem> = getOwnerDataItems(ownerEditModel)
+        val petDataItems: List<DelegateItem> = getPetRecyclerItems(petFullModel)
+        val ownerDataItems: List<DelegateItem> = getOwnerDataItems(ownerFullModel)
         recyclerItems.add(
             ToolbarDelegateItem(
                 ToolbarModel(
@@ -259,7 +259,7 @@ class EditFragment : MviBaseFragment<
         mainAdapter.submitList(recyclerItems)
     }
 
-    private fun getOwnerDataItems(ownerData: OwnerEditModel): List<DelegateItem> = listOf(
+    private fun getOwnerDataItems(ownerData: OwnerFullModel): List<DelegateItem> = listOf(
         HeadlineTextDelegateItem(
             HeadlineTextModel(text = getString(R.string.owner_data))
         ),
@@ -290,7 +290,7 @@ class EditFragment : MviBaseFragment<
                 hint = getString(R.string.enter_name),
                 defaultValue = ownerData.ownerName.toString(),
                 textChangedListener = { char, p0, p1, p2 ->
-                    updatedUser.ownerEditModel.ownerName = char.toString()
+                    updatedUser.ownerFullModel.ownerName = char.toString()
                 }
             )),
         TitleTextDelegateItem(TitleTextModel(title = getString(R.string.surname))),
@@ -299,14 +299,14 @@ class EditFragment : MviBaseFragment<
                 hint = getString(R.string.enter_surname),
                 defaultValue = ownerData.ownerSurname.toString(),
                 textChangedListener = { char, p0, p1, p2 ->
-                    updatedUser.ownerEditModel.ownerSurname = char.toString()
+                    updatedUser.ownerFullModel.ownerSurname = char.toString()
                 }
             )),
         TitleTextDelegateItem(TitleTextModel(title = getString(R.string.birthday))),
         TextInputLayoutDelegateItem(
             TextInputLayoutModel(
                 id = OWNER_DATE_TEXT_INPUT,
-                defaultValue = updatedUser.ownerEditModel.ownerBirthday.toString(),
+                defaultValue = updatedUser.ownerFullModel.ownerBirthday.toString(),
                 hint = getString(R.string.enter_date_of_birth),
                 editable = false
             )
@@ -323,7 +323,7 @@ class EditFragment : MviBaseFragment<
                     )
                 }
             )),
-        TitleTextDelegateItem(TitleTextModel(title = getString(R.string.birthday))),
+        TitleTextDelegateItem(TitleTextModel(title = getString(R.string.gender))),
         ChooserViewDelegateItem(
             ChooserViewModel(
                 text1 = getString(R.string.female),
@@ -350,7 +350,7 @@ class EditFragment : MviBaseFragment<
                     context?.theme
                 ),
                 clickListener = { value ->
-                    updatedUser.ownerEditModel.ownerGender = value
+                    updatedUser.ownerFullModel.ownerGender = value
                 }
             )
         ),
@@ -361,12 +361,12 @@ class EditFragment : MviBaseFragment<
                 values = getCities(),
                 defaultValue = ownerData.ownerCity.toString(),
                 textChangedListener = { char, p0, p1, p2 ->
-                    updatedUser.ownerEditModel.ownerCity = char.toString()
+                    updatedUser.ownerFullModel.ownerCity = char.toString()
                 }
             ))
     )
 
-    private fun getPetRecyclerItems(petData: PetEditModel): List<DelegateItem> = listOf(
+    private fun getPetRecyclerItems(petData: PetFullModel): List<DelegateItem> = listOf(
         HeadlineTextDelegateItem(
             HeadlineTextModel(text = getString(R.string.pet_data))
         ),
@@ -398,7 +398,7 @@ class EditFragment : MviBaseFragment<
                 hint = getString(R.string.enter_name),
                 defaultValue = petData.petName.toString(),
                 textChangedListener = { char, p0, p1, p2 ->
-                    updatedUser.petEditModel.petName = char.toString()
+                    updatedUser.petFullModel.petName = char.toString()
                 }
             )),
         TitleTextDelegateItem(TitleTextModel(title = getString(R.string.pet_birthday))),
@@ -425,7 +425,7 @@ class EditFragment : MviBaseFragment<
                 alignment = LayoutAlignment.LEFT,
                 defaultValue = listOf(petData.petType.toString()),
                 chosenItemListener = { chosenItem ->
-                    updatedUser.petEditModel.petType = chosenItem
+                    updatedUser.petFullModel.petType = chosenItem
                 }
             )),
         TitleTextDelegateItem(TitleTextModel(title = getString(R.string.gender))),
@@ -455,7 +455,7 @@ class EditFragment : MviBaseFragment<
                     context?.theme
                 ),
                 clickListener = { value ->
-                    updatedUser.petEditModel.petGender = value
+                    updatedUser.petFullModel.petGender = value
                 }
             )
         ),
@@ -469,7 +469,7 @@ class EditFragment : MviBaseFragment<
                 hint = getString(R.string.write_about_your_pet),
                 defaultValue = petData.petDescription.toString(),
                 textChangedListener = { char, p0, p1, p2 ->
-                    updatedUser.petEditModel.petDescription = char.toString()
+                    updatedUser.petFullModel.petDescription = char.toString()
                 }
             )
         ),
@@ -483,7 +483,7 @@ class EditFragment : MviBaseFragment<
                 hint = getString(R.string.favorite_games),
                 defaultValue = petData.petGames.toString(),
                 textChangedListener = { char, p0, p1, p2 ->
-                    updatedUser.petEditModel.petGames = char.toString()
+                    updatedUser.petFullModel.petGames = char.toString()
                 }
             )
         ),
@@ -497,7 +497,7 @@ class EditFragment : MviBaseFragment<
                 hint = getString(R.string.favorite_places),
                 defaultValue = petData.petPlaces.toString(),
                 textChangedListener = { char, p0, p1, p2 ->
-                    updatedUser.petEditModel.petPlaces = char.toString()
+                    updatedUser.petFullModel.petPlaces = char.toString()
                 }
             )
         ),
@@ -511,7 +511,7 @@ class EditFragment : MviBaseFragment<
                 hint = getString(R.string.favorite_food),
                 defaultValue = petData.petFood.toString(),
                 textChangedListener = { char, p0, p1, p2 ->
-                    updatedUser.petEditModel.petFood = char.toString()
+                    updatedUser.petFullModel.petFood = char.toString()
                 }
             )
         ),
@@ -536,10 +536,10 @@ class EditFragment : MviBaseFragment<
             EditProfileEffect.FinishActivity -> activity?.finish()
             EditProfileEffect.FinishActivityWithResultOK -> {
                 val data = Intent().apply {
-                    putExtra(OWNER_IMAGE, updatedUser.ownerEditModel.ownerImageUri)
-                    putExtra(OWNER_NAME, updatedUser.ownerEditModel.ownerName)
-                    putExtra(PET_IMAGE, updatedUser.petEditModel.petImageUri)
-                    putExtra(PET_NAME, updatedUser.petEditModel.petName)
+                    putExtra(OWNER_IMAGE, updatedUser.ownerFullModel.ownerImageUri)
+                    putExtra(OWNER_NAME, updatedUser.ownerFullModel.ownerName)
+                    putExtra(PET_IMAGE, updatedUser.petFullModel.petImageUri)
+                    putExtra(PET_NAME, updatedUser.petFullModel.petName)
                 }
                 activity?.setResult(Activity.RESULT_OK, data)
                 activity?.finish()
@@ -550,9 +550,9 @@ class EditFragment : MviBaseFragment<
                 showDialog { date ->
                     updateDateTextInputLayout(effect.itemId, date, mainAdapter)
                     if (effect.itemId == PET_DATE_TEXT_INPUT) {
-                        updatedUser.petEditModel.petBirthday = date
+                        updatedUser.petFullModel.petBirthday = date
                     } else if (effect.itemId == OWNER_DATE_TEXT_INPUT) {
-                        updatedUser.ownerEditModel.ownerBirthday = date
+                        updatedUser.ownerFullModel.ownerBirthday = date
                     }
                 }
             }

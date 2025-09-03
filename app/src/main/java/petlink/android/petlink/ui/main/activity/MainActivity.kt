@@ -21,7 +21,6 @@ import petlink.android.petlink.ui.profile.achievement.AchievementActivity
 import petlink.android.petlink.ui.profile.create_account.activity.CreateAccountActivity
 import petlink.android.petlink.ui.profile.edit.EditActivity
 import petlink.android.petlink.ui.profile.friends.FriendActivity
-import petlink.android.petlink.ui.profile.my_data.MyDataActivity
 import petlink.android.petlink.ui.profile.settings.SettingsActivity
 import javax.inject.Inject
 
@@ -106,11 +105,6 @@ class MainActivity : AppCompatActivity() {
 
     fun openFriendsActivity() {
         val intent = Intent(this, FriendActivity::class.java)
-        startActivity(intent)
-    }
-
-    fun openMyDataActivity() {
-        val intent = Intent(this, MyDataActivity::class.java)
         startActivity(intent)
     }
 

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="ThemeOverlay.MyApp.BottomSheetDialog" parent="ThemeOverlay.Material3.BottomSheetDialog">
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Material3.LargeComponent</item>
+    </style>
     <style name="BottomNavTextActive">
         <item name="android:textSize">12sp</item>
         <item name="fontFamily">@font/roboto_bold</item>
         <item name="android:fontFamily">@font/roboto_bold</item>
     </style>
-
-
     <style name="BottomNavTextInactive">
         <item name="android:textSize">12sp</item>
         <item name="fontFamily">@font/roboto_regular</item>

@@ -54,7 +54,11 @@ class FlexboxDelegate : AdapterDelegate {
             }
         }
 
-        private fun FlexBoxLayout.addFlexItem(title: String, model: FlexboxModel, isChosen: Boolean = false) {
+        private fun FlexBoxLayout.addFlexItem(
+            title: String,
+            model: FlexboxModel,
+            isChosen: Boolean = false
+        ) {
             val view = FlexboxItemView(itemView.context)
             val params = ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
             with(view) {
@@ -73,21 +77,25 @@ class FlexboxDelegate : AdapterDelegate {
                         R.drawable.ripple_left_chooser,
                         context.theme
                     )
-                clickListener =
-                    object : ClickIntegerListener {
-                        override fun onClick(int: Int) {
-                            if (!model.isMultiply) {
-                                binding.flexboxLayout.children.forEach {
-                                    (it as FlexboxItemView)
-                                    if (it.viewId != int) {
-                                        it.isChosen = false
+            }
+            if (model.chosenItemListener != null) {
+                with(view) {
+                    view.clickListener =
+                        object : ClickIntegerListener {
+                            override fun onClick(int: Int) {
+                                if (!model.isMultiply) {
+                                    binding.flexboxLayout.children.forEach {
+                                        (it as FlexboxItemView)
+                                        if (it.viewId != int) {
+                                            it.isChosen = false
+                                        }
                                     }
                                 }
+                                model.chosenItemListener(title)
                             }
-                            model.chosenItemListener(title)
                         }
-                    }
-                onViewClicked()
+                    onViewClicked()
+                }
             }
             addView(view, childCount, params)
         }

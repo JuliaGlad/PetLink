@@ -1,11 +1,10 @@
-package petlink.android.petlink.ui.profile.edit.mapper
+package petlink.android.petlink.ui.profile.mapper
 
 import petlink.android.petlink.domain.model.user.owner.OwnerDomain
-import petlink.android.petlink.domain.model.user.owner.OwnerMainDataDomain
-import petlink.android.petlink.ui.profile.edit.model.OwnerEditModel
+import petlink.android.petlink.ui.profile.model.OwnerFullModel
 
-fun OwnerDomain.toEdit() =
-    OwnerEditModel(
+fun OwnerDomain.toFull() =
+    OwnerFullModel(
         ownerImageUri = imageUri,
         ownerName = name,
         ownerSurname = surname,

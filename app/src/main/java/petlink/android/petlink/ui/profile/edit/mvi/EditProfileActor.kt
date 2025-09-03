@@ -9,8 +9,9 @@ import petlink.android.petlink.domain.usecase.user_account.EditPetDataUseCase
 import petlink.android.petlink.domain.usecase.user_account.GetUserFullDataUseCase
 import petlink.android.petlink.ui.main.asyncAwait
 import petlink.android.petlink.ui.main.runCatchingNonCancellation
-import petlink.android.petlink.ui.profile.edit.mapper.toEdit
-import petlink.android.petlink.ui.profile.edit.model.UserEditModel
+import petlink.android.petlink.ui.profile.mapper.toFull
+import petlink.android.petlink.ui.profile.mapper.toFullDataUi
+import petlink.android.petlink.ui.profile.model.UserFullModel
 
 class EditProfileActor(
     private val getUserFullDataUseCase: GetUserFullDataUseCase,
@@ -185,10 +186,7 @@ class EditProfileActor(
             asyncAwait(
                 { getUserFullDataUseCase.invoke() }
             ) { data ->
-                UserEditModel(
-                    data.owner.toEdit(),
-                    data.pet.toEdit()
-                )
+                data.toFullDataUi()
             }
         }.getOrThrow()
 

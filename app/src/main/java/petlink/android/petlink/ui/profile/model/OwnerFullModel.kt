@@ -1,6 +1,6 @@
-package petlink.android.petlink.ui.profile.edit.model
+package petlink.android.petlink.ui.profile.model
 
-class OwnerEditModel(
+class OwnerFullModel(
     var ownerImageUri: String?,
     var ownerName: String?,
     var ownerSurname: String?,

@@ -51,7 +51,7 @@ class ChooserViewDelegate : AdapterDelegate {
             text: String,
             selectedIcon: Drawable?,
             unselectedIcon: Drawable?,
-            clickListener: (String) -> Unit
+            clickListener: ((String) -> Unit)?
         ){
             view.apply {
                 this.text = text
@@ -59,8 +59,10 @@ class ChooserViewDelegate : AdapterDelegate {
                 iconUnselected = unselectedIcon
                 view.setOnClickListener {
                     view.chosen = !view.chosen
-                    binding.chooserView.onViewClicked(viewId)
-                    clickListener(text)
+                    if (clickListener != null) {
+                        binding.chooserView.onViewClicked(viewId)
+                        clickListener(text)
+                    }
                 }
             }
         }
