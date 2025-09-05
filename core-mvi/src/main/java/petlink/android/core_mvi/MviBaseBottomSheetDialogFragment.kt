@@ -3,17 +3,16 @@ package petlink.android.core_mvi
 import android.os.Bundle
 import android.view.View
 import androidx.annotation.LayoutRes
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.launch
 
-abstract class MviBaseFragment<
+abstract class MviBaseBottomSheetDialogFragment<
         PartialState : MviPartialState,
         Intent : MviIntent,
         State : MviState,
         Effect : MviEffect>(@LayoutRes layoutId: Int) :
-    Fragment(layoutId) {
+    BottomSheetDialogFragment(layoutId) {
 
     protected abstract val store: MviStore<PartialState, Intent, State, Effect>
 

@@ -10,5 +10,5 @@ data class FlexboxModel(
     val alignment: Int,
     val defaultValue: List<String> = emptyList<String>(),
     val isMultiply: Boolean = false,
-    var chosenItemListener: (String) -> Unit
+    val chosenItemListener: ((String) -> Unit)? = null
 )

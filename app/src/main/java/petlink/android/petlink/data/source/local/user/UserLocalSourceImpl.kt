@@ -12,13 +12,25 @@ class UserLocalSourceImpl @Inject constructor(): UserLocalSource {
     override suspend fun getUserById(userId: String): UserDto? =
         UserProvider().getUser(userId)?.toDto()
 
+    override suspend fun updateBackground(
+        userId: String,
+        background: String
+    ) {
+        UserProvider().updateBackground(
+            userId = userId,
+            background = background
+        )
+    }
+
     override suspend fun insertUser(
         userId: String,
+        background: String,
         pet: PetDto,
         owner: OwnerDto
     ) {
         UserProvider().insertUser(
             userId = userId,
+            background = background,
             pet = pet.toLocalDb(),
             owner = owner.toLocalDb()
         )

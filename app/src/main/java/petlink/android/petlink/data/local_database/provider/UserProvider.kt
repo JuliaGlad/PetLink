@@ -78,14 +78,30 @@ class UserProvider {
         }
     }
 
+    suspend fun updateBackground(
+        userId: String,
+        background: String
+    ){
+        val dao =  app.database.userDao()
+        val users = dao.getUsers()
+        for (item in users){
+            if (item.userId == userId){
+                item.background = background
+                dao.updateBackground(item)
+            }
+        }
+    }
+
     suspend fun insertUser(
         userId: String,
+        background: String,
         pet: PetLocalDb,
         owner: OwnerLocalDb
     ) {
         app.database.userDao().insertUser(
             UserEntity(
                 userId = userId,
+                background = background,
                 pet = pet,
                 owner = owner
             )

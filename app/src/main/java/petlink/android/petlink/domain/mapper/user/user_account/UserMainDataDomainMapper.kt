@@ -8,6 +8,7 @@ import petlink.android.petlink.domain.model.user.user_account.UserMainDataDomain
 fun UserDto.toDomainMainData() =
     UserMainDataDomain(
         userId = userId,
+        background = background,
         petMainDataDomain = petDto.toDomainMainData(),
         ownerMainDataDomain = ownerDto.toDomainMainData()
     )

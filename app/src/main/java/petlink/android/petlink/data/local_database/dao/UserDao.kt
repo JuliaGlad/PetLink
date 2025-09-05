@@ -16,6 +16,9 @@ interface UserDao {
     suspend fun insertUser(user: UserEntity)
 
     @Update
+    suspend fun updateBackground(user: UserEntity)
+
+    @Update
     suspend fun updateOwnerData(user: UserEntity)
 
     @Update

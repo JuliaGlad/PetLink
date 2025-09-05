@@ -1,7 +1,7 @@
 package petlink.android.petlink.ui.profile.edit.mvi
 
 import petlink.android.core_mvi.MviPartialState
-import petlink.android.petlink.ui.profile.edit.model.UserEditModel
+import petlink.android.petlink.ui.profile.model.UserFullModel
 
 sealed interface EditPartialState: MviPartialState{
 
@@ -9,7 +9,7 @@ sealed interface EditPartialState: MviPartialState{
 
     data class Error(val throwable: Throwable): EditPartialState
 
-    data class DataLoaded(val user: UserEditModel): EditPartialState
+    data class DataLoaded(val user: UserFullModel): EditPartialState
 
     data object PetDataUpdated: EditPartialState
 

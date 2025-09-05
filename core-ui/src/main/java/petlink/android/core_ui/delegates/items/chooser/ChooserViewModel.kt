@@ -13,5 +13,5 @@ data class ChooserViewModel(
     val defaultValue: String,
     val selectedIcon2: Drawable?,
     val unselectedIcon2: Drawable?,
-    val clickListener: (String) -> Unit
+    val clickListener: ((String) -> Unit)? = null
 )

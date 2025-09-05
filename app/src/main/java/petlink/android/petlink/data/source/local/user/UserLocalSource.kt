@@ -8,7 +8,17 @@ interface UserLocalSource {
 
     suspend fun getUserById(userId: String): UserDto?
 
-    suspend fun insertUser(userId: String, pet: PetDto, owner: OwnerDto)
+    suspend fun updateBackground(
+        userId: String,
+        background: String
+    )
+
+    suspend fun insertUser(
+        userId: String,
+        background: String,
+        pet: PetDto,
+        owner: OwnerDto
+    )
 
     suspend fun updatePetData(
         userId: String,

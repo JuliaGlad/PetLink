@@ -8,6 +8,7 @@ class UserEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = -1,
     val userId: String,
+    var background: String,
     val pet: PetLocalDb,
     val owner: OwnerLocalDb
 )

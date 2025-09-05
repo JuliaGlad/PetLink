@@ -8,4 +8,6 @@ sealed interface ProfileIntent: MviIntent {
 
     data object LoadUserPosts: ProfileIntent
 
+    class UpdateBackground(val uri: String): ProfileIntent
+
 }

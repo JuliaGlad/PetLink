@@ -5,6 +5,7 @@ import petlink.android.petlink.ui.profile.profile.model.ProfileMainDataUi
 
 fun UserMainDataDomain.toProfileMainData() =
     ProfileMainDataUi(
+        background = background,
         petData = petMainDataDomain.toPetMainDataUi(),
         ownerData = ownerMainDataDomain.toOwnerMainDataUi()
     )

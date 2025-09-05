@@ -39,6 +39,7 @@ import petlink.android.petlink.databinding.FragmentProfileBinding
 import petlink.android.petlink.di.DaggerAppComponent
 import petlink.android.petlink.ui.cicerone.screen.main.BottomScreen
 import petlink.android.petlink.ui.main.activity.MainActivity
+import petlink.android.petlink.ui.profile.my_data.MyDataBottomSheetFragment
 import petlink.android.petlink.ui.profile.profile.di.DaggerProfileComponent
 import petlink.android.petlink.ui.profile.profile.model.OwnerMainDataUi
 import petlink.android.petlink.ui.profile.profile.model.PetMainDataUi
@@ -133,10 +134,13 @@ class ProfileFragment : MviBaseFragment<
         if (result.resultCode == Activity.RESULT_OK) {
             val photoResult = result.data
             if (photoResult != null) {
+                val uri = photoResult.data.toString()
+                store.sendIntent(ProfileIntent.UpdateBackground(uri))
                 for (i in items) {
                     if (i is ProfileAvatarsDelegateItem) {
                         val content = i.content() as ProfileAvatarsModel
-                        content.backgroundImage = photoResult.data.toString()
+                        content.backgroundImage = uri
+                        mainAdapter.notifyItemChanged(items.indexOf(i))
                     }
                 }
             }
@@ -145,9 +149,9 @@ class ProfileFragment : MviBaseFragment<
 
     private fun initImagePicker() {
         ImagePicker.with(this)
-            .crop()
+            .crop(16f, 11f)
             .compress(512)
-            .maxResultSize(512, 512)
+            .maxResultSize(512, 1024)
             .createIntent { intent -> addCoverImageLauncher?.launch(intent) }
     }
 
@@ -174,10 +178,9 @@ class ProfileFragment : MviBaseFragment<
                 }
                 with(state.value.data) {
                     initMainAdapter()
-                    initRecycler(petData, ownerData)
+                    initRecycler(background, petData, ownerData)
                 }
             }
-
             is LceState.Error -> {
                 with(binding) {
                     loadingScreen.root.visibility = GONE
@@ -186,7 +189,6 @@ class ProfileFragment : MviBaseFragment<
                     errorScreen.button.setOnClickListener { store.sendIntent(ProfileIntent.LoadUserData) }
                 }
             }
-
             LceState.Loading -> {
                 with(binding) {
                     loadingScreen.root.visibility = VISIBLE
@@ -202,9 +204,10 @@ class ProfileFragment : MviBaseFragment<
             ProfileEffect.NavigateToEdit -> (activity as MainActivity).openEditActivity(
                 editProfileActivityResultLauncher
             )
-
             ProfileEffect.NavigateToFriends -> (activity as MainActivity).openFriendsActivity()
-            ProfileEffect.NavigateToMyData -> (activity as MainActivity).openMyDataActivity()
+            ProfileEffect.NavigateToMyData -> {
+                activity?.supportFragmentManager?.let { MyDataBottomSheetFragment().show(it, MY_DATA_BOTTOM_SHEET) }
+            }
             ProfileEffect.NavigateToSettings -> (activity as MainActivity).openSettingsActivity(settingsActivityResultLauncher)
             ProfileEffect.ShowPosts -> showPosts()
             ProfileEffect.LaunchImagePicker -> initImagePicker()
@@ -220,7 +223,7 @@ class ProfileFragment : MviBaseFragment<
         }
     }
 
-    private fun initRecycler(petData: PetMainDataUi, ownerData: OwnerMainDataUi) {
+    private fun initRecycler(background: String, petData: PetMainDataUi, ownerData: OwnerMainDataUi) {
         items.addAll(
             listOf(
                 ProfileAvatarsDelegateItem(
@@ -229,6 +232,7 @@ class ProfileFragment : MviBaseFragment<
                         petImage = petData.imageUri,
                         ownerName = ownerData.ownerName,
                         ownerImage = ownerData.imageUri,
+                        backgroundImage = background,
                         addImageClickListener = { store.sendEffect(ProfileEffect.LaunchImagePicker) }
                     )
                 ),
@@ -382,6 +386,7 @@ class ProfileFragment : MviBaseFragment<
     companion object {
         const val POSTS_ID = 1
         const val MANAGEMENT_ID = 2
+        const val MY_DATA_BOTTOM_SHEET = "MyDataBottomSheetTAG"
         const val OWNER_IMAGE = "OwnerImageExtra"
         const val PET_IMAGE = "PetImageExtra"
         const val PET_NAME = "PetNameExtra"
