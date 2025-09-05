@@ -1,15 +1,18 @@
 package petlink.android.petlink.ui.profile.profile.mvi
 
+import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import petlink.android.core_mvi.MviActor
 import petlink.android.core_mvi.runCatchingNonCancellation
 import petlink.android.petlink.domain.usecase.user_account.GetUserMainDataDomainUseCase
+import petlink.android.petlink.domain.usecase.user_account.UpdateBackgroundUseCase
 import petlink.android.petlink.ui.main.asyncAwait
 import petlink.android.petlink.ui.profile.profile.model.mapper.toProfileMainData
 
 class ProfileActor(
-    private val getUserDataUseCase: GetUserMainDataDomainUseCase
+    private val getUserDataUseCase: GetUserMainDataDomainUseCase,
+    private val updateBackgroundUseCase: UpdateBackgroundUseCase
 ) : MviActor<
         ProfilePartialState,
         ProfileIntent,
@@ -22,6 +25,19 @@ class ProfileActor(
         when (intent) {
             ProfileIntent.LoadUserData -> getProfileData()
             ProfileIntent.LoadUserPosts -> TODO("Add posts UseCase")
+            is ProfileIntent.UpdateBackground -> updateBackground(intent.uri)
+        }
+
+    private fun updateBackground(uri: String) =
+        flow {
+            runCatching {
+                updateBackgroundUseCase(uri)
+            }.fold(
+                onSuccess = { emit(ProfilePartialState.BackgroundUpdated) },
+                onFailure = { throwable ->
+                    emit(ProfilePartialState.Error(throwable))
+                }
+            )
         }
 
     private fun getProfileData() = flow {
@@ -36,6 +52,13 @@ class ProfileActor(
             }
         )
     }
+
+    private suspend fun updateBackgroundUseCase(uri: String) =
+        runCatchingNonCancellation {
+            asyncAwait(
+                { updateBackgroundUseCase.invoke(uri) }
+            ) { result -> Log.i("Result", result.toString()) }
+        }.getOrThrow()
 
     private suspend fun loadUserData() =
         runCatchingNonCancellation {

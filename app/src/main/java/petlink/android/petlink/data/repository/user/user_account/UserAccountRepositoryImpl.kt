@@ -1,7 +1,7 @@
 package petlink.android.petlink.data.repository.user.user_account
 
-import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +17,16 @@ class UserAccountRepositoryImpl @javax.inject.Inject constructor(
     private val store: FirebaseFirestore,
     private val localSource: UserLocalSource
 ) : UserAccountRepository {
+
+    override suspend fun updateBackground(uri: String) {
+        auth.currentUser?.uid?.let { uid ->
+            store.collection(USER_COLLECTION)
+                .document(uid)
+                .update(BACKGROUND, uri)
+                .await()
+            localSource.updateBackground(uid, uri)
+        }
+    }
 
     override suspend fun editOwnerData(
         imageUri: String?,
@@ -118,6 +128,7 @@ class UserAccountRepositoryImpl @javax.inject.Inject constructor(
                     )
                     UserDto(
                         userId = it.uid,
+                        background = data.getStringOrEmpty(BACKGROUND),
                         petDto = petDto,
                         ownerDto = ownerDto
                     )
@@ -125,18 +136,6 @@ class UserAccountRepositoryImpl @javax.inject.Inject constructor(
             result
         }
         return result
-    }
-
-    override suspend fun addUserData(
-        userId: String,
-        ownerDto: OwnerDto,
-        petDto: PetDto
-    ) {
-        localSource.insertUser(
-            userId = userId,
-            owner = ownerDto,
-            pet = petDto
-        )
     }
 
     override suspend fun addUserData(
@@ -158,6 +157,7 @@ class UserAccountRepositoryImpl @javax.inject.Inject constructor(
                     .document(it.uid)
                     .set(
                         hashMapOf(
+                            BACKGROUND to "",
                             PET_NAME to petName,
                             PET_BIRTHDAY to petBirthday,
                             PET_TYPE to petType,
@@ -174,9 +174,60 @@ class UserAccountRepositoryImpl @javax.inject.Inject constructor(
                             OWNER_CITY to city,
                             OWNER_IMAGE to imageUri
                         )
-                    )
+                    ).await()
+                addUserToLocalDb(
+                    it.uid,
+                    petImageUri,
+                    petName,
+                    petBirthday,
+                    petType,
+                    gender,
+                    imageUri,
+                    name,
+                    surname,
+                    birthday,
+                    city
+                )
             }
         }
+    }
+
+    private suspend fun addUserToLocalDb(
+        userId: String,
+        petImageUri: String,
+        petName: String,
+        petBirthday: String,
+        petType: String,
+        gender: String,
+        imageUri: String,
+        name: String,
+        surname: String,
+        birthday: String,
+        city: String
+    ) {
+        localSource.insertUser(
+            userId = userId,
+            background = "",
+            pet = PetDto(
+                imageUri = petImageUri,
+                name = petName,
+                birthday = petBirthday,
+                petType = petType,
+                gender = gender,
+                description = "",
+                games = "",
+                places = "",
+                food = ""
+            ),
+            owner = OwnerDto(
+                imageUri = imageUri,
+                name = name,
+                surname = surname,
+                birthday = birthday,
+                gender = gender,
+                city = city
+            )
+        )
     }
 
     private suspend fun updateUserDataFields(userId: String, updates: Map<String, Any?>) {
@@ -192,6 +243,7 @@ class UserAccountRepositoryImpl @javax.inject.Inject constructor(
         get(field)?.toString() ?: ""
 
     companion object {
+        const val BACKGROUND = "Background"
         const val USER_COLLECTION = "Users"
         const val OWNER_IMAGE: String = "OwnerImage"
         const val OWNER_NAME: String = "OwnerName"

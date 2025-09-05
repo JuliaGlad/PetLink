@@ -134,10 +134,13 @@ class ProfileFragment : MviBaseFragment<
         if (result.resultCode == Activity.RESULT_OK) {
             val photoResult = result.data
             if (photoResult != null) {
+                val uri = photoResult.data.toString()
+                store.sendIntent(ProfileIntent.UpdateBackground(uri))
                 for (i in items) {
                     if (i is ProfileAvatarsDelegateItem) {
                         val content = i.content() as ProfileAvatarsModel
-                        content.backgroundImage = photoResult.data.toString()
+                        content.backgroundImage = uri
+                        mainAdapter.notifyItemChanged(items.indexOf(i))
                     }
                 }
             }
@@ -146,9 +149,9 @@ class ProfileFragment : MviBaseFragment<
 
     private fun initImagePicker() {
         ImagePicker.with(this)
-            .crop()
+            .crop(16f, 11f)
             .compress(512)
-            .maxResultSize(512, 512)
+            .maxResultSize(512, 1024)
             .createIntent { intent -> addCoverImageLauncher?.launch(intent) }
     }
 
@@ -175,7 +178,7 @@ class ProfileFragment : MviBaseFragment<
                 }
                 with(state.value.data) {
                     initMainAdapter()
-                    initRecycler(petData, ownerData)
+                    initRecycler(background, petData, ownerData)
                 }
             }
             is LceState.Error -> {
@@ -220,7 +223,7 @@ class ProfileFragment : MviBaseFragment<
         }
     }
 
-    private fun initRecycler(petData: PetMainDataUi, ownerData: OwnerMainDataUi) {
+    private fun initRecycler(background: String, petData: PetMainDataUi, ownerData: OwnerMainDataUi) {
         items.addAll(
             listOf(
                 ProfileAvatarsDelegateItem(
@@ -229,6 +232,7 @@ class ProfileFragment : MviBaseFragment<
                         petImage = petData.imageUri,
                         ownerName = ownerData.ownerName,
                         ownerImage = ownerData.imageUri,
+                        backgroundImage = background,
                         addImageClickListener = { store.sendEffect(ProfileEffect.LaunchImagePicker) }
                     )
                 ),

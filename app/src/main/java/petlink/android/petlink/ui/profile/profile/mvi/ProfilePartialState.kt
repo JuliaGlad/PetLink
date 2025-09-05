@@ -12,4 +12,6 @@ sealed interface ProfilePartialState : MviPartialState {
     class DataLoaded(val data: ProfileMainDataUi): ProfilePartialState
 
     data object PostsLoaded : ProfilePartialState
+
+    data object BackgroundUpdated: ProfilePartialState
 }

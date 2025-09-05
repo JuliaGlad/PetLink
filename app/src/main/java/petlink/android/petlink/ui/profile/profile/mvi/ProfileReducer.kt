@@ -16,7 +16,10 @@ class ProfileReducer: MviReducer<
             is ProfilePartialState.Error -> updateError(prevState, partialState.throwable)
             ProfilePartialState.Loading -> updateLoading(prevState)
             ProfilePartialState.PostsLoaded -> TODO("Add PostLoaded state")
+            ProfilePartialState.BackgroundUpdated -> updateBackgroundUpdated(prevState)
         }
+
+    private fun updateBackgroundUpdated(prevState: ProfileState) = prevState.copy()
 
     private fun updateDataLoaded(prevState: ProfileState, data: ProfileMainDataUi) =
         prevState.copy(value = LceState.Content(data))

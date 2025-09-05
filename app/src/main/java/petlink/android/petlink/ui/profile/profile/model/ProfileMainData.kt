@@ -1,6 +1,7 @@
 package petlink.android.petlink.ui.profile.profile.model
 
 class ProfileMainDataUi(
+    val background: String,
     val petData: PetMainDataUi,
     val ownerData: OwnerMainDataUi,
 )

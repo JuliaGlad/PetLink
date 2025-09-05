@@ -6,6 +6,8 @@ import petlink.android.petlink.data.repository.user.dto.UserDto
 
 interface UserAccountRepository {
 
+    suspend fun updateBackground(uri: String)
+
     suspend fun editOwnerData(
         imageUri: String?,
         name: String?,
@@ -29,11 +31,7 @@ interface UserAccountRepository {
 
     suspend fun getUserData(): UserDto?
 
-    suspend fun addUserData(
-        userId: String,
-        ownerDto: OwnerDto,
-        petDto: PetDto
-    )
+
     suspend fun addUserData(
         petImageUri: String = "",
         petName: String,
