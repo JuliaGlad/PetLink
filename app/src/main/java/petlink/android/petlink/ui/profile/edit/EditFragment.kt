@@ -306,7 +306,7 @@ class EditFragment : MviBaseFragment<
         TextInputLayoutDelegateItem(
             TextInputLayoutModel(
                 id = OWNER_DATE_TEXT_INPUT,
-                defaultValue = updatedUser.ownerFullModel.ownerBirthday.toString(),
+                defaultValue = ownerData.ownerBirthday.toString(),
                 hint = getString(R.string.enter_date_of_birth),
                 editable = false
             )

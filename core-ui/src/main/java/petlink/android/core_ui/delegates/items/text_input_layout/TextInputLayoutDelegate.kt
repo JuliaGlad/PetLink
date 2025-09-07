@@ -1,5 +1,6 @@
 package petlink.android.core_ui.delegates.items.text_input_layout
 
+import android.text.TextWatcher
 import android.text.method.PasswordTransformationMethod
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -32,17 +33,21 @@ class TextInputLayoutDelegate : AdapterDelegate {
 
     class ViewHolder(private val binding: DelegateTextInputLayoutBinding) :
         RecyclerView.ViewHolder(binding.root) {
+        var textWatcher: TextWatcher? = null
         fun bind(model: TextInputLayoutModel) {
             with(binding.editText) {
-                hint = model.hint
+                textWatcher?.let { removeTextChangedListener(it) }
+                binding.textInputLayout.hint = model.hint
                 inputType = model.inputType
                 isEnabled = model.editable
                 setText(model.defaultValue)
                 binding.textInputLayout.error = model.error
-                model.textChangedListener?.let { addTextChangedListener(onTextChanged = { char, p0, p1, p2 ->
-                    model.textChangedListener(char.toString())
-                }) }
-                if (model.endIconMode == TextInputLayout.END_ICON_PASSWORD_TOGGLE){
+                textWatcher = model.textChangedListener?.let {
+                    addTextChangedListener(onTextChanged = { char, p0, p1, p2 ->
+                        model.textChangedListener(char.toString())
+                    })
+                }
+                if (model.endIconMode == TextInputLayout.END_ICON_PASSWORD_TOGGLE) {
                     transformationMethod = PasswordTransformationMethod.getInstance()
                 }
             }
