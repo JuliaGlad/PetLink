@@ -199,7 +199,7 @@ class AuthFragment : MviBaseFragment<
                         id = EMAIL_ID,
                         hint = getString(R.string.enter_mail),
                         inputType = InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
-                        textChangedListener = { char, p0, p1, p2 ->
+                        textChangedListener = { char  ->
                             email = char.toString()
                             if (store.uiState.value.emailError.isNotEmpty() && email?.isNotEmpty() == true)
                                 store.sendEffect(AuthEffect.SetEmailError(""))
@@ -216,7 +216,7 @@ class AuthFragment : MviBaseFragment<
                         hint = getString(R.string.enter_password),
                         inputType = InputType.TYPE_TEXT_VARIATION_PASSWORD,
                         endIconMode = TextInputLayout.END_ICON_PASSWORD_TOGGLE,
-                        textChangedListener = { char, p0, p1, p2 ->
+                        textChangedListener = { char ->
                             password = char.toString()
                             if (store.uiState.value.passwordError.isNotEmpty() && password?.isNotEmpty() == true)
                                 store.sendEffect(AuthEffect.SetPasswordError(""))
@@ -251,7 +251,6 @@ class AuthFragment : MviBaseFragment<
         const val EMAIL_ID = 1
         const val PASSWORD_ID = 2
         const val FORGOT_PASSWORD_DIALOG = "Dialog forgot password"
-        const val PASSWORD_UPDATED_DIALOG = "Password updated dialog"
     }
 
 }

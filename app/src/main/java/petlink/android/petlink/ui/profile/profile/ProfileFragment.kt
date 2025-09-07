@@ -210,7 +210,6 @@ class ProfileFragment : MviBaseFragment<
             }
             ProfileEffect.NavigateToSettings -> (activity as MainActivity).openSettingsActivity(settingsActivityResultLauncher)
             ProfileEffect.ShowPosts -> showPosts()
-            ProfileEffect.LaunchImagePicker -> initImagePicker()
         }
     }
 
@@ -233,7 +232,7 @@ class ProfileFragment : MviBaseFragment<
                         ownerName = ownerData.ownerName,
                         ownerImage = ownerData.imageUri,
                         backgroundImage = background,
-                        addImageClickListener = { store.sendEffect(ProfileEffect.LaunchImagePicker) }
+                        addImageClickListener = { initImagePicker() }
                     )
                 ),
                 TabDelegateItem(

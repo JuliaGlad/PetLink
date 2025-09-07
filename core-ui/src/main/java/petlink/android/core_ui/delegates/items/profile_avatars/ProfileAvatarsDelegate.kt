@@ -1,6 +1,7 @@
 package petlink.android.core_ui.delegates.items.profile_avatars
 
 import android.view.LayoutInflater
+import android.view.View.GONE
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
@@ -36,7 +37,7 @@ class ProfileAvatarsDelegate : AdapterDelegate {
             with(binding.avatars) {
                 petName.text = model.petName
                 ownerName.text = model.ownerName
-                if (model.petImage != null) {
+                if (!model.petImage.isNullOrEmpty()) {
                     petImage.setImageUri(model.petImage?.toUri())
                 } else {
                     petImage.setDrawableImage(
@@ -47,7 +48,7 @@ class ProfileAvatarsDelegate : AdapterDelegate {
                         )
                     )
                 }
-                if (model.ownerImage != null) {
+                if (!model.ownerImage.isNullOrEmpty()) {
                     ownerImage.setImageUri(model.ownerImage?.toUri())
                 } else {
                     ownerImage.setDrawableImage(
@@ -58,10 +59,12 @@ class ProfileAvatarsDelegate : AdapterDelegate {
                         )
                     )
                 }
-                if (model.backgroundImage != null){
+                if (!model.backgroundImage.isNullOrEmpty()){
                     model.backgroundImage?.let {
                         binding.profileAvatarsBackground.setImageURI(it.toUri())
                     }
+                } else {
+                    binding.backgroundMask.visibility = GONE
                 }
             }
 

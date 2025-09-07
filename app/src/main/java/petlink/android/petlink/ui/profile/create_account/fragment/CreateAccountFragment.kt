@@ -256,7 +256,7 @@ class CreateAccountFragment : MviBaseFragment<
                 TextInputLayoutModel(
                     hint = getString(R.string.enter_name),
                     defaultValue = (activity as CreateAccountActivity).viewModel.ownerData.name,
-                    textChangedListener = { char, p0, p1, p2 ->
+                    textChangedListener = { char ->
                         (activity as CreateAccountActivity).viewModel.ownerData.name =
                             char.toString()
                     }
@@ -266,7 +266,7 @@ class CreateAccountFragment : MviBaseFragment<
                 TextInputLayoutModel(
                     hint = getString(R.string.enter_surname),
                     defaultValue = (activity as CreateAccountActivity).viewModel.ownerData.surname,
-                    textChangedListener = { char, p0, p1, p2 ->
+                    textChangedListener = { char ->
                         (activity as CreateAccountActivity).viewModel.ownerData.surname =
                             char.toString()
                     }
@@ -351,7 +351,7 @@ class CreateAccountFragment : MviBaseFragment<
                     hint = getString(R.string.enter_mail),
                     inputType = InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
                     defaultValue = (activity as CreateAccountActivity).viewModel.mainData.email,
-                    textChangedListener = { char, p0, p1, p2 ->
+                    textChangedListener = { char ->
                         (activity as CreateAccountActivity).viewModel.mainData.email =
                             char.toString()
                     }
@@ -363,7 +363,7 @@ class CreateAccountFragment : MviBaseFragment<
                     inputType = InputType.TYPE_TEXT_VARIATION_PASSWORD,
                     endIconMode = TextInputLayout.END_ICON_PASSWORD_TOGGLE,
                     defaultValue = (activity as CreateAccountActivity).viewModel.mainData.password,
-                    textChangedListener = { char, p0, p1, p2 ->
+                    textChangedListener = { char ->
                         (activity as CreateAccountActivity).viewModel.mainData.password =
                             char.toString()
                     }
@@ -407,7 +407,7 @@ class CreateAccountFragment : MviBaseFragment<
                 TextInputLayoutModel(
                     hint = getString(R.string.enter_name),
                     defaultValue = (activity as CreateAccountActivity).viewModel.petData.name,
-                    textChangedListener = { char, p0, p1, p2 ->
+                    textChangedListener = { char ->
                         (activity as CreateAccountActivity).viewModel.petData.name = char.toString()
                     }
                 )),
