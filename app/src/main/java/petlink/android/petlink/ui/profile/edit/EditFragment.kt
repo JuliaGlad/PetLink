@@ -289,7 +289,7 @@ class EditFragment : MviBaseFragment<
             TextInputLayoutModel(
                 hint = getString(R.string.enter_name),
                 defaultValue = ownerData.ownerName.toString(),
-                textChangedListener = { char, p0, p1, p2 ->
+                textChangedListener = { char ->
                     updatedUser.ownerFullModel.ownerName = char.toString()
                 }
             )),
@@ -298,7 +298,7 @@ class EditFragment : MviBaseFragment<
             TextInputLayoutModel(
                 hint = getString(R.string.enter_surname),
                 defaultValue = ownerData.ownerSurname.toString(),
-                textChangedListener = { char, p0, p1, p2 ->
+                textChangedListener = { char ->
                     updatedUser.ownerFullModel.ownerSurname = char.toString()
                 }
             )),
@@ -306,7 +306,7 @@ class EditFragment : MviBaseFragment<
         TextInputLayoutDelegateItem(
             TextInputLayoutModel(
                 id = OWNER_DATE_TEXT_INPUT,
-                defaultValue = updatedUser.ownerFullModel.ownerBirthday.toString(),
+                defaultValue = ownerData.ownerBirthday.toString(),
                 hint = getString(R.string.enter_date_of_birth),
                 editable = false
             )
@@ -397,7 +397,7 @@ class EditFragment : MviBaseFragment<
             TextInputLayoutModel(
                 hint = getString(R.string.enter_name),
                 defaultValue = petData.petName.toString(),
-                textChangedListener = { char, p0, p1, p2 ->
+                textChangedListener = { char ->
                     updatedUser.petFullModel.petName = char.toString()
                 }
             )),
@@ -468,7 +468,7 @@ class EditFragment : MviBaseFragment<
             TextInputLayoutModel(
                 hint = getString(R.string.write_about_your_pet),
                 defaultValue = petData.petDescription.toString(),
-                textChangedListener = { char, p0, p1, p2 ->
+                textChangedListener = { char ->
                     updatedUser.petFullModel.petDescription = char.toString()
                 }
             )
@@ -482,7 +482,7 @@ class EditFragment : MviBaseFragment<
             TextInputLayoutModel(
                 hint = getString(R.string.favorite_games),
                 defaultValue = petData.petGames.toString(),
-                textChangedListener = { char, p0, p1, p2 ->
+                textChangedListener = { char ->
                     updatedUser.petFullModel.petGames = char.toString()
                 }
             )
@@ -496,7 +496,7 @@ class EditFragment : MviBaseFragment<
             TextInputLayoutModel(
                 hint = getString(R.string.favorite_places),
                 defaultValue = petData.petPlaces.toString(),
-                textChangedListener = { char, p0, p1, p2 ->
+                textChangedListener = { char ->
                     updatedUser.petFullModel.petPlaces = char.toString()
                 }
             )
@@ -510,7 +510,7 @@ class EditFragment : MviBaseFragment<
             TextInputLayoutModel(
                 hint = getString(R.string.favorite_food),
                 defaultValue = petData.petFood.toString(),
-                textChangedListener = { char, p0, p1, p2 ->
+                textChangedListener = { char ->
                     updatedUser.petFullModel.petFood = char.toString()
                 }
             )

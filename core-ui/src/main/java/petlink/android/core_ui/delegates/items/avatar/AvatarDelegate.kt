@@ -32,7 +32,7 @@ class AvatarDelegate : AdapterDelegate {
         RecyclerView.ViewHolder(binding.root) {
         fun bind(model: AvatarModel) {
             with(binding) {
-                if (model.uri != null) { model.uri?.let { image.setImageUri(it.toUri()) }
+                if (!model.uri.isNullOrEmpty()) { model.uri?.let { image.setImageUri(it.toUri()) }
                 } else if (model.drawable != null) { image.setDrawableImage(model.drawable) }
                 model.clickListener?.let { image.setOnClickListener { it() } }
             }

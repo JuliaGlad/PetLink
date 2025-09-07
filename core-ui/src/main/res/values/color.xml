@@ -18,6 +18,7 @@
     <color name="brightest_green">#5DFF5D</color>
     <color name="bright_green">#42F72E</color>
     <color name="white">#FBFFFB</color>
+    <color name="white_50_transparent">#FBFFFB</color>
     <color name="white_end_gradient">#DFFFDF</color>
     <color name="light_grey">#E8E8E8</color>
     <color name="green_grey">#EBFAEB</color>
