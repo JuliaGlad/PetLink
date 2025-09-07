@@ -12,5 +12,5 @@ data class TextInputLayoutModel(
     var defaultValue: String = "",
     var error: String = "",
     val editable: Boolean = true,
-    val textChangedListener: ((CharSequence?, Int, Int, Int) -> Unit)? = null
+    val textChangedListener: ((String) -> Unit)? = null
 )

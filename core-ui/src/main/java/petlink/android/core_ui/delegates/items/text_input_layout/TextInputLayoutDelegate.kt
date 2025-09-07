@@ -39,7 +39,9 @@ class TextInputLayoutDelegate : AdapterDelegate {
                 isEnabled = model.editable
                 setText(model.defaultValue)
                 binding.textInputLayout.error = model.error
-                model.textChangedListener?.let { addTextChangedListener(onTextChanged = it) }
+                model.textChangedListener?.let { addTextChangedListener(onTextChanged = { char, p0, p1, p2 ->
+                    model.textChangedListener(char.toString())
+                }) }
                 if (model.endIconMode == TextInputLayout.END_ICON_PASSWORD_TOGGLE){
                     transformationMethod = PasswordTransformationMethod.getInstance()
                 }
