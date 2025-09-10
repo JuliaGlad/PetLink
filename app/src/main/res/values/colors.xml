@@ -34,7 +34,8 @@
     <color name="bright_blue">#26F1FF</color>
     <color name="bright_indigo">#4A2EFF</color>
     <color name="light_turquoise">#F1FFFE</color>
-    <color name="dark_turquoise">#209087</color>
+    <color name="dark_turquoise">#084C46</color>
+    <color name="medium_turquoise">#209087</color>
     <color name="light_purple">#FBF9FF</color>
     <color name="bright_purple">#DA20FF</color>
     <color name="dark_purple">#8C6EB9</color>

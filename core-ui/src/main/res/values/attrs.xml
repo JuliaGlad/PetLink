@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <declare-styleable name="CalendarEventView">
+        <attr name="event_date" format="string"/>
+        <attr name="event_title" format="string"/>
+        <attr name="is_notification_on" format="boolean"/>
+    </declare-styleable>
+
     <declare-styleable name="DescriptionButton">
         <attr name="description" format="string"/>
         <attr name="title" format="string"/>
