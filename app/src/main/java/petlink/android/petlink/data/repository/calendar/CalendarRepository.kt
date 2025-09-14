@@ -8,10 +8,14 @@ interface CalendarRepository {
         title: String,
         date: String,
         theme: String,
+        dateForTimestamp: String,
         isNotificationOn: Boolean
     )
 
-    suspend fun getEvents(): List<CalendarEventDto>
+    suspend fun getEvents(
+        orderByDate: Boolean = false,
+        limit: Long? = null
+    ): List<CalendarEventDto>
 
     suspend fun deleteEvent(id: String)
 

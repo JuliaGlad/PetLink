@@ -1,9 +1,14 @@
 package petlink.android.petlink.data.repository.calendar
 
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
 import petlink.android.petlink.data.repository.calendar.dto.CalendarEventDto
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.stream.Collectors
 import javax.inject.Inject
 
@@ -15,13 +20,18 @@ class CalendarRepositoryImpl @Inject constructor(
         title: String,
         date: String,
         theme: String,
+        dateForTimestamp: String,
         isNotificationOn: Boolean
     ) {
+        val sdf = SimpleDateFormat(DATE_FORMAT, Locale.getDefault())
+        val parsedDate: Date = sdf.parse(date)!!
+
         auth.currentUser?.uid?.let { uid ->
-            val event = hashSetOf(
+            val event = hashMapOf(
                 EVENT_TITLE to title,
                 EVENT_DATE to date,
                 EVENT_THEME to theme,
+                EVENT_DATE_TIME_STAMP to Timestamp(parsedDate),
                 IS_NOTIFICATION_ON to isNotificationOn
             )
             store.collection(USER_COLLECTION)
@@ -33,13 +43,19 @@ class CalendarRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getEvents(): List<CalendarEventDto> {
+    override suspend fun getEvents(
+        orderByDate: Boolean,
+        limit: Long?
+    ): List<CalendarEventDto> {
         val snapshot = auth.currentUser?.uid?.let { uid ->
-            store.collection(USER_COLLECTION)
+            var query = store.collection(USER_COLLECTION)
                 .document(uid)
-                .collection(CALENDAR_EVENT)
-                .get()
-                .await()
+                .collection(CALENDAR_EVENT) as Query
+
+            if (orderByDate) query = query.orderBy(EVENT_DATE_TIME_STAMP)
+            if (limit != null) query = query.limit(limit)
+
+            query.get().await()
         }
         return snapshot?.documents?.stream()?.map { document ->
             CalendarEventDto(
@@ -96,10 +112,12 @@ class CalendarRepositoryImpl @Inject constructor(
     }
 
     companion object {
+        const val DATE_FORMAT = "yyyy-MM-dd"
         const val CALENDAR_EVENT = "CalendarEvent"
         const val USER_COLLECTION = "Users"
         const val EVENT_TITLE = "EventTitle"
         const val EVENT_THEME = "EventTheme"
+        const val EVENT_DATE_TIME_STAMP = "EvenDateTimeStamp"
         const val EVENT_DATE = "EventDate"
         const val IS_NOTIFICATION_ON = "IsNotificationOn"
     }
