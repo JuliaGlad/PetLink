@@ -1,11 +1,11 @@
 package petlink.android.petlink.data.source.local.user
 
-import petlink.android.petlink.data.local_database.provider.UserProvider
+import petlink.android.petlink.data.local_database.provider.user.UserProvider
 import petlink.android.petlink.data.mapper.user.toDto
 import petlink.android.petlink.data.repository.user.dto.OwnerDto
 import petlink.android.petlink.data.repository.user.dto.PetDto
 import petlink.android.petlink.data.repository.user.dto.UserDto
-import petlink.android.petlink.data.source.local.mapper.toLocalDb
+import petlink.android.petlink.data.source.local.mapper.user.toLocalDb
 import javax.inject.Inject
 
 class UserLocalSourceImpl @Inject constructor(): UserLocalSource {

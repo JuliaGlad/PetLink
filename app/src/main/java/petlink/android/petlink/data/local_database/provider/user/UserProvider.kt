@@ -1,16 +1,15 @@
-package petlink.android.petlink.data.local_database.provider
+package petlink.android.petlink.data.local_database.provider.user
 
-import petlink.android.petlink.App.Companion.app
-import petlink.android.petlink.data.local_database.entity.OwnerLocalDb
-import petlink.android.petlink.data.local_database.entity.PetLocalDb
-import petlink.android.petlink.data.local_database.entity.UserEntity
-import kotlin.reflect.KMutableProperty
+import petlink.android.petlink.App
+import petlink.android.petlink.data.local_database.entity.user.OwnerLocalDb
+import petlink.android.petlink.data.local_database.entity.user.PetLocalDb
+import petlink.android.petlink.data.local_database.entity.user.UserEntity
 import kotlin.reflect.KMutableProperty0
 
 class UserProvider {
     suspend fun getUser(userId: String): UserEntity? {
         var entity: UserEntity? = null
-        val users = app.database.userDao().getUsers()
+        val users = App.Companion.app.database.userDao().getUsers()
         for (item in users){
             if (item.userId == userId){
                 entity = item
@@ -29,7 +28,7 @@ class UserProvider {
         gender: String?,
         city: String?
     ){
-        val dao = app.database.userDao()
+        val dao = App.Companion.app.database.userDao()
         val users = dao.getUsers()
         for (item in users){
             if (item.userId == userId){
@@ -58,7 +57,7 @@ class UserProvider {
         places: String?,
         food: String?
     ){
-        val dao = app.database.userDao()
+        val dao = App.Companion.app.database.userDao()
         val users = dao.getUsers()
         for (item in users){
             if (item.userId == userId){
@@ -82,7 +81,7 @@ class UserProvider {
         userId: String,
         background: String
     ){
-        val dao =  app.database.userDao()
+        val dao =  App.Companion.app.database.userDao()
         val users = dao.getUsers()
         for (item in users){
             if (item.userId == userId){
@@ -98,7 +97,7 @@ class UserProvider {
         pet: PetLocalDb,
         owner: OwnerLocalDb
     ) {
-        app.database.userDao().insertUser(
+        App.Companion.app.database.userDao().insertUser(
             UserEntity(
                 userId = userId,
                 background = background,
@@ -109,7 +108,7 @@ class UserProvider {
     }
 
     suspend fun deleteUser(userId: String) {
-        val dao = app.database.userDao()
+        val dao = App.Companion.app.database.userDao()
         val tracks = dao.getUsers()
         for (item in tracks){
             if (item.userId == userId){
@@ -120,7 +119,7 @@ class UserProvider {
     }
 
     suspend fun deleteAll() {
-        app.database.userDao().deleteAll()
+        App.Companion.app.database.userDao().deleteAll()
     }
 
     private fun <T> updateIfChanged(prev: KMutableProperty0<T>, new: T?) {

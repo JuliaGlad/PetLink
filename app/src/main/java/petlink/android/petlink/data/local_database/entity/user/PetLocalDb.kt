@@ -1,4 +1,4 @@
-package petlink.android.petlink.data.local_database.entity
+package petlink.android.petlink.data.local_database.entity.user
 
 class PetLocalDb(
     var imageUri: String,

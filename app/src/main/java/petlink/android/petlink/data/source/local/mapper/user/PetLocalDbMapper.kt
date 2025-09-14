@@ -1,6 +1,6 @@
-package petlink.android.petlink.data.source.local.mapper
+package petlink.android.petlink.data.source.local.mapper.user
 
-import petlink.android.petlink.data.local_database.entity.PetLocalDb
+import petlink.android.petlink.data.local_database.entity.user.PetLocalDb
 import petlink.android.petlink.data.repository.user.dto.PetDto
 
 fun PetDto.toLocalDb() =

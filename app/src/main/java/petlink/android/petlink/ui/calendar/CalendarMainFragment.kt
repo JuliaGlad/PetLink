@@ -5,12 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import petlink.android.petlink.databinding.FragmentCalendarBinding
-import petlink.android.petlink.databinding.FragmentMapBinding
+import petlink.android.petlink.databinding.FragmentMainCalendarBinding
 
-class CalendarFragment: Fragment() {
+class CalendarMainFragment: Fragment() {
 
-    private var _binding: FragmentCalendarBinding? = null
+    private var _binding: FragmentMainCalendarBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,7 +21,7 @@ class CalendarFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentCalendarBinding.inflate(layoutInflater)
+        _binding = FragmentMainCalendarBinding.inflate(layoutInflater)
         return binding.root
     }
 
