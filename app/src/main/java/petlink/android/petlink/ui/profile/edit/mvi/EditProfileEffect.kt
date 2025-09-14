@@ -11,5 +11,7 @@ sealed interface EditProfileEffect: MviEffect {
 
     data object LaunchImagePicker: EditProfileEffect
 
+    data object ShowEmptyFieldSnackBar: EditProfileEffect
+
     class ShowDataPickerDialog(val itemId: Int): EditProfileEffect
 }

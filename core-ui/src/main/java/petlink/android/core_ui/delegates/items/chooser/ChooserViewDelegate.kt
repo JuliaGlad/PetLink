@@ -32,38 +32,52 @@ class ChooserViewDelegate : AdapterDelegate {
 
     class ViewHolder(private val binding: DelegateChooserViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(model: ChooserViewModel){
+        fun bind(model: ChooserViewModel) {
             with(binding.chooserView) {
-                initChooser(getChooser1(), model.text1, model.selectedIcon1, model.unselectedIcon1, model.clickListener)
-                initChooser(getChooser2(), model.text2, model.selectedIcon2, model.unselectedIcon2, model.clickListener)
+                initChooser(
+                    getChooser1(),
+                    model.text1,
+                    model.selectedIcon1,
+                    model.unselectedIcon1,
+                    model.clickListener
+                )
+                initChooser(
+                    getChooser2(),
+                    model.text2,
+                    model.selectedIcon2,
+                    model.unselectedIcon2,
+                    model.clickListener
+                )
                 if (getChooser1().text == model.defaultValue) {
                     getChooser1().chosen = true
                     getChooser2().chosen = false
-                }
-                else if (getChooser2().text == model.defaultValue) {
+                } else if (getChooser2().text == model.defaultValue) {
                     getChooser2().chosen = true
                     getChooser1().chosen = false
                 }
             }
         }
+
         private fun initChooser(
             view: ChooserItemView,
             text: String,
             selectedIcon: Drawable?,
             unselectedIcon: Drawable?,
             clickListener: ((String) -> Unit)?
-        ){
+        ) {
             view.apply {
                 this.text = text
                 iconSelected = selectedIcon
                 iconUnselected = unselectedIcon
                 view.setOnClickListener {
-                    view.chosen = !view.chosen
+                    if (binding.chooserView.chosenId != viewId)
+                        view.chosen = !view.chosen
                     if (clickListener != null) {
                         binding.chooserView.onViewClicked(viewId)
                         clickListener(text)
                     }
                 }
+
             }
         }
     }

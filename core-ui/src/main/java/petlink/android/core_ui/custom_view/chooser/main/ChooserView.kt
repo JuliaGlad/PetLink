@@ -22,7 +22,7 @@ class ChooserView @JvmOverloads constructor(
     defTheme: Int = 0
 ) : ViewGroup(context, attributeSet, defStyle, defTheme) {
 
-    private var chosenId: Int = -1
+    var chosenId: Int = -1
     private lateinit var chooser1: ChooserItemView
     private lateinit var chooser2: ChooserItemView
     var selectedIcon1: Drawable? = null
@@ -88,11 +88,6 @@ class ChooserView @JvmOverloads constructor(
             else chooser2.chosen = false
         }
     }
-
-    fun getChosen(): String? =
-        if (chooser1.viewId == chosenId) text1
-        else if (chooser2.viewId == chosenId) text2
-        else null
 
     private fun TypedArray.initChooser2() {
         chooser2 = findViewById(R.id.chooser_2)
