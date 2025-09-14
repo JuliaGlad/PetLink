@@ -1,0 +1,24 @@
+package petlink.android.petlink.domain.usecase.calendar
+
+import petlink.android.petlink.data.repository.calendar.CalendarRepository
+import javax.inject.Inject
+
+class AddCalendarEventUseCase @Inject constructor(
+    private val repository: CalendarRepository
+) {
+    suspend fun invoke(
+        title: String,
+        date: String,
+        theme: String,
+        dateForTimestamp: String,
+        isNotificationOn: Boolean
+    ) {
+        repository.addEvent(
+            title = title,
+            date = date,
+            theme = theme,
+            dateForTimestamp = dateForTimestamp,
+            isNotificationOn = isNotificationOn
+        )
+    }
+}
