@@ -6,7 +6,11 @@ sealed interface EditProfileIntent: MviIntent {
 
     data object LoadUserData: EditProfileIntent
 
-    data class UpdateOwnerData(
+    class AddIdToEmptyFields(val id: Int): EditProfileIntent
+
+    class RemoveIdFromEmptyFields(val id: Int): EditProfileIntent
+
+    class UpdateOwnerData(
         val ownerImageUri: String?,
         val ownerName: String?,
         val ownerSurname: String?,
@@ -15,7 +19,7 @@ sealed interface EditProfileIntent: MviIntent {
         val ownerCity: String?
     ): EditProfileIntent
 
-    data class UpdatePetData(
+    class UpdatePetData(
         val petImageUri: String?,
         val petName: String?,
         val petBirthday: String?,

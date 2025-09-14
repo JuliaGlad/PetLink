@@ -49,7 +49,14 @@ class EditProfileActor(
                 petPlaces = intent.petPlaces,
                 petDescription = intent.petDescription
             )
+
+            is EditProfileIntent.AddIdToEmptyFields -> addIdToEmptyFields(intent.id)
+            is EditProfileIntent.RemoveIdFromEmptyFields -> removeIdFromEmptyFields(intent.id)
         }
+
+    private fun addIdToEmptyFields(id: Int) = flow { emit(EditPartialState.AddEmptyFieldId(id)) }
+
+    private fun removeIdFromEmptyFields(id: Int) = flow { emit(EditPartialState.RemoveEmptyFieldId(id)) }
 
     private fun getUserData() = flow {
         kotlin.runCatching {

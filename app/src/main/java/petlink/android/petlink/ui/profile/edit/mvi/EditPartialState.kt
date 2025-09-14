@@ -7,9 +7,13 @@ sealed interface EditPartialState: MviPartialState{
 
     data object Loading: EditPartialState
 
-    data class Error(val throwable: Throwable): EditPartialState
+    class Error(val throwable: Throwable): EditPartialState
 
-    data class DataLoaded(val user: UserFullModel): EditPartialState
+    class DataLoaded(val user: UserFullModel): EditPartialState
+
+    class AddEmptyFieldId(val id: Int): EditPartialState
+
+    class RemoveEmptyFieldId(val id: Int): EditPartialState
 
     data object PetDataUpdated: EditPartialState
 

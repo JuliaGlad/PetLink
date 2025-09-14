@@ -6,7 +6,8 @@ import petlink.android.petlink.ui.profile.model.UserFullModel
 data class EditMviState(
     val value: EditState<UserFullModel>,
     val isPetUpdated: Boolean = false,
-    val isOwnerUpdated: Boolean = false
+    val isOwnerUpdated: Boolean = false,
+    val emptyFields: List<Int> = emptyList<Int>()
 ): MviState
 
 sealed interface EditState<out T>{

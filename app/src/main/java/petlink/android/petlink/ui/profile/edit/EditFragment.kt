@@ -16,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.viewModels
 import com.github.dhaval2404.imagepicker.ImagePicker
+import com.google.android.material.snackbar.Snackbar
 import org.json.JSONArray
 import petlink.android.core_mvi.MviBaseFragment
 import petlink.android.core_mvi.MviStore
@@ -152,14 +153,16 @@ class EditFragment : MviBaseFragment<
                 with(binding) {
                     loadingScreen.root.visibility = GONE
                     errorScreen.root.visibility = GONE
-                    with(state.value.data) {
-                        updatedUser = this
-                        initRecycler(
-                            petFullModel = petFullModel,
-                            ownerFullModel = ownerFullModel
-                        )
+                    if (recyclerItems.isEmpty()) {
+                        with(state.value.data) {
+                            updatedUser = this
+                            initRecycler(
+                                petFullModel = petFullModel,
+                                ownerFullModel = ownerFullModel
+                            )
+                        }
+                        initSaveButton()
                     }
-                    initSaveButton()
                 }
             }
 
@@ -219,20 +222,24 @@ class EditFragment : MviBaseFragment<
 
     private fun initSaveButton() {
         binding.saveButton.setOnClickListener {
-            with(updatedUser.petFullModel) {
-                store.sendIntent(
-                    EditProfileIntent.UpdatePetData(
-                        petBirthday = petBirthday,
-                        petFood = petFood,
-                        petType = petType,
-                        petName = petName,
-                        petGames = petGames,
-                        petPlaces = petPlaces,
-                        petGender = petGender,
-                        petDescription = petDescription,
-                        petImageUri = petImageUri
+            if (store.uiState.value.emptyFields.isEmpty()) {
+                with(updatedUser.petFullModel) {
+                    store.sendIntent(
+                        EditProfileIntent.UpdatePetData(
+                            petBirthday = petBirthday,
+                            petFood = petFood,
+                            petType = petType,
+                            petName = petName,
+                            petGames = petGames,
+                            petPlaces = petPlaces,
+                            petGender = petGender,
+                            petDescription = petDescription,
+                            petImageUri = petImageUri
+                        )
                     )
-                )
+                }
+            } else {
+                store.sendEffect(EditProfileEffect.ShowEmptyFieldSnackBar)
             }
         }
     }
@@ -287,18 +294,32 @@ class EditFragment : MviBaseFragment<
         TitleTextDelegateItem(TitleTextModel(title = getString(R.string.name))),
         TextInputLayoutDelegateItem(
             TextInputLayoutModel(
+                id = OWNER_NAME_ID,
                 hint = getString(R.string.enter_name),
+                canBeEmpty = false,
+                error = getString(R.string.this_field_cannot_be_empty),
                 defaultValue = ownerData.ownerName.toString(),
                 textChangedListener = { char ->
+                    checkTextFieldOnUpdate(
+                        textFieldId = OWNER_NAME_ID,
+                        value = char
+                    )
                     updatedUser.ownerFullModel.ownerName = char.toString()
                 }
             )),
         TitleTextDelegateItem(TitleTextModel(title = getString(R.string.surname))),
         TextInputLayoutDelegateItem(
             TextInputLayoutModel(
+                id = OWNER_SURNAME_ID,
                 hint = getString(R.string.enter_surname),
                 defaultValue = ownerData.ownerSurname.toString(),
+                canBeEmpty = false,
+                error = getString(R.string.this_field_cannot_be_empty),
                 textChangedListener = { char ->
+                    checkTextFieldOnUpdate(
+                        textFieldId = OWNER_SURNAME_ID,
+                        value = char
+                    )
                     updatedUser.ownerFullModel.ownerSurname = char.toString()
                 }
             )),
@@ -395,9 +416,16 @@ class EditFragment : MviBaseFragment<
         TitleTextDelegateItem(TitleTextModel(title = getString(R.string.pet_name))),
         TextInputLayoutDelegateItem(
             TextInputLayoutModel(
+                id = PET_NAME_ID,
                 hint = getString(R.string.enter_name),
+                canBeEmpty = false,
                 defaultValue = petData.petName.toString(),
+                error = getString(R.string.this_field_cannot_be_empty),
                 textChangedListener = { char ->
+                    checkTextFieldOnUpdate(
+                        textFieldId = PET_NAME_ID,
+                        value = char
+                    )
                     updatedUser.petFullModel.petName = char.toString()
                 }
             )),
@@ -556,6 +584,12 @@ class EditFragment : MviBaseFragment<
                     }
                 }
             }
+
+            is EditProfileEffect.ShowEmptyFieldSnackBar ->
+                Snackbar.make(
+                    requireView(), getString(R.string.this_field_cannot_be_empty),
+                    Snackbar.LENGTH_LONG
+                ).show()
         }
     }
 
@@ -613,6 +647,15 @@ class EditFragment : MviBaseFragment<
         datePickerDialog.show()
     }
 
+    private fun checkTextFieldOnUpdate(textFieldId: Int, value: String){
+        val emptyFields = store.uiState.value.emptyFields
+        if (value.isEmpty() && !emptyFields.contains(textFieldId)){
+            store.sendIntent(EditProfileIntent.AddIdToEmptyFields(textFieldId))
+        } else if (value.isNotEmpty() && emptyFields.contains(textFieldId)){
+            store.sendIntent(EditProfileIntent.RemoveIdFromEmptyFields(textFieldId))
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
@@ -622,6 +665,9 @@ class EditFragment : MviBaseFragment<
         const val EDIT_PROFILE_FRAGMENT_TAG = "EditProfileFragmentTag"
         const val PET_AVATAR_ID = 1
         const val OWNER_AVATAR_ID = 2
+        const val PET_NAME_ID = 5
+        const val OWNER_NAME_ID = 6
+        const val OWNER_SURNAME_ID = 7
         const val OWNER_IMAGE = "OwnerImageExtra"
         const val PET_IMAGE = "PetImageExtra"
         const val PET_NAME = "PetNameExtra"

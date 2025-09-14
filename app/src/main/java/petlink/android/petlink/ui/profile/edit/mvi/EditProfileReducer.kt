@@ -17,7 +17,25 @@ class EditProfileReducer : MviReducer<
             EditPartialState.Loading -> updateLoading(prevState)
             EditPartialState.OwnerDataUpdated -> updateOwnerDataUpdated(prevState)
             EditPartialState.PetDataUpdated -> updatePetDataUpdated(prevState)
+            is EditPartialState.AddEmptyFieldId -> updateAddEmptyFieldId(prevState, partialState.id)
+            is EditPartialState.RemoveEmptyFieldId -> updateRemoveEmptyFieldId(prevState, partialState.id)
         }
+
+    private fun updateRemoveEmptyFieldId(prevState: EditMviState, id: Int): EditMviState {
+        val emptyFields = mutableListOf<Int>().apply {
+            addAll(prevState.emptyFields)
+            remove(id)
+        }.toList()
+        return prevState.copy(emptyFields = emptyFields)
+    }
+
+    private fun updateAddEmptyFieldId(prevState: EditMviState, id: Int): EditMviState {
+        val emptyFields = mutableListOf<Int>().apply {
+            addAll(prevState.emptyFields)
+            add(id)
+        }.toList()
+        return prevState.copy(emptyFields = emptyFields)
+    }
 
     private fun updateDataLoaded(prevState: EditMviState, data: UserFullModel) =
         prevState.copy(value = EditState.DataLoaded(data))

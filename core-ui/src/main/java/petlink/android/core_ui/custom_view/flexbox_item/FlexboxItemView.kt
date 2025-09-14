@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.util.AttributeSet
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
@@ -111,10 +112,13 @@ class FlexboxItemView @JvmOverloads constructor(
         setMeasuredDimension(actualWidth, actualHeight)
     }
 
+
     fun FlexboxItemView.onViewClicked() {
         setOnClickListener {
-            isChosen = !isChosen
-            clickListener?.onClick(viewId)
+            if (!isChosen) {
+                isChosen = !isChosen
+                clickListener?.onClick(viewId)
+            }
         }
     }
 

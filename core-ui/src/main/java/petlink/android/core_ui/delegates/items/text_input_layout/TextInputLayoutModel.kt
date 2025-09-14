@@ -11,6 +11,7 @@ data class TextInputLayoutModel(
     val endIconMode: Int = TextInputLayout.END_ICON_NONE,
     var defaultValue: String = "",
     var error: String = "",
+    val canBeEmpty: Boolean = true,
     val editable: Boolean = true,
     val textChangedListener: ((String) -> Unit)? = null
 )
