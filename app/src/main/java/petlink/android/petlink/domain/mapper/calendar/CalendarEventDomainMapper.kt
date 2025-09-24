@@ -9,5 +9,6 @@ fun CalendarEventDto.toDomain() =
         title = title,
         date = date,
         theme = theme,
+        time = time,
         isNotificationOn = isNotificationOn
     )

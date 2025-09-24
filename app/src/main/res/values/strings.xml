@@ -2,6 +2,7 @@
     <string name="app_name" translatable="false">PetLink</string>
     <string name="update_password">Update password</string>
     <string name="enter_new_email">Enter new email</string>
+    <string name="event_creation">Event creation</string>
     <string name="are_you_sure_you_want_to_delete_your_account">Are you sure you want to delete your account? You won`t be able to restore it</string>
     <string name="we_ll_send_you_a_link_to_your_email_to_change_your_password">We`ll send a link to your email to change your password</string>
     <string name="send">Send</string>

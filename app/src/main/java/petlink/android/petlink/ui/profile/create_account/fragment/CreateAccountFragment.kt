@@ -174,7 +174,8 @@ class CreateAccountFragment : MviBaseFragment<
                                     CreateUser(
                                         mainData,
                                         ownerData,
-                                        petData
+                                        petData,
+                                        getString(R.string.pet_birthday)
                                     )
                                 )
                             }
@@ -538,7 +539,7 @@ class CreateAccountFragment : MviBaseFragment<
             { _, selectedYear, selectedMonth, selectedDay ->
                 val dayFormatted = String.format(Locale.getDefault(), "%02d", selectedDay)
                 val monthFormatted = String.format(Locale.getDefault(), "%02d", selectedMonth + 1)
-                val date = "$dayFormatted.$monthFormatted.$selectedYear"
+                val date = "$selectedYear-$monthFormatted-$dayFormatted"
                 getDate(date)
             },
             year, month, day

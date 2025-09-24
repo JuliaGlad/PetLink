@@ -12,6 +12,7 @@ import com.github.terrakok.cicerone.androidx.AppNavigator
 import petlink.android.petlink.R
 import petlink.android.petlink.databinding.ActivityMainBinding
 import petlink.android.petlink.di.DaggerAppComponent
+import petlink.android.petlink.ui.calendar.add_event.AddEventActivity
 import petlink.android.petlink.ui.cicerone.AppNavigationCoordinator
 import petlink.android.petlink.ui.cicerone.Presenter
 import petlink.android.petlink.ui.cicerone.screen.main.BottomScreen
@@ -86,6 +87,11 @@ class MainActivity : AppCompatActivity() {
             screen?.let { presenter.navigateTo(it) }
             true
         }
+    }
+
+    fun openAddEventActivity() {
+        val intent = Intent(this, AddEventActivity::class.java)
+        startActivity(intent)
     }
 
     fun openCreateAccountActivity(launcher: ActivityResultLauncher<Intent>) {

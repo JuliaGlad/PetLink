@@ -32,7 +32,8 @@ class CalendarEventDelegate : AdapterDelegate {
         fun bind(model: CalendarEventModel) {
             with(binding.item) {
                 eventTitle = model.title
-                eventDateText = model.eventDate
+                eventDateText = "${model.time} ${model.eventDate}"
+                eventTheme = model.theme
                 isNotificationOn = model.isNotificationOn
                 setOnClickListener { model.clickListener() }
             }

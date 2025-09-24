@@ -3,6 +3,7 @@
     <string name="community">Сообщество</string>
     <string name="enter_new_email">Введите новую почту</string>
     <string name="update_password">Обновить пароль</string>
+    <string name="event_creation">Создание события</string>
     <string name="we_ll_send_you_a_link_to_your_email_to_change_your_password">Мы отправим ссылку на вашу почту для обновления пароля</string>
     <string name="cancel">Отмена</string>
     <string name="update">Обновить</string>

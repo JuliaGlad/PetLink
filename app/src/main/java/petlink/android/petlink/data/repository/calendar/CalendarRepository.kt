@@ -8,6 +8,7 @@ interface CalendarRepository {
         title: String,
         date: String,
         theme: String,
+        time: String,
         dateForTimestamp: String,
         isNotificationOn: Boolean
     )
@@ -24,6 +25,8 @@ interface CalendarRepository {
         title: String,
         date: String,
         theme: String,
+        time: String,
+        dateForTimestamp: String,
         isNotificationOn: Boolean
     )
 

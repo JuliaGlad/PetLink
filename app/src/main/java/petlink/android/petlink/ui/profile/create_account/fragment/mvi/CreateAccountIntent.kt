@@ -9,7 +9,8 @@ sealed interface CreateAccountIntent: MviIntent {
     class CreateUser(
         val mainData: MainAccountCreationData,
         val ownerData: OwnerAccountCreationData,
-        val petData: PetAccountCreationData
+        val petData: PetAccountCreationData,
+        val eventTitle: String
     ): CreateAccountIntent
     data object Loading: CreateAccountIntent
 }

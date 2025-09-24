@@ -49,3 +49,15 @@ suspend fun <T1, T2, R> runSequentially(
     val r2 = s2()
     transform(r1, r2)
 }
+
+suspend fun <T1, T2, T3, R> runSequentially(
+    s1: suspend () -> T1,
+    s2: suspend () -> T2,
+    s3: suspend () -> T3,
+    transform: suspend (T1, T2, T3) -> R
+): R = coroutineScope {
+    val r1 = s1()
+    val r2 = s2()
+    val r3 = s3()
+    transform(r1, r2, r3)
+}

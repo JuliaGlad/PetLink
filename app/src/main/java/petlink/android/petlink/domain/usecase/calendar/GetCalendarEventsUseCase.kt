@@ -16,5 +16,5 @@ class GetCalendarEventsUseCase @Inject constructor(
         repository.getEvents(
             orderByDate = orderByDate,
             limit = limit
-        ).stream().map { it.toDomain() }.collect(Collectors.toList())
+        ).map { it.toDomain() }.toList()
 }

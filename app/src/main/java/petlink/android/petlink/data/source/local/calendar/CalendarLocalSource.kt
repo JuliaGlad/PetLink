@@ -6,7 +6,7 @@ interface CalendarLocalSource {
 
     suspend fun getEvents(
         orderByDate: Boolean = false,
-        limit: Int? = null
+        limit: Long? = null
     ): List<CalendarEventDto>?
 
     suspend fun deleteEvent(id: String)
@@ -18,6 +18,7 @@ interface CalendarLocalSource {
         title: String,
         date: String,
         theme: String,
+        time: String,
         dateForTimestamp: String,
         isNotificationOn: Boolean
     )
@@ -27,6 +28,7 @@ interface CalendarLocalSource {
         title: String,
         date: String,
         theme: String,
+        time: String,
         dateForTimestamp: String,
         isNotificationOn: Boolean
     )

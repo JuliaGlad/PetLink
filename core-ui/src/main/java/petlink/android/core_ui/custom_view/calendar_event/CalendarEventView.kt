@@ -26,7 +26,18 @@ class CalendarEventView @JvmOverloads constructor(
     private lateinit var eventTitleTextView: TextView
     private lateinit var eventDateTextView: TextView
 
-    var eventTheme: CalendarEventTheme = CalendarEventTheme.BLUE
+    var isNotificationOn: Boolean = false
+        set(value) {
+            if (value != field){
+                field = value
+                val iconId = if (field)R.drawable.ic_notification_on
+                else R.drawable.ic_notification_off
+
+                notificationIconView.setImageDrawable(ResourcesCompat.getDrawable(resources, iconId, context?.theme))
+            }
+        }
+
+    var eventTheme: CalendarEventTheme = CalendarEventTheme.GREEN
         set(value) {
             if (value != field){
                 field = value
@@ -41,7 +52,7 @@ class CalendarEventView @JvmOverloads constructor(
                 eventDateTextView.text = field
             }
         }
-    var titleText: String = ""
+    var eventTitle: String = ""
         set(value) {
             if (value != field){
                 field = value
@@ -73,7 +84,7 @@ class CalendarEventView @JvmOverloads constructor(
 
     private fun TypedArray.initIcon() {
         notificationIconView = findViewById(R.id.notification_icon)
-        val isNotificationOn = getBoolean(R.styleable.CalendarEventView_is_notification_on, false)
+        isNotificationOn = getBoolean(R.styleable.CalendarEventView_is_notification_on, false)
         val iconId = if (isNotificationOn)R.drawable.ic_notification_on
         else R.drawable.ic_notification_off
 
@@ -90,8 +101,8 @@ class CalendarEventView @JvmOverloads constructor(
 
     private fun TypedArray.initTitle() {
         eventTitleTextView = findViewById(R.id.event_title)
-        titleText = getString(R.styleable.CalendarEventView_event_title).toString()
-        eventTitleTextView.text = titleText
+        eventTitle = getString(R.styleable.CalendarEventView_event_title).toString()
+        eventTitleTextView.text = eventTitle
         eventTitleTextView.setTextColor(ResourcesCompat.getColor(resources, eventTheme.theme.titleTextColor, context.theme))
     }
 
