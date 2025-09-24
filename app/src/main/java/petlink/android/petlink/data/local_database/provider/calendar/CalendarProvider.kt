@@ -13,6 +13,7 @@ class CalendarProvider {
         title: String,
         date: String,
         theme: String,
+        time: String,
         dateForTimestamp: String,
         isNotificationOn: Boolean
     ) {
@@ -22,6 +23,7 @@ class CalendarProvider {
                 title = title,
                 date = date,
                 theme = theme,
+                time = time,
                 dateForTimestamp = dateForTimestamp,
                 isNotificationOn = isNotificationOn
             )
@@ -33,6 +35,7 @@ class CalendarProvider {
         title: String,
         date: String,
         theme: String,
+        time: String,
         dateForTimestamp: String,
         isNotificationOn: Boolean
     ) {
@@ -44,6 +47,7 @@ class CalendarProvider {
                     updateIfChanged(::title, title)
                     updateIfChanged(::date, date)
                     updateIfChanged(::theme, theme)
+                    updateIfChanged(::time, time)
                     updateIfChanged(::dateForTimestamp, dateForTimestamp)
                     updateIfChanged(::isNotificationOn, isNotificationOn)
                 }

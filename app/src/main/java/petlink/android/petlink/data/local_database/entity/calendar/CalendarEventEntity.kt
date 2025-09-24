@@ -12,6 +12,7 @@ class CalendarEventEntity(
     val eventId: String,
     var title: String,
     var date: String,
+    var time: String,
     var dateForTimestamp: String,
     var theme: String,
     var isNotificationOn: Boolean

@@ -5,5 +5,6 @@ class CalendarEventDomainModel(
     val title: String,
     val date: String,
     val theme: String,
+    val time: String,
     val isNotificationOn: Boolean
 )

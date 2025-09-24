@@ -41,6 +41,7 @@ class TextInputLayoutDelegate : AdapterDelegate {
                 inputType = model.inputType
                 isEnabled = model.editable
                 setText(model.defaultValue)
+                hint = model.hint
                 binding.textInputLayout.error = model.error
                 textWatcher = model.textChangedListener?.let {
                     addTextChangedListener(onTextChanged = { char, p0, p1, p2 ->

@@ -10,6 +10,7 @@ class AddCalendarEventUseCase @Inject constructor(
         title: String,
         date: String,
         theme: String,
+        time: String,
         dateForTimestamp: String,
         isNotificationOn: Boolean
     ) {
@@ -17,6 +18,7 @@ class AddCalendarEventUseCase @Inject constructor(
             title = title,
             date = date,
             theme = theme,
+            time = time,
             dateForTimestamp = dateForTimestamp,
             isNotificationOn = isNotificationOn
         )
