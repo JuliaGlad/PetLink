@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import petlink.android.petlink.R
 import petlink.android.petlink.databinding.FragmentCommunityMainBinding
 import petlink.android.petlink.databinding.FragmentMapBinding
 
@@ -24,6 +25,10 @@ class CommunityMainFragment: Fragment() {
     ): View? {
         _binding = FragmentCommunityMainBinding.inflate(layoutInflater)
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
     }
 
     override fun onDestroy() {

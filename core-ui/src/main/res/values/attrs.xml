@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <declare-styleable name="ThemeView">
+        <attr name="stroke_color" format="integer"/>
+        <attr name="background_color" format="integer"/>
+    </declare-styleable>
+
     <declare-styleable name="CalendarEventView">
         <attr name="event_date" format="string"/>
         <attr name="event_title" format="string"/>
