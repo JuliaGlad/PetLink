@@ -18,6 +18,14 @@ interface CreateAccountModule {
 
     @CreateAccountScope
     @Binds
+    fun bindCalendarRepository(calendarRepositoryImpl: CalendarRepositoryImpl): CalendarRepository
+
+    @CreateAccountScope
+    @Binds
+    fun bindCalendarLocalSource(calendarLocalSourceImpl: CalendarLocalSourceImpl): CalendarLocalSource
+
+    @CreateAccountScope
+    @Binds
     fun bindUserAuthRepository(userAuthRepositoryImpl: UserAuthRepositoryImpl): UserAuthRepository
 
     @CreateAccountScope

@@ -176,7 +176,8 @@ class CreateAccountFragment : MviBaseFragment<
                                     CreateUser(
                                         mainData,
                                         ownerData,
-                                        petData
+                                        petData,
+                                        getString(R.string.pet_birthday)
                                     )
                                 )
                             }

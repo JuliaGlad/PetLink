@@ -10,12 +10,14 @@ import javax.inject.Inject
 
 class CreateAccountLocalDI @Inject constructor(
     authRepository: UserAuthRepository,
-    accountRepository: UserAccountRepository
+    accountRepository: UserAccountRepository,
+    calendarRepository: CalendarRepository
 ) {
     val createUserUseCase = CreateUserUseCase(authRepository)
     val addUserDataUseCase = AddUserDataUseCase(accountRepository)
+    val addCalendarEventUseCase = AddCalendarEventUseCase(calendarRepository)
 
-    val actor: CreateAccountActor by lazy { CreateAccountActor(createUserUseCase, addUserDataUseCase) }
+    val actor: CreateAccountActor by lazy { CreateAccountActor(createUserUseCase, addUserDataUseCase, addCalendarEventUseCase) }
 
     val reducer: CreateAccountReducer by lazy { CreateAccountReducer() }
 

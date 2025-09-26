@@ -14,7 +14,8 @@ class CreateAccountLocalDIModule {
     @Provides
     fun provideCreateAccountLocalDi(
         authRepository: UserAuthRepository,
-        accountRepository: UserAccountRepository
-    ): CreateAccountLocalDI = CreateAccountLocalDI(authRepository, accountRepository)
+        accountRepository: UserAccountRepository,
+        calendarRepository: CalendarRepository
+    ): CreateAccountLocalDI = CreateAccountLocalDI(authRepository, accountRepository, calendarRepository)
 
 }
