@@ -50,4 +50,6 @@
     <color name="light_orange">#FFFBF6</color>
     <color name="bright_orange">#FFAB45</color>
     <color name="dark_orange">#C28547</color>
+    <color name="switch_start_green">#74AF74</color>
+    <color name="switch_end_green">#A4F3A4</color>
 </resources>
