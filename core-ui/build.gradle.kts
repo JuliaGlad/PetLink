@@ -37,6 +37,7 @@ android {
 
 dependencies {
     implementation(libs.github.glide)
+    implementation(libs.material)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

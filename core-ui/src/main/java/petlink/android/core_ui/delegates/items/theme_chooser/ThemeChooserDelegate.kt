@@ -47,8 +47,10 @@ class ThemeChooserDelegate : AdapterDelegate {
                         isChosen = isChosen,
                         clickListener = {
                             recyclerItems.forEach { recyclerItem ->
-                                recyclerItem.isChosen = !recyclerItem.isChosen
+                                val currentThemeId = recyclerItem.theme.value.id
+                                recyclerItem.isChosen = item.value.id == currentThemeId
                                 adapter.notifyItemChanged(recyclerItems.indexOf(recyclerItem))
+                                if (recyclerItem.isChosen) model.clickListener(currentThemeId)
                             }
                         }
                     )

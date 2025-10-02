@@ -31,9 +31,8 @@ class ThemeView @JvmOverloads constructor(
                     else GONE
             }
         }
-
-    @ColorRes
-    var backgroundThemeColor: Int = R.color.light_green_variant
+    
+    var backgroundThemeColor: Int = -1
         set(value) {
             if (value != field) {
                 field = value
@@ -41,13 +40,13 @@ class ThemeView @JvmOverloads constructor(
                 bg.color = ColorStateList.valueOf(ResourcesCompat.getColor(resources, field, context.theme))
             }
         }
-    var strokeColor = R.color.icon_color
+    var strokeColor = -1
         set(value) {
             if (value != field) {
                 field = value
                 val bg = themeBackground.background.mutate() as GradientDrawable
                 val colorStateValue = ColorStateList.valueOf(ResourcesCompat.getColor(resources, field, context.theme))
-                bg.setStroke(2, colorStateValue)
+                bg.setStroke(5, colorStateValue)
                 selectedThemeIcon.imageTintList = colorStateValue
             }
         }

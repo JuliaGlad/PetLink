@@ -11,7 +11,7 @@ class EventTheme(
     @ColorRes val descriptionTextColor: Int
 )
 
-enum class CalendarEventTheme(val theme: EventTheme) {
+enum class CalendarEventTheme(val value: EventTheme) {
     GREEN(
         EventTheme(
             id = 0,

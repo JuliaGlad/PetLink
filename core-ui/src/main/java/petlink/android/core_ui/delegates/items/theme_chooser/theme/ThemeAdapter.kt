@@ -32,8 +32,8 @@ class ThemeAdapter : ListAdapter<ThemeModel, ViewHolder>(ThemeCallback()) {
         RecyclerView.ViewHolder(binding.root) {
         fun bind(model: ThemeModel) {
             with(binding.theme) {
-                backgroundThemeColor = model.theme.background
-                strokeColor = model.theme.iconTint
+                backgroundThemeColor = model.theme.value.background
+                strokeColor = model.theme.value.iconTint
                 isChosen = model.isChosen
                 setOnClickListener { model.clickListener() }
             }

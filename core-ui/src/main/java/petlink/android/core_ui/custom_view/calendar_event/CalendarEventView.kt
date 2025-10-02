@@ -69,7 +69,7 @@ class CalendarEventView @JvmOverloads constructor(
                 R.drawable.bg_button,
                 context.theme
             ) as GradientDrawable
-            backgroundGradientDrawable.setColor(ResourcesCompat.getColor(resources, eventTheme.theme.background, context.theme))
+            backgroundGradientDrawable.setColor(ResourcesCompat.getColor(resources, eventTheme.value.background, context.theme))
             background = backgroundGradientDrawable
             foreground = ResourcesCompat.getDrawable(
                 resources,
@@ -89,21 +89,21 @@ class CalendarEventView @JvmOverloads constructor(
         else R.drawable.ic_notification_off
 
         notificationIconView.setImageDrawable(ResourcesCompat.getDrawable(resources, iconId, context?.theme))
-        notificationIconView.imageTintList = ColorStateList.valueOf(ResourcesCompat.getColor(resources, eventTheme.theme.iconTint, context.theme))
+        notificationIconView.imageTintList = ColorStateList.valueOf(ResourcesCompat.getColor(resources, eventTheme.value.iconTint, context.theme))
     }
 
     private fun TypedArray.initDescription() {
         eventDateTextView = findViewById(R.id.event_date)
         eventDateText = getString(R.styleable.CalendarEventView_event_date).toString()
         eventDateTextView.text = eventDateText
-        eventDateTextView.setTextColor(ResourcesCompat.getColor(resources, eventTheme.theme.descriptionTextColor, context.theme))
+        eventDateTextView.setTextColor(ResourcesCompat.getColor(resources, eventTheme.value.descriptionTextColor, context.theme))
     }
 
     private fun TypedArray.initTitle() {
         eventTitleTextView = findViewById(R.id.event_title)
         eventTitle = getString(R.styleable.CalendarEventView_event_title).toString()
         eventTitleTextView.text = eventTitle
-        eventTitleTextView.setTextColor(ResourcesCompat.getColor(resources, eventTheme.theme.titleTextColor, context.theme))
+        eventTitleTextView.setTextColor(ResourcesCompat.getColor(resources, eventTheme.value.titleTextColor, context.theme))
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

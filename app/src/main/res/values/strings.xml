@@ -1,11 +1,19 @@
 <resources>
     <string name="app_name" translatable="false">PetLink</string>
+    <string name="on" translatable="false">ON</string>
+    <string name="off" translatable="false">OFF</string>
+    <string name="enter_event_title">Enter event title</string>
     <string name="update_password">Update password</string>
     <string name="enter_new_email">Enter new email</string>
+    <string name="choose_time">Choose time</string>
+    <string name="enter_event_date">Enter event date</string>
     <string name="event_creation">Event creation</string>
+    <string name="time">Time</string>
+    <string name="enter_event_time">Enter event time</string>
     <string name="are_you_sure_you_want_to_delete_your_account">Are you sure you want to delete your account? You won`t be able to restore it</string>
     <string name="we_ll_send_you_a_link_to_your_email_to_change_your_password">We`ll send a link to your email to change your password</string>
     <string name="send">Send</string>
+    <string name="choose_event_time">Choose event time</string>
     <string name="success">Success</string>
     <string name="ok">Ok</string>
     <string name="looks_like_something_went_wrong">Looks like something went wrong! Please, try again later</string>
@@ -90,6 +98,7 @@
     <string name="you_dont_have_any_events_yet">You don`t have any events, yet!</string>
     <string name="date">Date</string>
     <string name="change_date">Change date</string>
+    <string name="change_time">Change time</string>
     <string name="event_theme">Event theme</string>
     <string name="notifications">Notifications</string>
     <string name="turned_on">turned on</string>

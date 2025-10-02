@@ -2,8 +2,8 @@ package petlink.android.core_ui.delegates.items.switch
 
 import petlink.android.core_ui.delegates.main.DelegateItem
 
-class SwitchDelegateItem(
-    val model: SwitchModel
+class NotificationSwitchDelegateItem(
+    val model: NotificationSwitchModel
 ): DelegateItem {
     override fun content(): Any = model
 

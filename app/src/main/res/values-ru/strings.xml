@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="enter_event_title">Введите название события</string>
     <string name="community">Сообщество</string>
+    <string name="choose_event_time">Выберите время события</string>
+    <string name="enter_event_date">Укажите дату события</string>
     <string name="enter_new_email">Введите новую почту</string>
     <string name="update_password">Обновить пароль</string>
     <string name="event_creation">Создание события</string>
     <string name="we_ll_send_you_a_link_to_your_email_to_change_your_password">Мы отправим ссылку на вашу почту для обновления пароля</string>
+    <string name="enter_event_time">Укажите время события</string>
     <string name="cancel">Отмена</string>
+    <string name="time">Время</string>
     <string name="update">Обновить</string>
     <string name="this_field_cannot_be_empty">Это поле не может быть пустым!</string>
     <string name="calendar">Календарь</string>
@@ -13,6 +18,7 @@
     <string name="profile">Профиль</string>
     <string name="useful">Полезный</string>
     <string name="news">Новости</string>
+    <string name="choose_time">Выберите время</string>
     <string name="ask_question">Задать вопрос</string>
     <string name="pet_photos">Фото питомцев</string>
     <string name="chats">Чаты</string>
@@ -85,6 +91,7 @@
     <string name="you_dont_have_any_events_yet">У вас пока что нет событий</string>
     <string name="date">Дата</string>
     <string name="change_date">Сменить дату</string>
+    <string name="change_time">Сменить время</string>
     <string name="event_theme">Тема события</string>
     <string name="notifications">Уведомления</string>
     <string name="choose_owner_birthday">Выбери свою дату рождения</string>

@@ -25,6 +25,17 @@
         <item name="colorAccent">@color/medium_green</item>
     </style>
 
+    <style name="GreenTimePickerDialogTheme" parent="ThemeOverlay.MaterialComponents.TimePicker">
+        <item name="colorPrimary">@color/medium_green</item>
+        <item name="colorOnPrimary">@color/icon_color</item>
+        <item name="colorPrimaryVariant">@color/dark_green_variant</item>
+        <item name="colorAccent">@color/medium_green</item>
+        <item name="clockHandColor">@color/light_green</item>
+        <item name="clockFaceBackgroundColor">@color/light_green</item>
+        <item name="clockNumberTextColor">@color/black</item>
+    </style>
+
+
     <style name="GreenDialogActionButton"
         parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">@color/icon_color</item>

@@ -78,6 +78,7 @@ class CalendarMainFragment : MviBaseFragment<
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initFab()
         store.sendIntent(CalendarMainIntent.LoadCalendarEvents)
     }
 
@@ -90,7 +91,6 @@ class CalendarMainFragment : MviBaseFragment<
                 }
                 initMainAdapter()
                 initRecycler(state.value.data.events)
-                initFab()
             }
 
             is LceState.Error -> {
@@ -118,7 +118,7 @@ class CalendarMainFragment : MviBaseFragment<
         val recyclerItems = mutableListOf<DelegateItem>()
         events.forEach { item ->
             with(item) {
-                val eventTheme = CalendarEventTheme.entries.filter { it.theme.id == theme }[0]
+                val eventTheme = CalendarEventTheme.entries.filter { it.value.id == theme }[0]
                 recyclerItems.add(
                     CalendarEventDelegateItem(
                         CalendarEventModel(
