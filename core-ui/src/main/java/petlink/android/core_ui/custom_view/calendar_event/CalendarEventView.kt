@@ -41,7 +41,16 @@ class CalendarEventView @JvmOverloads constructor(
         set(value) {
             if (value != field){
                 field = value
-                invalidate()
+                val bg = background.mutate() as GradientDrawable
+                bg.color = ColorStateList.valueOf(ResourcesCompat.getColor(resources, field.value.background, context.theme))
+                notificationIconView.imageTintList =
+                    ColorStateList.valueOf(ResourcesCompat.getColor(resources, field.value.iconTint, context.theme))
+                eventDateTextView.setTextColor(
+                    ResourcesCompat.getColor(resources, field.value.descriptionTextColor, context.theme)
+                )
+                eventTitleTextView.setTextColor(
+                    ResourcesCompat.getColor(resources, field.value.titleTextColor, context.theme)
+                )
             }
         }
 
@@ -89,21 +98,26 @@ class CalendarEventView @JvmOverloads constructor(
         else R.drawable.ic_notification_off
 
         notificationIconView.setImageDrawable(ResourcesCompat.getDrawable(resources, iconId, context?.theme))
-        notificationIconView.imageTintList = ColorStateList.valueOf(ResourcesCompat.getColor(resources, eventTheme.value.iconTint, context.theme))
+        notificationIconView.imageTintList =
+            ColorStateList.valueOf(ResourcesCompat.getColor(resources, eventTheme.value.iconTint, context.theme))
     }
 
     private fun TypedArray.initDescription() {
         eventDateTextView = findViewById(R.id.event_date)
         eventDateText = getString(R.styleable.CalendarEventView_event_date).toString()
         eventDateTextView.text = eventDateText
-        eventDateTextView.setTextColor(ResourcesCompat.getColor(resources, eventTheme.value.descriptionTextColor, context.theme))
+        eventDateTextView.setTextColor(
+            ResourcesCompat.getColor(resources, eventTheme.value.descriptionTextColor, context.theme)
+        )
     }
 
     private fun TypedArray.initTitle() {
         eventTitleTextView = findViewById(R.id.event_title)
         eventTitle = getString(R.styleable.CalendarEventView_event_title).toString()
         eventTitleTextView.text = eventTitle
-        eventTitleTextView.setTextColor(ResourcesCompat.getColor(resources, eventTheme.value.titleTextColor, context.theme))
+        eventTitleTextView.setTextColor(
+            ResourcesCompat.getColor(resources, eventTheme.value.titleTextColor, context.theme)
+        )
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

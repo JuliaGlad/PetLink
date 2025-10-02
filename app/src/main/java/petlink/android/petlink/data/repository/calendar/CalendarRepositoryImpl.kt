@@ -1,5 +1,6 @@
 package petlink.android.petlink.data.repository.calendar
 
+import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -21,10 +22,11 @@ class CalendarRepositoryImpl @Inject constructor(
         title: String,
         date: String,
         theme: String,
-        dateForTimestamp: String,
         time: String,
+        dateForTimestamp: String,
         isNotificationOn: Boolean
     ) {
+        Log.i("Date for timestamp", dateForTimestamp.toString())
         val sdf = SimpleDateFormat(DATE_FORMAT, Locale.getDefault())
         val parsedDate: Date = sdf.parse(dateForTimestamp)!!
 

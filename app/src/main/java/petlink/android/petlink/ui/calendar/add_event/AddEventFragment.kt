@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -96,6 +97,7 @@ class AddEventFragment : MviBaseFragment<
                 with(binding) {
                     error.root.visibility = VISIBLE
                     loading.root.visibility = GONE
+                    Log.i("Error", state.value.throwable.message.toString())
                 }
             }
 
