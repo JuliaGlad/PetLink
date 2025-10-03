@@ -1,6 +1,5 @@
 package petlink.android.petlink.ui.calendar.add_event.mvi
 
-import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import petlink.android.core_mvi.MviActor
@@ -49,7 +48,7 @@ class AddEventActor(
                 isNotificationOn = isNotificationOn
             )
         }.fold(
-            onSuccess = { emit(AddEventPartialState.EventCreated) },
+            onSuccess = { id -> emit(AddEventPartialState.EventCreated(id)) },
             onFailure = { throwable -> emit(AddEventPartialState.Error(throwable)) }
         )
     }
@@ -73,13 +72,7 @@ class AddEventActor(
                     time = time
                 )
             }
-        ){ data ->
-            Log.i(ADD_EVENT_ACTOR_TAG, EVENT_ADDED_SUCCESSFULLY + data.toString())
-        }
+        ){ it }
     }.getOrThrow()
 
-    companion object{
-        const val ADD_EVENT_ACTOR_TAG = "AddEventActor"
-        const val EVENT_ADDED_SUCCESSFULLY = "Event added successfully"
-    }
 }

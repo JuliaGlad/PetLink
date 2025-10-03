@@ -1,5 +1,7 @@
 package petlink.android.petlink.ui.calendar.main
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -7,6 +9,8 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.viewModels
 import petlink.android.core_mvi.LceState
@@ -48,7 +52,10 @@ class CalendarMainFragment : MviBaseFragment<
     private var _binding: FragmentMainCalendarBinding? = null
     private val binding get() = _binding!!
 
+    private lateinit var addEventActivityResultLauncher: ActivityResultLauncher<Intent>
+
     private val mainAdapter: MainAdapter = MainAdapter()
+    val recyclerItems = mutableListOf<DelegateItem>()
 
     @Inject
     lateinit var localDI: CalendarMainLocalDI
@@ -63,9 +70,39 @@ class CalendarMainFragment : MviBaseFragment<
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        addEventActivityResultLauncher = initAddEventLauncher()
         val appComponent = DaggerAppComponent.factory().create(requireContext())
         DaggerCalendarMainComponent.factory().create(appComponent).inject(this)
     }
+
+    private fun initAddEventLauncher(): ActivityResultLauncher<Intent> =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                result.data?.let {
+                    with(it) {
+                        val id = getStringExtra(ID_ARG).toString()
+                        val title = getStringExtra(TITLE_ARG).toString()
+                        val time = getStringExtra(TIME_ARG).toString()
+                        val themeId = getStringExtra(THEME_ARG)?.toInt()
+                        val theme = CalendarEventTheme.entries.filter { it.value.id == themeId }[0]
+                        val date = getStringExtra(DATE_ARG).toString()
+                        val isNotificationOn = getBooleanExtra(NOTIFICATION_ON_ARG, false)
+                        recyclerItems.add(
+                            0,
+                            getCalendarEventDelegateItem(
+                                id = id,
+                                title = title,
+                                time = time,
+                                date = date,
+                                eventTheme = theme,
+                                isNotificationOn = isNotificationOn
+                            )
+                        )
+                        mainAdapter.notifyItemInserted(0)
+                    }
+                }
+            }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -115,27 +152,17 @@ class CalendarMainFragment : MviBaseFragment<
     }
 
     private fun initRecycler(events: List<CalendarEventUiModel>) {
-        val recyclerItems = mutableListOf<DelegateItem>()
         events.forEach { item ->
             with(item) {
                 val eventTheme = CalendarEventTheme.entries.filter { it.value.id == theme }[0]
                 recyclerItems.add(
-                    CalendarEventDelegateItem(
-                        CalendarEventModel(
-                            eventId = id,
-                            title = title,
-                            eventDate = date,
-                            time = time,
-                            theme = eventTheme,
-                            isNotificationOn = isNotificationOn,
-                            clickListener = {
-                                store.sendEffect(
-                                    CalendarMainEffect.OpenEventDetails(
-                                        id
-                                    )
-                                )
-                            }
-                        )
+                    getCalendarEventDelegateItem(
+                        id = id,
+                        title = title,
+                        time = time,
+                        date = date,
+                        eventTheme = eventTheme,
+                        isNotificationOn = isNotificationOn
                     )
                 )
             }
@@ -173,6 +200,32 @@ class CalendarMainFragment : MviBaseFragment<
         mainAdapter.submitList(recyclerItems)
     }
 
+    private fun getCalendarEventDelegateItem(
+        id: String,
+        title: String,
+        date: String,
+        time: String,
+        eventTheme: CalendarEventTheme,
+        isNotificationOn: Boolean
+    ): CalendarEventDelegateItem =
+        CalendarEventDelegateItem(
+            CalendarEventModel(
+                eventId = id,
+                title = title,
+                eventDate = date,
+                time = time,
+                theme = eventTheme,
+                isNotificationOn = isNotificationOn,
+                clickListener = {
+                    store.sendEffect(
+                        CalendarMainEffect.OpenEventDetails(
+                            id
+                        )
+                    )
+                }
+            )
+        )
+
     private fun initMainAdapter() {
         mainAdapter.apply {
             addDelegate(CalendarEventDelegate())
@@ -186,13 +239,23 @@ class CalendarMainFragment : MviBaseFragment<
             CalendarMainEffect.OpenCalendarViewFragment -> TODO()
             is CalendarMainEffect.OpenEventDetails -> TODO()
             CalendarMainEffect.OpenHistoryFragment -> TODO()
-            CalendarMainEffect.NavigateToAddCalendarEvent -> (activity as MainActivity).openAddEventActivity()
+            CalendarMainEffect.NavigateToAddCalendarEvent ->
+                (activity as MainActivity).openAddEventActivity(addEventActivityResultLauncher)
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+    }
+
+    companion object {
+        const val ID_ARG = "IdTag"
+        const val TITLE_ARG = "TitleArg"
+        const val TIME_ARG = "TimeArg"
+        const val THEME_ARG = "ThemeArg"
+        const val DATE_ARG = "DateArg"
+        const val NOTIFICATION_ON_ARG = "NotificationOnArg"
     }
 
 }

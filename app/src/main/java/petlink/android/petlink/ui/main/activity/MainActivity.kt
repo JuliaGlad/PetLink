@@ -89,9 +89,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun openAddEventActivity() {
+    fun openAddEventActivity(launcher: ActivityResultLauncher<Intent>) {
         val intent = Intent(this, AddEventActivity::class.java)
-        startActivity(intent)
+        launcher.launch(intent)
     }
 
     fun openCreateAccountActivity(launcher: ActivityResultLauncher<Intent>) {

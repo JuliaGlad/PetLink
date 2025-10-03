@@ -69,7 +69,7 @@ enum class CalendarEventTheme(val value: EventTheme) {
     ORANGE(
         EventTheme(
             id = 7,
-            background = R.color.light_coral,
+            background = R.color.light_orange,
             iconTint = R.color.medium_orange,
             titleTextColor = R.color.dark_orange,
             descriptionTextColor = R.color.medium_orange

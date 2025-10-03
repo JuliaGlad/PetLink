@@ -3,6 +3,7 @@ package petlink.android.petlink.ui.calendar.add_event
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -101,7 +102,10 @@ class AddEventFragment : MviBaseFragment<
                 }
             }
 
-            AddEventState.EventCreated -> store.sendEffect(AddEventEffect.FinishActivityWithResultOK)
+            is AddEventState.EventCreated -> {
+                store.sendEffect(AddEventEffect.FinishActivityWithResultOK)
+                newEventModel.id = state.value.eventId
+            }
             AddEventState.Init -> {
                 with(binding) {
                     error.root.visibility = GONE
@@ -115,7 +119,7 @@ class AddEventFragment : MviBaseFragment<
             AddEventState.Loading -> {
                 with(binding) {
                     error.root.visibility = GONE
-                    loading.root.visibility = VISIBLE
+                    loader.visibility = VISIBLE
                 }
             }
         }
@@ -253,7 +257,8 @@ class AddEventFragment : MviBaseFragment<
             R.style.GreenDatePickerDialogTheme,
             { _, selectedYear, selectedMonth, selectedDay ->
                 val dayFormatted = String.format(Locale.getDefault(), DATE_FORMAT, selectedDay)
-                val monthFormatted = String.format(Locale.getDefault(), DATE_FORMAT, selectedMonth + 1)
+                val monthFormatted =
+                    String.format(Locale.getDefault(), DATE_FORMAT, selectedMonth + 1)
                 val date = "$selectedYear-$monthFormatted-$dayFormatted"
                 getDate(date)
             },
@@ -271,7 +276,8 @@ class AddEventFragment : MviBaseFragment<
             requireContext(),
             R.style.GreenTimePickerDialogTheme,
             { _, selectedHour, selectedMinute ->
-                val time = String.format(Locale.getDefault(), TIME_FORMAT, selectedHour, selectedMinute)
+                val time =
+                    String.format(Locale.getDefault(), TIME_FORMAT, selectedHour, selectedMinute)
                 getTime(time)
             },
             hour,
@@ -324,7 +330,15 @@ class AddEventFragment : MviBaseFragment<
 
             AddEventEffect.FinishActivityWithResultOK -> {
                 with(requireActivity()) {
-                    setResult(Activity.RESULT_OK)
+                    val intent = Intent().apply {
+                        putExtra(ID_ARG, newEventModel.id)
+                        putExtra(TITLE_ARG, newEventModel.title)
+                        putExtra(TIME_ARG, newEventModel.time)
+                        putExtra(THEME_ARG, newEventModel.theme)
+                        putExtra(DATE_ARG, newEventModel.date)
+                        putExtra(NOTIFICATION_ON_ARG, newEventModel.isNotificationOn)
+                    }
+                    setResult(Activity.RESULT_OK, intent)
                     finish()
                 }
             }
@@ -357,6 +371,12 @@ class AddEventFragment : MviBaseFragment<
         const val TIME_TEXT_INPUT = 2
         const val TIME_FORMAT = "%02d:%02d"
         const val DATE_FORMAT = "%02d"
+        const val ID_ARG = "IdArg"
+        const val TITLE_ARG = "TitleArg"
+        const val TIME_ARG = "TimeArg"
+        const val THEME_ARG = "ThemeArg"
+        const val DATE_ARG = "DateArg"
+        const val NOTIFICATION_ON_ARG = "NotificationOnArg"
     }
 
 }

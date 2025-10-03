@@ -25,12 +25,11 @@ class CalendarRepositoryImpl @Inject constructor(
         time: String,
         dateForTimestamp: String,
         isNotificationOn: Boolean
-    ) {
-        Log.i("Date for timestamp", dateForTimestamp.toString())
+    ): String {
         val sdf = SimpleDateFormat(DATE_FORMAT, Locale.getDefault())
         val parsedDate: Date = sdf.parse(dateForTimestamp)!!
 
-        auth.currentUser?.uid?.let { uid ->
+        val id = auth.currentUser?.uid?.let { uid ->
             val event = hashMapOf(
                 EVENT_TITLE to title,
                 EVENT_DATE to date,
@@ -39,13 +38,20 @@ class CalendarRepositoryImpl @Inject constructor(
                 EVENT_DATE_TIME_STAMP to Timestamp(parsedDate),
                 IS_NOTIFICATION_ON to isNotificationOn
             )
-            store.collection(USER_COLLECTION)
+            val eventId = store.collection(USER_COLLECTION)
                 .document(uid)
                 .collection(CALENDAR_EVENT)
                 .document()
+                .id
+            store.collection(USER_COLLECTION)
+                .document(uid)
+                .collection(CALENDAR_EVENT)
+                .document(eventId)
                 .set(event)
                 .await()
+            eventId
         }
+        return id.toString()
     }
 
     override suspend fun getEvents(

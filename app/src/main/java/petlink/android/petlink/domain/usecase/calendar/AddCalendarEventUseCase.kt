@@ -14,14 +14,12 @@ class AddCalendarEventUseCase @Inject constructor(
         time: String,
         dateForTimestamp: String,
         isNotificationOn: Boolean
-    ) {
-        repository.addEvent(
-            title = title,
-            date = date,
-            theme = theme,
-            time = time,
-            dateForTimestamp = dateForTimestamp,
-            isNotificationOn = isNotificationOn
-        )
-    }
+    ): String = repository.addEvent(
+        title = title,
+        date = date,
+        theme = theme,
+        time = time,
+        dateForTimestamp = dateForTimestamp,
+        isNotificationOn = isNotificationOn
+    )
 }

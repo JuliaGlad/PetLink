@@ -11,7 +11,7 @@ interface CalendarRepository {
         time: String,
         dateForTimestamp: String,
         isNotificationOn: Boolean
-    )
+    ): String
 
     suspend fun getEvents(
         orderByDate: Boolean = false,

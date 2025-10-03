@@ -7,6 +7,6 @@ data class AddEventMviState(val value: AddEventState): MviState
 sealed interface AddEventState{
     data object Init: AddEventState
     data object Loading: AddEventState
-    data object EventCreated: AddEventState
+    class EventCreated(val eventId: String): AddEventState
     class Error(val throwable: Throwable): AddEventState
 }

@@ -14,12 +14,12 @@ class AddEventReducer: MviReducer<
                 prevState = prevState,
                 throwable = partialState.throwable
             )
-            AddEventPartialState.EventCreated -> updateEventCreated(prevState)
+            is AddEventPartialState.EventCreated -> updateEventCreated(prevState, partialState.eventId)
             AddEventPartialState.Loading -> updateLoading(prevState = prevState)
         }
 
-    private fun updateEventCreated(prevState: AddEventMviState) =
-        prevState.copy(value = AddEventState.EventCreated)
+    private fun updateEventCreated(prevState: AddEventMviState, eventId: String) =
+        prevState.copy(value = AddEventState.EventCreated(eventId))
 
     private fun updateLoading(prevState: AddEventMviState) =
         prevState.copy(value = AddEventState.Loading)

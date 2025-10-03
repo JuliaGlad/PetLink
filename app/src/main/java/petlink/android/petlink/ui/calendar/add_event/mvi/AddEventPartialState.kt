@@ -6,7 +6,7 @@ sealed interface AddEventPartialState: MviPartialState {
 
     data object Loading: AddEventPartialState
 
-    data object EventCreated: AddEventPartialState
+    class EventCreated(val eventId: String): AddEventPartialState
 
     class Error(val throwable: Throwable): AddEventPartialState
 
