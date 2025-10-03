@@ -6,10 +6,10 @@ import kotlin.random.Random
 data class CalendarEventModel(
     val id: Int = Random.nextInt(),
     val eventId: String,
-    val title: String,
-    val theme: CalendarEventTheme,
-    val time: String,
-    val eventDate: String,
-    val isNotificationOn: Boolean,
+    var title: String,
+    var theme: CalendarEventTheme,
+    var time: String,
+    var eventDate: String,
+    var isNotificationOn: Boolean,
     val clickListener: () -> Unit
 )

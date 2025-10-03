@@ -100,7 +100,7 @@
     <string name="turned_off">выключены</string>
     <string name="change_sound">Изменить звук</string>
     <string name="notification_souns">Звук уведомления</string>
-    <string name="even_details">Детали события</string>
+    <string name="event_details">Детали события</string>
     <string name="all">Все</string>
     <string name="my_marks">Мои метки</string>
     <string name="google_marks">Google-метки</string>
@@ -171,6 +171,7 @@
     <string name="are_you_sure">Вы уверены?</string>
     <string name="are_you_sure_you_want_to_log_out">Вы уверены, что хотите выйти из аккаунта?</string>
     <string name="are_you_sure_you_want_to_delete_your_account">Вы уверены что хотите удалить свой аккаунт? Это действие нельзя будет отменить</string>
+    <string name="add">Добавить</string>
     <string-array name="pet_types">
         <item>Кошка</item>
         <item>Собака</item>

@@ -1,6 +1,6 @@
-package petlink.android.petlink.ui.calendar.add_event.model
+package petlink.android.petlink.ui.calendar.model
 
-class AddEventModel(
+class MutableEventModel(
     var id: String = EMPTY_STRING,
     var title: String = EMPTY_STRING,
     var date: String = EMPTY_STRING,

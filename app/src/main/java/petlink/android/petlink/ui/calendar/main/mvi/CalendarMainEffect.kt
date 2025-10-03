@@ -10,6 +10,13 @@ sealed interface CalendarMainEffect: MviEffect {
 
     data object NavigateToAddCalendarEvent: CalendarMainEffect
 
-    class OpenEventDetails(val eventId: String): CalendarMainEffect
+    class OpenEventDetails(
+        val eventId: String,
+        val title: String,
+        val time: String,
+        val date: String,
+        val theme: String,
+        val isNotificationOn: Boolean
+    ): CalendarMainEffect
 
 }

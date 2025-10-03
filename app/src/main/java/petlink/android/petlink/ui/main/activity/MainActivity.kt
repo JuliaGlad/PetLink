@@ -2,7 +2,6 @@ package petlink.android.petlink.ui.main.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -13,6 +12,7 @@ import petlink.android.petlink.R
 import petlink.android.petlink.databinding.ActivityMainBinding
 import petlink.android.petlink.di.DaggerAppComponent
 import petlink.android.petlink.ui.calendar.add_event.AddEventActivity
+import petlink.android.petlink.ui.calendar.edit_event.EditEventActivity
 import petlink.android.petlink.ui.cicerone.AppNavigationCoordinator
 import petlink.android.petlink.ui.cicerone.Presenter
 import petlink.android.petlink.ui.cicerone.screen.main.BottomScreen
@@ -89,6 +89,26 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun openEditEventActivity(
+        launcher: ActivityResultLauncher<Intent>,
+        eventId: String,
+        title: String,
+        time: String,
+        date: String,
+        theme: String,
+        isNotificationOn: Boolean
+    ) {
+        val intent = Intent(this, EditEventActivity::class.java).apply {
+            putExtra(ID_ARG, eventId)
+            putExtra(TITLE_ARG, title)
+            putExtra(TIME_ARG, time)
+            putExtra(DATE_ARG, date)
+            putExtra(THEME_ARG, theme)
+            putExtra(NOTIFICATION_ON_ARG, isNotificationOn)
+        }
+        launcher.launch(intent)
+    }
+
     fun openAddEventActivity(launcher: ActivityResultLauncher<Intent>) {
         val intent = Intent(this, AddEventActivity::class.java)
         launcher.launch(intent)
@@ -123,4 +143,14 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         _binding = null
     }
+
+    companion object{
+        const val ID_ARG = "IdTag"
+        const val TITLE_ARG = "TitleArg"
+        const val TIME_ARG = "TimeArg"
+        const val THEME_ARG = "ThemeArg"
+        const val DATE_ARG = "DateArg"
+        const val NOTIFICATION_ON_ARG = "NotificationOnArg"
+    }
+
 }

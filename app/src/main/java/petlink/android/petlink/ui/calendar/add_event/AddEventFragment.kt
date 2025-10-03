@@ -36,7 +36,6 @@ import petlink.android.petlink.R
 import petlink.android.petlink.databinding.FragmentAddEventBinding
 import petlink.android.petlink.di.DaggerAppComponent
 import petlink.android.petlink.ui.calendar.add_event.di.DaggerAddEventComponent
-import petlink.android.petlink.ui.calendar.add_event.model.AddEventModel
 import petlink.android.petlink.ui.calendar.add_event.mvi.AddEventEffect
 import petlink.android.petlink.ui.calendar.add_event.mvi.AddEventIntent
 import petlink.android.petlink.ui.calendar.add_event.mvi.AddEventLocalDI
@@ -59,7 +58,6 @@ class AddEventFragment : MviBaseFragment<
 
     private val mainAdapter: MainAdapter = MainAdapter()
     private val recyclerItems: MutableList<DelegateItem> = mutableListOf()
-    private val newEventModel: AddEventModel = AddEventModel()
 
     @Inject
     lateinit var localDI: AddEventLocalDI
@@ -97,19 +95,19 @@ class AddEventFragment : MviBaseFragment<
             is AddEventState.Error -> {
                 with(binding) {
                     error.root.visibility = VISIBLE
-                    loading.root.visibility = GONE
+                    loader.visibility = GONE
                     Log.i("Error", state.value.throwable.message.toString())
                 }
             }
 
             is AddEventState.EventCreated -> {
                 store.sendEffect(AddEventEffect.FinishActivityWithResultOK)
-                newEventModel.id = state.value.eventId
+                state.newEventModel.id = state.value.eventId
             }
             AddEventState.Init -> {
                 with(binding) {
                     error.root.visibility = GONE
-                    loading.root.visibility = GONE
+                    loader.visibility = GONE
                     initButtonBack()
                     initSaveButton()
                     initRecyclerView()
@@ -128,7 +126,7 @@ class AddEventFragment : MviBaseFragment<
     private fun initSaveButton() {
         binding.button.setOnClickListener {
             store.sendIntent(AddEventIntent.Loading)
-            with(newEventModel) {
+            with(store.uiState.value.newEventModel) {
                 store.sendIntent(
                     AddEventIntent.AddEvent(
                         title = title,
@@ -156,7 +154,7 @@ class AddEventFragment : MviBaseFragment<
                     TextInputLayoutModel(
                         hint = getString(R.string.enter_event_title),
                         textChangedListener = { value ->
-                            newEventModel.title = value
+                            store.uiState.value.newEventModel.title = value
                         }
                     )
                 ),
@@ -170,7 +168,7 @@ class AddEventFragment : MviBaseFragment<
                         id = DATE_TEXT_INPUT,
                         hint = getString(R.string.enter_event_date),
                         textChangedListener = { value ->
-                            newEventModel.date = value
+                            store.uiState.value.newEventModel.date = value
                         }
                     )
                 ),
@@ -193,7 +191,7 @@ class AddEventFragment : MviBaseFragment<
                         id = TIME_TEXT_INPUT,
                         hint = getString(R.string.enter_event_time),
                         textChangedListener = { value ->
-                            newEventModel.time = value
+                            store.uiState.value.newEventModel.time = value
                         }
                     )
                 ),
@@ -224,7 +222,7 @@ class AddEventFragment : MviBaseFragment<
                         ),
                         defaultChosenId = 0,
                         clickListener = { value ->
-                            newEventModel.theme = value.toString()
+                            store.uiState.value.newEventModel.theme = value.toString()
                         }
                     )
                 ),
@@ -236,7 +234,7 @@ class AddEventFragment : MviBaseFragment<
                 NotificationSwitchDelegateItem(
                     NotificationSwitchModel(
                         clickListener = { value ->
-                            newEventModel.isNotificationOn = value
+                            store.uiState.value.newEventModel.isNotificationOn = value
                         }
                     )
                 )
@@ -313,7 +311,7 @@ class AddEventFragment : MviBaseFragment<
                         id = DATE_TEXT_INPUT,
                         mainAdapter = mainAdapter
                     )
-                    newEventModel.date = date
+                    store.uiState.value.newEventModel.date = date
                 }
             }
 
@@ -324,19 +322,21 @@ class AddEventFragment : MviBaseFragment<
                         id = TIME_TEXT_INPUT,
                         mainAdapter = mainAdapter
                     )
-                    newEventModel.time = time
+                    store.uiState.value.newEventModel.time = time
                 }
             }
 
             AddEventEffect.FinishActivityWithResultOK -> {
                 with(requireActivity()) {
-                    val intent = Intent().apply {
-                        putExtra(ID_ARG, newEventModel.id)
-                        putExtra(TITLE_ARG, newEventModel.title)
-                        putExtra(TIME_ARG, newEventModel.time)
-                        putExtra(THEME_ARG, newEventModel.theme)
-                        putExtra(DATE_ARG, newEventModel.date)
-                        putExtra(NOTIFICATION_ON_ARG, newEventModel.isNotificationOn)
+                    val intent = with(store.uiState.value.newEventModel) {
+                        Intent().apply {
+                            putExtra(ID_ARG, id)
+                            putExtra(TITLE_ARG, title)
+                            putExtra(TIME_ARG, time)
+                            putExtra(THEME_ARG, theme)
+                            putExtra(DATE_ARG, date)
+                            putExtra(NOTIFICATION_ON_ARG, isNotificationOn)
+                        }
                     }
                     setResult(Activity.RESULT_OK, intent)
                     finish()

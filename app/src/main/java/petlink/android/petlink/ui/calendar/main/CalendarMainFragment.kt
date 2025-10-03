@@ -53,6 +53,7 @@ class CalendarMainFragment : MviBaseFragment<
     private val binding get() = _binding!!
 
     private lateinit var addEventActivityResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var editEventActivityResultLauncher: ActivityResultLauncher<Intent>
 
     private val mainAdapter: MainAdapter = MainAdapter()
     val recyclerItems = mutableListOf<DelegateItem>()
@@ -71,9 +72,27 @@ class CalendarMainFragment : MviBaseFragment<
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         addEventActivityResultLauncher = initAddEventLauncher()
+        editEventActivityResultLauncher = initEditEventLauncher()
         val appComponent = DaggerAppComponent.factory().create(requireContext())
         DaggerCalendarMainComponent.factory().create(appComponent).inject(this)
     }
+
+    private fun initEditEventLauncher(): ActivityResultLauncher<Intent> =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                result.data?.let {
+                    with(it) {
+                        val eventId = getStringExtra(ID_ARG).toString()
+                        val actionId = getIntExtra(ACTION_ID_ARG, -1)
+                        if (actionId == DELETE_ACTION_ID) {
+                            deleteEventFromRecycler(eventId)
+                        } else if (actionId == UPDATE_ACTION_ID) {
+                            updateCalendarEvent(eventId)
+                        }
+                    }
+                }
+            }
+        }
 
     private fun initAddEventLauncher(): ActivityResultLauncher<Intent> =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -117,6 +136,28 @@ class CalendarMainFragment : MviBaseFragment<
         super.onViewCreated(view, savedInstanceState)
         initFab()
         store.sendIntent(CalendarMainIntent.LoadCalendarEvents)
+    }
+
+    override fun resolveEffect(effect: CalendarMainEffect) {
+        when (effect) {
+            CalendarMainEffect.OpenCalendarViewFragment -> TODO()
+            is CalendarMainEffect.OpenEventDetails -> {
+                with(effect) {
+                    (activity as MainActivity).openEditEventActivity(
+                        launcher = editEventActivityResultLauncher,
+                        eventId = eventId,
+                        title = title,
+                        date = date,
+                        time = time,
+                        theme = theme,
+                        isNotificationOn = isNotificationOn
+                    )
+                }
+            }
+            CalendarMainEffect.OpenHistoryFragment -> TODO()
+            CalendarMainEffect.NavigateToAddCalendarEvent ->
+                (activity as MainActivity).openAddEventActivity(addEventActivityResultLauncher)
+        }
     }
 
     override fun render(state: CalendarMainState) {
@@ -219,7 +260,12 @@ class CalendarMainFragment : MviBaseFragment<
                 clickListener = {
                     store.sendEffect(
                         CalendarMainEffect.OpenEventDetails(
-                            id
+                            eventId = id,
+                            title = title,
+                            date = date,
+                            time = time,
+                            theme = eventTheme.value.id.toString(),
+                            isNotificationOn = isNotificationOn
                         )
                     )
                 }
@@ -234,13 +280,40 @@ class CalendarMainFragment : MviBaseFragment<
         }
     }
 
-    override fun resolveEffect(effect: CalendarMainEffect) {
-        when (effect) {
-            CalendarMainEffect.OpenCalendarViewFragment -> TODO()
-            is CalendarMainEffect.OpenEventDetails -> TODO()
-            CalendarMainEffect.OpenHistoryFragment -> TODO()
-            CalendarMainEffect.NavigateToAddCalendarEvent ->
-                (activity as MainActivity).openAddEventActivity(addEventActivityResultLauncher)
+    private fun Intent.updateCalendarEvent(eventId: String) {
+        val title = getStringExtra(TITLE_ARG).toString()
+        val time = getStringExtra(TIME_ARG).toString()
+        val themeId = getStringExtra(THEME_ARG)?.toInt()
+        val theme =
+            CalendarEventTheme.entries.filter { it.value.id == themeId }[0]
+        val date = getStringExtra(DATE_ARG).toString()
+        val isNotificationOn = getBooleanExtra(NOTIFICATION_ON_ARG, false)
+        recyclerItems.forEach { item ->
+            if (item is CalendarEventDelegateItem) {
+                with((item.content() as CalendarEventModel)) {
+                    val index = recyclerItems.indexOf(item)
+                    if (this.eventId == eventId) {
+                        this.title = title
+                        this.time = time
+                        this.theme = theme
+                        this.eventDate = date
+                        this.isNotificationOn = isNotificationOn
+                    }
+                    mainAdapter.notifyItemChanged(index)
+                }
+            }
+        }
+    }
+
+    private fun deleteEventFromRecycler(eventId: String) {
+        recyclerItems.forEach { item ->
+            if (item is CalendarEventDelegateItem) {
+                if ((item.content() as CalendarEventModel).eventId == eventId) {
+                    val index = recyclerItems.indexOf(item)
+                    recyclerItems.remove(item)
+                    mainAdapter.notifyItemRemoved(index)
+                }
+            }
         }
     }
 
@@ -250,9 +323,12 @@ class CalendarMainFragment : MviBaseFragment<
     }
 
     companion object {
+        const val DELETE_ACTION_ID = 1
+        const val UPDATE_ACTION_ID = 2
         const val ID_ARG = "IdTag"
         const val TITLE_ARG = "TitleArg"
         const val TIME_ARG = "TimeArg"
+        const val ACTION_ID_ARG = "ActionIdArg"
         const val THEME_ARG = "ThemeArg"
         const val DATE_ARG = "DateArg"
         const val NOTIFICATION_ON_ARG = "NotificationOnArg"

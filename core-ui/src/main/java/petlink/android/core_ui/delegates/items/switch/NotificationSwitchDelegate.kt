@@ -3,7 +3,6 @@ package petlink.android.core_ui.delegates.items.switch
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.materialswitch.MaterialSwitch
 import petlink.android.core_ui.R
 import petlink.android.core_ui.databinding.DelegateNotificationSwitchBinding
 import petlink.android.core_ui.delegates.main.AdapterDelegate
@@ -33,6 +32,7 @@ class NotificationSwitchDelegate : AdapterDelegate {
         RecyclerView.ViewHolder(binding.root) {
         fun bind(model: NotificationSwitchModel) {
             with(binding.switchItem) {
+                isChecked = model.defaultIsChosen
                 setText()
                 setOnClickListener {
                     model.clickListener(isChecked)
