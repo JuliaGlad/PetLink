@@ -1,11 +1,8 @@
 package petlink.android.core_ui.delegates.items.theme_chooser
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import petlink.android.core_ui.custom_view.calendar_event.CalendarEventTheme
-import petlink.android.core_ui.custom_view.calendar_event.EventTheme
 import petlink.android.core_ui.databinding.DelegateThemeChooserBinding
 import petlink.android.core_ui.delegates.items.theme_chooser.theme.ThemeAdapter
 import petlink.android.core_ui.delegates.items.theme_chooser.theme.ThemeModel
@@ -40,7 +37,7 @@ class ThemeChooserDelegate : AdapterDelegate {
 
         fun bind(model: ThemeChooserModel) {
             model.items.forEach { item ->
-                val isChosen = recyclerItems.lastIndex + 1 == model.defaultChosenId
+                val isChosen = item.value.id == model.defaultChosenId
                 recyclerItems.add(
                     ThemeModel(
                         theme = item,

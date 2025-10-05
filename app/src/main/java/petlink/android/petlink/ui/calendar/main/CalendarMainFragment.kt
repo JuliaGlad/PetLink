@@ -31,6 +31,7 @@ import petlink.android.core_ui.delegates.main.MainAdapter
 import petlink.android.petlink.R
 import petlink.android.petlink.databinding.FragmentMainCalendarBinding
 import petlink.android.petlink.di.DaggerAppComponent
+import petlink.android.petlink.ui.calendar.edit_event.action.EditEventAction
 import petlink.android.petlink.ui.calendar.main.di.DaggerCalendarMainComponent
 import petlink.android.petlink.ui.calendar.main.mvi.CalendarMainEffect
 import petlink.android.petlink.ui.calendar.main.mvi.CalendarMainIntent
@@ -80,14 +81,15 @@ class CalendarMainFragment : MviBaseFragment<
     private fun initEditEventLauncher(): ActivityResultLauncher<Intent> =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                result.data?.let {
-                    with(it) {
-                        val eventId = getStringExtra(ID_ARG).toString()
-                        val actionId = getIntExtra(ACTION_ID_ARG, -1)
-                        if (actionId == DELETE_ACTION_ID) {
-                            deleteEventFromRecycler(eventId)
-                        } else if (actionId == UPDATE_ACTION_ID) {
-                            updateCalendarEvent(eventId)
+                Log.i("Edit launcher", "ok")
+                if (result.data != null){
+                    val data = result.data!!
+                    val eventId = data.getStringExtra(ID_ARG).toString()
+                    val action = data.getParcelableExtra<EditEventAction>(ACTION_ID_ARG)
+                    action?.let {
+                        when(it){
+                            EditEventAction.DeleteEvent -> deleteEventFromRecycler(eventId)
+                            EditEventAction.UpdateEvent -> data.updateCalendarEvent(eventId)
                         }
                     }
                 }
@@ -306,12 +308,13 @@ class CalendarMainFragment : MviBaseFragment<
     }
 
     private fun deleteEventFromRecycler(eventId: String) {
-        recyclerItems.forEach { item ->
+        for (item in recyclerItems){
             if (item is CalendarEventDelegateItem) {
                 if ((item.content() as CalendarEventModel).eventId == eventId) {
                     val index = recyclerItems.indexOf(item)
                     recyclerItems.remove(item)
                     mainAdapter.notifyItemRemoved(index)
+                    break
                 }
             }
         }
@@ -323,8 +326,6 @@ class CalendarMainFragment : MviBaseFragment<
     }
 
     companion object {
-        const val DELETE_ACTION_ID = 1
-        const val UPDATE_ACTION_ID = 2
         const val ID_ARG = "IdTag"
         const val TITLE_ARG = "TitleArg"
         const val TIME_ARG = "TimeArg"

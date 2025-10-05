@@ -170,6 +170,7 @@
     <string name="delete_account">Удалить аккаунта</string>
     <string name="are_you_sure">Вы уверены?</string>
     <string name="are_you_sure_you_want_to_log_out">Вы уверены, что хотите выйти из аккаунта?</string>
+    <string name="are_you_sure_you_want_to_delete_this_event">Вы уверены, что хотите удалить это событие? Его нельзя будет восстановить</string>
     <string name="are_you_sure_you_want_to_delete_your_account">Вы уверены что хотите удалить свой аккаунт? Это действие нельзя будет отменить</string>
     <string name="add">Добавить</string>
     <string-array name="pet_types">

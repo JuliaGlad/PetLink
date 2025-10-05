@@ -56,7 +56,7 @@ class EditEventActor(
             )
         }.fold(
             onSuccess = {
-                emit(EditEventPartialState.EventDeleted)
+                emit(EditEventPartialState.EventUpdated)
             },
             onFailure = { throwable ->
                 emit(EditEventPartialState.Error(throwable))

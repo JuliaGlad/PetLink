@@ -1,7 +1,7 @@
 package petlink.android.petlink.ui.calendar.edit_event.mvi
 
 import petlink.android.core_mvi.MviEffect
-import petlink.android.petlink.ui.calendar.add_event.mvi.AddEventEffect
+import petlink.android.petlink.ui.calendar.edit_event.action.EditEventAction
 
 sealed interface EditEventEffect: MviEffect {
 
@@ -14,7 +14,7 @@ sealed interface EditEventEffect: MviEffect {
     data object ShowTimeDialog: EditEventEffect
 
     class FinishActivityAfterUpdate(
-        val actionId: Int,
+        val action: EditEventAction,
         val eventId: String,
         val title: String,
         val date: String,
@@ -24,7 +24,7 @@ sealed interface EditEventEffect: MviEffect {
     ): EditEventEffect
 
     class FinishActivityAfterDelete(
-        val actionId: Int,
+        val action: EditEventAction,
         val eventId: String,
     ): EditEventEffect
 }

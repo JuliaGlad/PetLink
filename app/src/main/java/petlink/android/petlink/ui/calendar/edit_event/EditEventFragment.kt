@@ -34,6 +34,8 @@ import petlink.android.core_ui.delegates.main.MainAdapter
 import petlink.android.petlink.R
 import petlink.android.petlink.databinding.FragmentEditEventBinding
 import petlink.android.petlink.di.DaggerAppComponent
+import petlink.android.petlink.ui.calendar.edit_event.action.EditEventAction
+import petlink.android.petlink.ui.calendar.edit_event.delete_event_dialog_fragment.DeleteEventDialogFragment
 import petlink.android.petlink.ui.calendar.edit_event.di.DaggerEditEventComponent
 import petlink.android.petlink.ui.calendar.edit_event.mvi.EditEventEffect
 import petlink.android.petlink.ui.calendar.edit_event.mvi.EditEventIntent
@@ -74,7 +76,6 @@ class EditEventFragment : MviBaseFragment<
         val appComponent = DaggerAppComponent.factory().create(requireContext())
         DaggerEditEventComponent.factory().create(appComponent).inject(this)
         initDefaultUserData()
-
     }
 
     override fun onCreateView(
@@ -96,7 +97,7 @@ class EditEventFragment : MviBaseFragment<
             EditEventState.EventDeleted ->
                 store.sendEffect(
                     EditEventEffect.FinishActivityAfterDelete(
-                        actionId = DELETE_ACTION_ID,
+                        action = EditEventAction.DeleteEvent,
                         eventId = state.event.id,
                     )
                 )
@@ -105,7 +106,7 @@ class EditEventFragment : MviBaseFragment<
                 with(state.event) {
                     store.sendEffect(
                         EditEventEffect.FinishActivityAfterUpdate(
-                            actionId = UPDATE_ACTION_ID,
+                            action = EditEventAction.UpdateEvent,
                             eventId = id,
                             title = title,
                             time = time,
@@ -136,7 +137,7 @@ class EditEventFragment : MviBaseFragment<
             recyclerItems.addAll(
                 listOf(
                     TitleTextDelegateItem(
-                        TitleTextModel(
+                       TitleTextModel(
                             title = getString(R.string.title)
                         )
                     ),
@@ -293,8 +294,10 @@ class EditEventFragment : MviBaseFragment<
             is EditEventEffect.FinishActivityAfterDelete -> {
                 with(requireActivity()) {
                     val intent = Intent().apply {
-                        putExtra(ID_ARG, store.uiState.value.event.id)
-                        putExtra(ACTION_ID_ARG, DELETE_ACTION_ID)
+                        with(effect) {
+                            putExtra(ID_ARG, eventId)
+                            putExtra(ACTION_ID_ARG, action)
+                        }
                     }
                     setResult(Activity.RESULT_OK, intent)
                     finish()
@@ -302,10 +305,9 @@ class EditEventFragment : MviBaseFragment<
             }
 
             is EditEventEffect.FinishActivityAfterUpdate -> {
-                with(requireActivity()) {
                     val intent = with(store.uiState.value.event) {
                         Intent().apply {
-                            putExtra(ACTION_ID_ARG, UPDATE_ACTION_ID)
+                            putExtra(ACTION_ID_ARG, effect.action)
                             putExtra(ID_ARG, id)
                             putExtra(TITLE_ARG, title)
                             putExtra(TIME_ARG, time)
@@ -314,12 +316,22 @@ class EditEventFragment : MviBaseFragment<
                             putExtra(NOTIFICATION_ON_ARG, isNotificationOn)
                         }
                     }
-                    setResult(Activity.RESULT_OK, intent)
-                    finish()
-                }
+                    activity?.setResult(Activity.RESULT_OK, intent)
+                    activity?.finish()
             }
 
-            EditEventEffect.ShowDeleteEventDialog -> TODO()
+            EditEventEffect.ShowDeleteEventDialog -> {
+                val dialogFragment = DeleteEventDialogFragment()
+                activity?.supportFragmentManager?.let {
+                    dialogFragment.show(
+                        it,
+                        DELETE_EVENT_DIALOG_TAG
+                    )
+                }
+                dialogFragment.dialogDismissListener = {
+                    store.sendIntent(EditEventIntent.DeleteEvent(store.uiState.value.event.id))
+                }
+            }
             EditEventEffect.ShowDataDialog -> showDateDialog { date ->
                 updateTextInputLayout(
                     data = date,
@@ -427,8 +439,6 @@ class EditEventFragment : MviBaseFragment<
     }
 
     companion object {
-        const val DELETE_ACTION_ID = 3
-        const val UPDATE_ACTION_ID = 4
         const val ACTION_ID_ARG = "ActionIdArg"
         const val TIME_FORMAT = "%02d:%02d"
         const val DATE_FORMAT = "%02d"
@@ -440,6 +450,7 @@ class EditEventFragment : MviBaseFragment<
         const val THEME_ARG = "ThemeArg"
         const val DATE_ARG = "DateArg"
         const val NOTIFICATION_ON_ARG = "NotificationOnArg"
+        const val DELETE_EVENT_DIALOG_TAG = "DeleteEventDialogTag"
     }
 
 }
