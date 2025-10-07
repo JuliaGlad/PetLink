@@ -48,6 +48,7 @@ android {
 dependencies {
     implementation(project(":core-ui"))
     implementation(project(":core-mvi"))
+    implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.firebase.auth)
     implementation(libs.assisted.inject.annotations.dagger2)
     kapt(libs.assisted.inject.processor.dagger2)
