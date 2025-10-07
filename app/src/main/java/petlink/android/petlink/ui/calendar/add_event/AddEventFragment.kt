@@ -114,6 +114,7 @@ class AddEventFragment : MviBaseFragment<
                 store.sendEffect(AddEventEffect.FinishActivityWithResultOK)
                 state.newEventModel.id = state.value.eventId
             }
+
             AddEventState.Init -> {
                 with(binding) {
                     error.root.visibility = GONE
@@ -339,21 +340,23 @@ class AddEventFragment : MviBaseFragment<
             AddEventEffect.FinishActivityWithResultOK -> {
                 with(requireActivity()) {
                     with(store.uiState.value.newEventModel) {
-                    scheduleNotification(
-                        eventTitle = title,
-                        date = date,
-                        dateForTimestamp = "$date $time"
-                    )
+                        scheduleNotification(
+                            eventTitle = title,
+                            date = date,
+                            dateForTimestamp = "$date $time"
+                        )
+                    }
                     val intent =
                         Intent().apply {
-                            putExtra(ID_ARG, id)
-                            putExtra(TITLE_ARG, title)
-                            putExtra(TIME_ARG, time)
-                            putExtra(THEME_ARG, theme)
-                            putExtra(DATE_ARG, date)
-                            putExtra(NOTIFICATION_ON_ARG, isNotificationOn)
+                            with(store.uiState.value.newEventModel) {
+                                putExtra(ID_ARG, id)
+                                putExtra(TITLE_ARG, title)
+                                putExtra(TIME_ARG, time)
+                                putExtra(THEME_ARG, theme)
+                                putExtra(DATE_ARG, date)
+                                putExtra(NOTIFICATION_ON_ARG, isNotificationOn)
+                            }
                         }
-                    }
                     setResult(Activity.RESULT_OK, intent)
                     finish()
                 }
