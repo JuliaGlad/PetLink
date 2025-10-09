@@ -30,4 +30,8 @@ interface CalendarRepository {
         isNotificationOn: Boolean
     )
 
+    suspend fun addEventToHistory(
+        eventId: String
+    )
+
 }

@@ -1,6 +1,5 @@
 package petlink.android.petlink.data.repository.calendar
 
-import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -117,6 +116,30 @@ class CalendarRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun addEventToHistory(eventId: String) {
+        auth.currentUser?.uid?.let { uid ->
+            val userDocument = store.collection(USER_COLLECTION)
+                .document(uid)
+            val calendarEventDocument = userDocument.collection(CALENDAR_EVENT).document(eventId)
+            val eventDocumentSnapshot = calendarEventDocument.get().await()
+
+            userDocument
+                .collection(CALENDAR_EVENT_HISTORY)
+                .document(eventId)
+                .set(
+                    hashMapOf(
+                        EVENT_TITLE to eventDocumentSnapshot.getString(EVENT_TITLE),
+                        EVENT_DATE to eventDocumentSnapshot.getString(EVENT_DATE),
+                        EVENT_TIME to eventDocumentSnapshot.getString(EVENT_TIME),
+                        EVENT_THEME to eventDocumentSnapshot.getString(EVENT_THEME),
+                        IS_NOTIFICATION_ON to eventDocumentSnapshot.getBoolean(IS_NOTIFICATION_ON)
+                    )
+                ).await()
+
+            calendarEventDocument.delete().await()
+        }
+    }
+
     private suspend fun updateEventDataFields(
         userId: String,
         eventId: String,
@@ -136,6 +159,7 @@ class CalendarRepositoryImpl @Inject constructor(
         const val EVENT_TIME = "EventTime"
         const val DATE_FORMAT = "yyyy-MM-dd HH:mm"
         const val CALENDAR_EVENT = "CalendarEvent"
+        const val CALENDAR_EVENT_HISTORY = "CalendarEventHistory"
         const val USER_COLLECTION = "Users"
         const val EVENT_TITLE = "EventTitle"
         const val EVENT_THEME = "EventTheme"

@@ -37,10 +37,8 @@ import petlink.android.core_ui.delegates.items.theme_chooser.ThemeChooserModel
 import petlink.android.core_ui.delegates.main.DelegateItem
 import petlink.android.core_ui.delegates.main.MainAdapter
 import petlink.android.petlink.R
-import petlink.android.petlink.data.repository.calendar.CalendarRepositoryImpl
 import petlink.android.petlink.databinding.FragmentAddEventBinding
 import petlink.android.petlink.di.DaggerAppComponent
-import petlink.android.petlink.ui.calendar.add_event.AddEventFragment.Companion.DATE_FORMAT
 import petlink.android.petlink.ui.calendar.add_event.di.DaggerAddEventComponent
 import petlink.android.petlink.ui.calendar.add_event.mvi.AddEventEffect
 import petlink.android.petlink.ui.calendar.add_event.mvi.AddEventIntent
@@ -340,11 +338,15 @@ class AddEventFragment : MviBaseFragment<
             AddEventEffect.FinishActivityWithResultOK -> {
                 with(requireActivity()) {
                     with(store.uiState.value.newEventModel) {
-                        scheduleNotification(
-                            eventTitle = title,
-                            date = date,
-                            dateForTimestamp = "$date $time"
-                        )
+                        if (isNotificationOn) {
+                            scheduleNotification(
+                                eventId = id,
+                                eventTitle = title,
+                                date = date,
+                                time = time,
+                                dateForTimestamp = "$date $time"
+                            )
+                        }
                     }
                     val intent =
                         Intent().apply {
@@ -364,14 +366,22 @@ class AddEventFragment : MviBaseFragment<
         }
     }
 
-    private fun scheduleNotification(eventTitle: String, date: String, dateForTimestamp: String) {
+    private fun scheduleNotification(
+        eventId: String,
+        eventTitle: String,
+        date: String,
+        time: String,
+        dateForTimestamp: String
+    ) {
         val sdf = SimpleDateFormat(DATE_FORMAT_TIMESTAMP, Locale.getDefault())
         val parsedDate: Date = sdf.parse(dateForTimestamp)!!
         val timestampMillis = Timestamp(parsedDate).seconds * 1000L
         val delay = timestampMillis - System.currentTimeMillis()
         val data = workDataOf(
+            EVENT_ID_WORK_ARG to eventId,
             EVENT_TITLE_WORK_ARG to eventTitle,
-            EVENT_DATE_WORK_ARG to date
+            EVENT_DATE_WORK_ARG to date,
+            EVENT_TIME_WORK_ARG to time
         )
         val work = OneTimeWorkRequestBuilder<CalendarEventWorker>()
             .setInitialDelay(delay, TimeUnit.MILLISECONDS)
@@ -405,6 +415,8 @@ class AddEventFragment : MviBaseFragment<
     companion object {
         const val DATE_FORMAT_TIMESTAMP = "yyyy-MM-dd HH:mm"
         const val EVENT_TITLE_WORK_ARG = "EventTitleWorkArg"
+        const val EVENT_ID_WORK_ARG = "EventIdWorkArg"
+        const val EVENT_TIME_WORK_ARG = "EventTimeWorkArg"
         const val EVENT_DATE_WORK_ARG = "EventDateWorkArg"
         const val DATE_TEXT_INPUT = 1
         const val TIME_TEXT_INPUT = 2
