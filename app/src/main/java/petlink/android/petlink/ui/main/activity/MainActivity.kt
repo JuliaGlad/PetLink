@@ -13,6 +13,7 @@ import petlink.android.petlink.databinding.ActivityMainBinding
 import petlink.android.petlink.di.DaggerAppComponent
 import petlink.android.petlink.ui.calendar.add_event.AddEventActivity
 import petlink.android.petlink.ui.calendar.edit_event.EditEventActivity
+import petlink.android.petlink.ui.calendar.history.CalendarEventHistoryActivity
 import petlink.android.petlink.ui.cicerone.AppNavigationCoordinator
 import petlink.android.petlink.ui.cicerone.Presenter
 import petlink.android.petlink.ui.cicerone.screen.main.BottomScreen
@@ -107,6 +108,11 @@ class MainActivity : AppCompatActivity() {
             putExtra(NOTIFICATION_ON_ARG, isNotificationOn)
         }
         launcher.launch(intent)
+    }
+
+    fun openCalendarEventHistoryActivity(){
+        val intent = Intent(this, CalendarEventHistoryActivity::class.java)
+        startActivity(intent)
     }
 
     fun openAddEventActivity(launcher: ActivityResultLauncher<Intent>) {

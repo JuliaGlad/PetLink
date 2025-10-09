@@ -34,4 +34,6 @@ interface CalendarRepository {
         eventId: String
     )
 
+    suspend fun getHistoryEvents(): List<CalendarEventDto>
+
 }

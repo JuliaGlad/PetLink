@@ -156,7 +156,7 @@ class CalendarMainFragment : MviBaseFragment<
                     )
                 }
             }
-            CalendarMainEffect.OpenHistoryFragment -> TODO()
+            CalendarMainEffect.OpenHistoryFragment -> (activity as MainActivity).openCalendarEventHistoryActivity()
             CalendarMainEffect.NavigateToAddCalendarEvent ->
                 (activity as MainActivity).openAddEventActivity(addEventActivityResultLauncher)
         }

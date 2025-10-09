@@ -140,6 +140,26 @@ class CalendarRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getHistoryEvents(): List<CalendarEventDto> {
+        val snapshot = auth.currentUser?.uid?.let { uid ->
+            store.collection(USER_COLLECTION)
+                .document(uid)
+                .collection(CALENDAR_EVENT_HISTORY)
+                .get()
+                .await()
+        }
+        return snapshot?.documents?.map { document ->
+            CalendarEventDto(
+                id = document.id,
+                title = document.getString(EVENT_TITLE).toString(),
+                date = document.get(EVENT_DATE).toString(),
+                theme = document.get(EVENT_THEME).toString(),
+                time = document.get(EVENT_TIME).toString(),
+                isNotificationOn = document.getBoolean(IS_NOTIFICATION_ON) == true
+            )
+        }?.toList() ?: emptyList()
+    }
+
     private suspend fun updateEventDataFields(
         userId: String,
         eventId: String,
