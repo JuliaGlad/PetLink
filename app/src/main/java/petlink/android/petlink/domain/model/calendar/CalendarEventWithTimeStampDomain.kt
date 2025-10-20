@@ -1,8 +1,8 @@
-package petlink.android.petlink.data.repository.calendar.dto
+package petlink.android.petlink.domain.model.calendar
 
 import com.google.firebase.Timestamp
 
-class CalendarEventDto(
+class CalendarEventWithTimeStampDomain(
     val id: String,
     val title: String,
     val date: String,

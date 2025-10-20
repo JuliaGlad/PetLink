@@ -17,6 +17,9 @@
         android:theme="@style/Theme.PetLink"
         tools:targetApi="31">
         <activity
+            android:name=".ui.calendar.calendar_view.CalendarViewActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.calendar.history.CalendarEventHistoryActivity"
             android:exported="false" />
         <activity

@@ -12,6 +12,7 @@ import petlink.android.petlink.R
 import petlink.android.petlink.databinding.ActivityMainBinding
 import petlink.android.petlink.di.DaggerAppComponent
 import petlink.android.petlink.ui.calendar.add_event.AddEventActivity
+import petlink.android.petlink.ui.calendar.calendar_view.CalendarViewActivity
 import petlink.android.petlink.ui.calendar.edit_event.EditEventActivity
 import petlink.android.petlink.ui.calendar.history.CalendarEventHistoryActivity
 import petlink.android.petlink.ui.cicerone.AppNavigationCoordinator
@@ -88,6 +89,11 @@ class MainActivity : AppCompatActivity() {
             screen?.let { presenter.navigateTo(it) }
             true
         }
+    }
+
+    fun openCalendarViewActivity() {
+        val intent = Intent(this, CalendarViewActivity::class.java)
+        startActivity(intent)
     }
 
     fun openEditEventActivity(

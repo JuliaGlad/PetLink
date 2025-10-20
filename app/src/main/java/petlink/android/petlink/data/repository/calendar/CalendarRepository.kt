@@ -13,6 +13,11 @@ interface CalendarRepository {
         isNotificationOn: Boolean
     ): String
 
+    suspend fun getEventsFromMonth(
+        year: Int,
+        month: Int
+    ): List<CalendarEventDto>
+
     suspend fun getEvents(
         orderByDate: Boolean = false,
         limit: Long? = null

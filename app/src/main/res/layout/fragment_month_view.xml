@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="8dp"
+    android:layout_marginTop="20dp"
+    android:background="@color/transparent">
+
+    <GridLayout
+        android:id="@+id/weekDaysHeader"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:alignmentMode="alignMargins"
+        android:columnCount="7"
+        android:useDefaultMargins="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            style="@style/CalendarWeekday"
+            android:text="ПН" />
+
+        <TextView
+            style="@style/CalendarWeekday"
+            android:text="ВТ" />
+
+        <TextView
+            style="@style/CalendarWeekday"
+            android:text="СР" />
+
+        <TextView
+            style="@style/CalendarWeekday"
+            android:text="ЧТ" />
+
+        <TextView
+            style="@style/CalendarWeekday"
+            android:text="ПТ" />
+
+        <TextView
+            style="@style/CalendarWeekday"
+            android:text="СБ" />
+
+        <TextView
+            style="@style/CalendarWeekday"
+            android:text="ВС" />
+    </GridLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingTop="4dp"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/weekDaysHeader"
+        app:spanCount="7" />
+
+    <include
+        android:id="@+id/loading"
+        layout="@layout/loading_screen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/error"
+        layout="@layout/error_screen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

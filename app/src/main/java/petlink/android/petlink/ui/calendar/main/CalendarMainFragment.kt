@@ -142,7 +142,7 @@ class CalendarMainFragment : MviBaseFragment<
 
     override fun resolveEffect(effect: CalendarMainEffect) {
         when (effect) {
-            CalendarMainEffect.OpenCalendarViewFragment -> TODO()
+            CalendarMainEffect.OpenCalendarViewFragment -> (activity as MainActivity).openCalendarViewActivity()
             is CalendarMainEffect.OpenEventDetails -> {
                 with(effect) {
                     (activity as MainActivity).openEditEventActivity(

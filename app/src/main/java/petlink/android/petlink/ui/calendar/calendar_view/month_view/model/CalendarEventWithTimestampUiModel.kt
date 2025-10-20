@@ -1,8 +1,8 @@
-package petlink.android.petlink.data.repository.calendar.dto
+package petlink.android.petlink.ui.calendar.calendar_view.month_view.model
 
 import com.google.firebase.Timestamp
 
-class CalendarEventDto(
+class CalendarEventWithTimestampUiModel(
     val id: String,
     val title: String,
     val date: String,

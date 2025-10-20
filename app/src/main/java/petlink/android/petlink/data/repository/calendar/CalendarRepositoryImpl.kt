@@ -8,6 +8,8 @@ import kotlinx.coroutines.tasks.await
 import petlink.android.petlink.data.repository.calendar.dto.CalendarEventDto
 import petlink.android.petlink.data.source.local.calendar.CalendarLocalSource
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
@@ -53,6 +55,48 @@ class CalendarRepositoryImpl @Inject constructor(
         return id.toString()
     }
 
+    override suspend fun getEventsFromMonth(
+        year: Int,
+        month: Int
+    ): List<CalendarEventDto> {
+
+        val startOfMonth = LocalDate.of(year, month, 1)
+            .atStartOfDay(ZoneId.systemDefault())
+            .toInstant()
+        val startTimestamp = Timestamp(Date.from(startOfMonth))
+
+        val startOfNextMonth = startOfMonth
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate()
+            .plusMonths(1)
+            .atStartOfDay(ZoneId.systemDefault())
+            .toInstant()
+
+        val endTimestamp = Timestamp(Date.from(startOfNextMonth))
+
+        val snapshot = auth.currentUser?.uid?.let { uid ->
+            store.collection(USER_COLLECTION)
+                .document(uid)
+                .collection(CALENDAR_EVENT)
+                .whereGreaterThanOrEqualTo(EVENT_DATE_TIME_STAMP, startTimestamp)
+                .whereLessThan(EVENT_DATE_TIME_STAMP, endTimestamp)
+                .get()
+                .await()
+        }
+        return snapshot?.documents?.map { document ->
+            CalendarEventDto(
+                id = document.id,
+                title = document.getString(EVENT_TITLE).toString(),
+                date = document.get(EVENT_DATE).toString(),
+                theme = document.get(EVENT_THEME).toString(),
+                time = document.get(EVENT_TIME).toString(),
+                timestamp = document.getTimestamp(EVENT_DATE_TIME_STAMP)!!,
+                isNotificationOn = document.getBoolean(IS_NOTIFICATION_ON) == true
+            )
+        }?.toList() ?: emptyList()
+    }
+
+
     override suspend fun getEvents(
         orderByDate: Boolean,
         limit: Long?
@@ -76,6 +120,7 @@ class CalendarRepositoryImpl @Inject constructor(
                     date = document.get(EVENT_DATE).toString(),
                     theme = document.get(EVENT_THEME).toString(),
                     time = document.get(EVENT_TIME).toString(),
+                    timestamp = document.getTimestamp(EVENT_DATE_TIME_STAMP)!!,
                     isNotificationOn = document.getBoolean(IS_NOTIFICATION_ON) == true
                 )
             }?.toList() ?: emptyList()
@@ -155,6 +200,7 @@ class CalendarRepositoryImpl @Inject constructor(
                 date = document.get(EVENT_DATE).toString(),
                 theme = document.get(EVENT_THEME).toString(),
                 time = document.get(EVENT_TIME).toString(),
+                timestamp = document.getTimestamp(EVENT_DATE_TIME_STAMP)!!,
                 isNotificationOn = document.getBoolean(IS_NOTIFICATION_ON) == true
             )
         }?.toList() ?: emptyList()
