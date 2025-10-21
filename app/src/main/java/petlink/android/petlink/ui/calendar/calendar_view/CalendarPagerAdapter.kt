@@ -1,5 +1,6 @@
 package petlink.android.petlink.ui.calendar.calendar_view
 
+import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import petlink.android.petlink.ui.calendar.calendar_view.month_view.MonthViewFragment
@@ -11,10 +12,11 @@ class CalendarPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) 
 
     override fun createFragment(position: Int): Fragment {
         val offset = position - START_POSITION
-        val cal = Calendar.getInstance().apply { add(Calendar.MONTH, offset) }
-
-        val month = cal.get(Calendar.MONTH) + 1
-        val year = cal.get(Calendar.YEAR)
+        val calendar = Calendar.getInstance().apply {
+            add(Calendar.MONTH, offset)
+        }
+        var month = calendar.get(Calendar.MONTH)+ 1
+        val year = calendar.get(Calendar.YEAR)
 
         return MonthViewFragment.newInstance(year, month)
     }

@@ -1,6 +1,7 @@
 package petlink.android.petlink.ui.calendar.calendar_view.month_view.recycler_view
 
 import android.graphics.drawable.GradientDrawable
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import petlink.android.core_ui.custom_view.calendar_event.CalendarEventTheme
 import petlink.android.petlink.databinding.RecyclerViewCalendarDayBinding
 import petlink.android.petlink.ui.calendar.calendar_view.month_view.recycler_view.CalendarDayAdapter.ViewHolder
+import kotlin.math.ceil
 
 class CalendarDayAdapter : ListAdapter<CalendarDayModel, ViewHolder>(CalendarDayCallback()) {
     override fun onCreateViewHolder(
@@ -29,9 +31,9 @@ class CalendarDayAdapter : ListAdapter<CalendarDayModel, ViewHolder>(CalendarDay
         holder: ViewHolder,
         position: Int
     ) {
+        setItemSize(holder)
         holder.bind(getItem(position))
     }
-
 
     class ViewHolder(val binding: RecyclerViewCalendarDayBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -65,5 +67,23 @@ class CalendarDayAdapter : ListAdapter<CalendarDayModel, ViewHolder>(CalendarDay
 
         }
     }
+
+    private fun setItemSize(holder: ViewHolder) {
+        val layoutParams = holder.itemView.layoutParams
+        val displayMetrics = holder.itemView.context.resources.displayMetrics
+        val screenHeight = displayMetrics.heightPixels
+        val totalDays = currentList.size
+        val rowCount = ceil(totalDays / 7.0).toInt().coerceAtLeast(5)
+        val headerHeightPx = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, 48f, displayMetrics
+        )
+        val verticalPaddingPx = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, 16f, displayMetrics
+        )
+        val availableHeight = screenHeight - headerHeightPx - verticalPaddingPx
+        layoutParams.height = (availableHeight / rowCount).toInt()
+        holder.itemView.layoutParams = layoutParams
+    }
+
 
 }

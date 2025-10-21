@@ -95,6 +95,7 @@ class MonthViewFragment : MviBaseFragment<
 
             is LceState.Error -> {
                 with(binding) {
+                    Log.i("MonthViewError", state.value.throwable.message.toString())
                     loading.root.visibility = GONE
                     error.root.visibility = VISIBLE
                 }
@@ -127,7 +128,7 @@ class MonthViewFragment : MviBaseFragment<
             (store.uiState.value.value as LceState.Content<ListCalendarEventWithTimestampUi>).data.events
 
         val temp = Calendar.getInstance().apply {
-            set(year, month, 1)
+            set(year, month - 1, 1)
         }
 
         val firstDayOfWeek = temp.get(Calendar.DAY_OF_WEEK) - 1
@@ -146,7 +147,7 @@ class MonthViewFragment : MviBaseFragment<
                 val date = event.timestamp.toDate()
                 val calendar = Calendar.getInstance().apply { time = date }
                 calendar.get(Calendar.YEAR) == year &&
-                        calendar.get(Calendar.MONTH) == month &&
+                        calendar.get(Calendar.MONTH) == month - 1 &&
                         calendar.get(Calendar.DAY_OF_MONTH) == day
             }
             result.add(

@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/item"
+    android:paddingTop="14dp"
     android:background="@color/transparent"
     android:layout_width="@dimen/calendar_day_size"
     android:layout_height="wrap_content"
@@ -11,14 +12,24 @@
     android:clickable="true"
     android:focusable="true">
 
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/dark_green_grey"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
     <TextView
         android:id="@+id/day"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="@dimen/calendar_day_text_size"
+        android:layout_marginTop="8dp"
         android:textColor="@color/black"
         android:gravity="center"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/divider"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

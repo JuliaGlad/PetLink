@@ -54,6 +54,7 @@ class CalendarViewFragment : Fragment() {
 
     private fun updateMonthHeader(offset: Int) {
         val calendar = calendarBase.clone() as Calendar
+        calendar.set(Calendar.DAY_OF_MONTH, 1)
         calendar.add(Calendar.MONTH, offset)
 
         val year = calendar.get(Calendar.YEAR)
