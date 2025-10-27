@@ -19,6 +19,28 @@ class CalendarRepositoryImpl @Inject constructor(
     private val store: FirebaseFirestore,
     private val localSource: CalendarLocalSource
 ) : CalendarRepository {
+    override suspend fun getEventsByDate(date: String): List<CalendarEventDto> {
+        val snapshot = auth.currentUser?.uid?.let { uid ->
+            store.collection(USER_COLLECTION)
+                .document(uid)
+                .collection(CALENDAR_EVENT)
+                .whereEqualTo(EVENT_DATE, date)
+                .get()
+                .await()
+        }
+        return snapshot?.documents?.map { document ->
+            CalendarEventDto(
+                id = document.id,
+                title = document.getString(EVENT_TITLE).toString(),
+                date = document.get(EVENT_DATE).toString(),
+                theme = document.get(EVENT_THEME).toString(),
+                time = document.get(EVENT_TIME).toString(),
+                timestamp = document.getTimestamp(EVENT_DATE_TIME_STAMP)!!,
+                isNotificationOn = document.getBoolean(IS_NOTIFICATION_ON) == true
+            )
+        }?.toList() ?: emptyList()
+    }
+
     override suspend fun addEvent(
         title: String,
         date: String,

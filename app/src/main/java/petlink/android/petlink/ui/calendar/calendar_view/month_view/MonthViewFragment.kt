@@ -14,7 +14,9 @@ import petlink.android.core_mvi.MviStore
 import petlink.android.petlink.R
 import petlink.android.petlink.databinding.FragmentMonthViewBinding
 import petlink.android.petlink.di.DaggerAppComponent
+import petlink.android.petlink.ui.calendar.calendar_view.day_bottom_sheet.DayDataBottomSheetFragment
 import petlink.android.petlink.ui.calendar.calendar_view.month_view.di.DaggerMonthViewComponent
+import petlink.android.petlink.ui.calendar.calendar_view.month_view.model.CalendarEventWithTimestampUiModel
 import petlink.android.petlink.ui.calendar.calendar_view.month_view.model.ListCalendarEventWithTimestampUi
 import petlink.android.petlink.ui.calendar.calendar_view.month_view.mvi.MonthViewEffect
 import petlink.android.petlink.ui.calendar.calendar_view.month_view.mvi.MonthViewIntent
@@ -40,8 +42,8 @@ class MonthViewFragment : MviBaseFragment<
 
     private val adapter = CalendarDayAdapter()
 
-    var month: Int = -1
-    var year: Int = -1
+    private var month: Int = -1
+    private var year: Int = -1
 
     @Inject
     lateinit var localDI: MonthViewLocalDI
@@ -110,6 +112,23 @@ class MonthViewFragment : MviBaseFragment<
         }
     }
 
+    override fun resolveEffect(effect: MonthViewEffect) {
+        when (effect) {
+            is MonthViewEffect.ShowDayBottomSheet -> {
+                activity?.supportFragmentManager?.let {
+                    DayDataBottomSheetFragment
+                        .newInstance(effect.date)
+                        .apply {
+                            dismissListener = { value ->
+                                addNewItemsToRecycler(effect.date, value)
+                            }
+                        }
+                        .show(it, DAY_DATA_BOTTOM_SHEET)
+                }
+            }
+        }
+    }
+
     @SuppressWarnings("NotifyDataSetChanged")
     private fun initRecyclerView() {
         if (recyclerItems.isNotEmpty()) recyclerItems.clear()
@@ -136,7 +155,7 @@ class MonthViewFragment : MviBaseFragment<
             result.add(
                 CalendarDayModel(
                     day = "",
-                    events = emptyList()
+                    events = mutableListOf()
                 )
             )
         }
@@ -154,15 +173,29 @@ class MonthViewFragment : MviBaseFragment<
                 CalendarDayModel(
                     day = day.toString(),
                     events = dayEvents,
-                    clickListener = {}
+                    clickListener = {
+                        val date = "$year-$month-$day"
+                        store.sendEffect(MonthViewEffect.ShowDayBottomSheet(date))
+                    }
                 )
             )
         }
         return result
     }
 
-    override fun resolveEffect(effect: MonthViewEffect) {
-        Log.i("Resolve effects", "no effects")
+    private fun addNewItemsToRecycler(date: String, items: List<CalendarEventWithTimestampUiModel>) {
+        recyclerItems.forEach { item ->
+            if ("$year-$month-${item.day}" == date){
+                val previousItems = item.events
+                val newEventsList: MutableList<CalendarEventWithTimestampUiModel> = mutableListOf()
+                newEventsList.apply {
+                    addAll(previousItems)
+                    addAll(items)
+                }
+                item.events = newEventsList
+                adapter.notifyItemChanged(recyclerItems.indexOf(item))
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -180,6 +213,7 @@ class MonthViewFragment : MviBaseFragment<
             }
         }
 
+        const val DAY_DATA_BOTTOM_SHEET = "DayDataBottomSheet"
         const val ARG_YEAR = "YearArg"
         const val ARG_MONTH = "MonthArg"
     }

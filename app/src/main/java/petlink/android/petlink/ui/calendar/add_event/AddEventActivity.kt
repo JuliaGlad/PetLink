@@ -17,11 +17,23 @@ class AddEventActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         _binding = ActivityAddEventBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        if (intent.extras != null){
+            val date = intent.extras?.getString(DATE_ARG) ?: ""
+            val newFragmentInstance = AddEventFragment.newInstance(date)
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container_view_add_event, newFragmentInstance)
+                .addToBackStack(null)
+                .commit()
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+    }
+
+    companion object{
+        const val DATE_ARG = "DateArg"
     }
 
 }

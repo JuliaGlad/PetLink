@@ -67,6 +67,8 @@ class AddEventFragment : MviBaseFragment<
     private val mainAdapter: MainAdapter = MainAdapter()
     private val recyclerItems: MutableList<DelegateItem> = mutableListOf()
 
+    private var date: String = ""
+
     @Inject
     lateinit var localDI: AddEventLocalDI
 
@@ -83,6 +85,9 @@ class AddEventFragment : MviBaseFragment<
         super.onCreate(savedInstanceState)
         val appComponent = DaggerAppComponent.factory().create(requireContext())
         DaggerAddEventComponent.factory().create(appComponent).inject(this)
+        if (arguments != null){
+            date = arguments?.getString(DATE_ARG) ?: ""
+        }
     }
 
     override fun onCreateView(
@@ -115,6 +120,7 @@ class AddEventFragment : MviBaseFragment<
 
             AddEventState.Init -> {
                 with(binding) {
+                    state.newEventModel.date = date
                     error.root.visibility = GONE
                     loader.visibility = GONE
                     initButtonBack()
@@ -176,6 +182,8 @@ class AddEventFragment : MviBaseFragment<
                     TextInputLayoutModel(
                         id = DATE_TEXT_INPUT,
                         hint = getString(R.string.enter_event_date),
+                        defaultValue = date,
+                        editable = date.isEmpty(),
                         textChangedListener = { value ->
                             store.uiState.value.newEventModel.date = value
                         }
@@ -184,6 +192,7 @@ class AddEventFragment : MviBaseFragment<
                 TextGradientDelegateItem(
                     TextGradientModel(
                         text = getString(R.string.change_date),
+                        enabled = date.isEmpty(),
                         textAlignment = View.TEXT_ALIGNMENT_VIEW_START,
                         clickListener = {
                             store.sendEffect(AddEventEffect.ShowDataDialog)
@@ -428,6 +437,12 @@ class AddEventFragment : MviBaseFragment<
         const val THEME_ARG = "ThemeArg"
         const val DATE_ARG = "DateArg"
         const val NOTIFICATION_ON_ARG = "NotificationOnArg"
+
+        fun newInstance(date: String) =
+            AddEventFragment().apply {
+                arguments = Bundle().apply { putString(DATE_ARG, date) }
+            }
+
     }
 
 }

@@ -32,7 +32,12 @@ class CalendarViewFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupViewPager()
+        initButtonBack()
         updateMonthHeader(0)
+    }
+
+    private fun initButtonBack() {
+        binding.iconBack.setOnClickListener { requireActivity().finish() }
     }
 
     private fun setupViewPager() {

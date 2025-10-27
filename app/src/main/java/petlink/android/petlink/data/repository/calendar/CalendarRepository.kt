@@ -1,8 +1,13 @@
 package petlink.android.petlink.data.repository.calendar
 
+import com.google.firebase.Timestamp
 import petlink.android.petlink.data.repository.calendar.dto.CalendarEventDto
 
 interface CalendarRepository {
+
+    suspend fun getEventsByDate(
+        date: String
+    ): List<CalendarEventDto>
 
     suspend fun addEvent(
         title: String,
