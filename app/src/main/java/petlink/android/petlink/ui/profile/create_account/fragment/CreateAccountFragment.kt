@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -123,6 +124,7 @@ class CreateAccountFragment : MviBaseFragment<
             }
 
             is CreateAccountState.Error -> {
+                Log.i("Create account error", state.state.throwable.message.toString())
                 Snackbar.make(
                     requireView(),
                     R.string.looks_like_something_went_wrong,
@@ -538,7 +540,7 @@ class CreateAccountFragment : MviBaseFragment<
             { _, selectedYear, selectedMonth, selectedDay ->
                 val dayFormatted = String.format(Locale.getDefault(), "%02d", selectedDay)
                 val monthFormatted = String.format(Locale.getDefault(), "%02d", selectedMonth + 1)
-                val date = "$dayFormatted.$monthFormatted.$selectedYear"
+                val date = "$selectedYear-$monthFormatted-$dayFormatted"
                 getDate(date)
             },
             year, month, day

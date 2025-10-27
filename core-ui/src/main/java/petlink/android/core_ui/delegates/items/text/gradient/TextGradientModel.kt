@@ -6,5 +6,6 @@ data class TextGradientModel(
     val id: Int = Random.nextInt(),
     val text: String,
     val textAlignment: Int,
+    val enabled: Boolean = true,
     val clickListener: (() -> Unit)? = null
 )

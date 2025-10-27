@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import petlink.android.core_ui.R
 import petlink.android.core_ui.databinding.DelegateSmallTextBinding
@@ -40,18 +41,26 @@ class TextGradientDelegate : AdapterDelegate {
         fun bind(model: TextGradientModel) {
             with(binding.textView) {
                 post {
-                    val height = measuredHeight.toFloat()
-
-                    val shader = LinearGradient(
-                        0f, 0f, 0f, height + 20,
-                        ContextCompat.getColor(context, R.color.dark_green_variant),
-                        ContextCompat.getColor(context, R.color.dark_green),
-                        TileMode.CLAMP
-                    )
-                    paint.shader = shader
-                    invalidate()
+                    if (model.enabled) {
+                        val height = measuredHeight.toFloat()
+                        val shader = LinearGradient(
+                            0f, 0f, 0f, height + 20,
+                            ContextCompat.getColor(context, R.color.dark_green_variant),
+                            ContextCompat.getColor(context, R.color.dark_green),
+                            TileMode.CLAMP
+                        )
+                        paint.shader = shader
+                        invalidate()
+                    }
                 }
-                model.clickListener?.let { setOnClickListener { it() } }
+                if (!model.enabled) setTextColor(
+                    ResourcesCompat.getColor(
+                        resources,
+                        R.color.grey_disabled,
+                        itemView.context.theme
+                    )
+                )
+                if (model.enabled) model.clickListener?.let { setOnClickListener { it() } }
                 textAlignment = model.textAlignment
                 text = model.text
             }

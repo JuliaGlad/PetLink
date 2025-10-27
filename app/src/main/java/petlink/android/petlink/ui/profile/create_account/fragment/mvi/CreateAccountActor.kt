@@ -31,14 +31,13 @@ class CreateAccountActor(
                     intent.petData
                 )
             }
-
             CreateAccountIntent.Loading -> flow { emit(CreateAccountPartialState.Loading) }
         }
 
     private fun createUser(
         mainData: MainAccountCreationData,
         ownerData: OwnerAccountCreationData,
-        petData: PetAccountCreationData
+        petData: PetAccountCreationData,
     ) = flow {
         runCatching {
             createUserUseCase(mainData, ownerData, petData)

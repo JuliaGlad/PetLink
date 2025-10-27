@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="calendar_day_size">72dp</dimen>
+    <dimen name="calendar_day_min_height">72dp</dimen>
+
+    <dimen name="calendar_weekday_size">72dp</dimen>
+    <dimen name="calendar_weekday_min_height">72dp</dimen>
+
+    <dimen name="calendar_dot_size">8dp</dimen>
+    <dimen name="calendar_dot_margin">4dp</dimen>
+
+    <dimen name="calendar_day_padding">4dp</dimen>
+    <dimen name="calendar_day_text_size">16sp</dimen>
+</resources>

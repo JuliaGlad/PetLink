@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="CalendarWeekday">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_columnWeight">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">14sp</item>
+        <item name="fontFamily">@font/roboto_bold</item>
+        <item name="android:fontFamily">@font/roboto_bold</item>
+        <item name="android:paddingVertical">4dp</item>
+    </style>
     <style name="ThemeOverlay.MyApp.BottomSheetDialog" parent="ThemeOverlay.Material3.BottomSheetDialog">
         <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Material3.LargeComponent</item>
     </style>
@@ -24,6 +35,17 @@
         <item name="colorPrimaryVariant">@color/dark_green_variant</item>
         <item name="colorAccent">@color/medium_green</item>
     </style>
+
+    <style name="GreenTimePickerDialogTheme" parent="ThemeOverlay.MaterialComponents.TimePicker">
+        <item name="colorPrimary">@color/medium_green</item>
+        <item name="colorOnPrimary">@color/icon_color</item>
+        <item name="colorPrimaryVariant">@color/dark_green_variant</item>
+        <item name="colorAccent">@color/medium_green</item>
+        <item name="clockHandColor">@color/light_green</item>
+        <item name="clockFaceBackgroundColor">@color/light_green</item>
+        <item name="clockNumberTextColor">@color/black</item>
+    </style>
+
 
     <style name="GreenDialogActionButton"
         parent="Widget.MaterialComponents.Button.TextButton.Dialog">

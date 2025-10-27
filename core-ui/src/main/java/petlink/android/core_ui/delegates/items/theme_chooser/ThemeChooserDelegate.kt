@@ -1,0 +1,60 @@
+package petlink.android.core_ui.delegates.items.theme_chooser
+
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import petlink.android.core_ui.databinding.DelegateThemeChooserBinding
+import petlink.android.core_ui.delegates.items.theme_chooser.theme.ThemeAdapter
+import petlink.android.core_ui.delegates.items.theme_chooser.theme.ThemeModel
+import petlink.android.core_ui.delegates.main.AdapterDelegate
+import petlink.android.core_ui.delegates.main.DelegateItem
+
+class ThemeChooserDelegate : AdapterDelegate {
+    override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
+        ViewHolder(
+            DelegateThemeChooserBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
+        )
+
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        item: DelegateItem,
+        position: Int
+    ) {
+        (holder as ViewHolder).bind(item.content() as ThemeChooserModel)
+    }
+
+    override fun isOfViewType(item: DelegateItem): Boolean = item is ThemeChooserDelegateItem
+
+    class ViewHolder(private val binding: DelegateThemeChooserBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        val recyclerItems: MutableList<ThemeModel> = mutableListOf()
+        val adapter: ThemeAdapter = ThemeAdapter()
+
+        fun bind(model: ThemeChooserModel) {
+            model.items.forEach { item ->
+                val isChosen = item.value.id == model.defaultChosenId
+                recyclerItems.add(
+                    ThemeModel(
+                        theme = item,
+                        isChosen = isChosen,
+                        clickListener = {
+                            recyclerItems.forEach { recyclerItem ->
+                                val currentThemeId = recyclerItem.theme.value.id
+                                recyclerItem.isChosen = item.value.id == currentThemeId
+                                adapter.notifyItemChanged(recyclerItems.indexOf(recyclerItem))
+                                if (recyclerItem.isChosen) model.clickListener(currentThemeId)
+                            }
+                        }
+                    )
+                )
+            }
+            binding.recyclerView.adapter = adapter
+            adapter.submitList(recyclerItems)
+        }
+    }
+}

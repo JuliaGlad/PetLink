@@ -4,4 +4,7 @@
     <string name="looks_like_something_went_wrong">Похоже что-то пошло не так! Пожалуйста, повторите попытку позже</string>
     <string name="try_again">Повторить</string>
     <string name="profile">Профиль</string>
+    <string name="notifications">Уведомления</string>
+    <string name="turned_on">включены</string>
+    <string name="turned_off">выключены</string>
 </resources>

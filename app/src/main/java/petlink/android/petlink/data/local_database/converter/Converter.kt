@@ -3,8 +3,8 @@ package petlink.android.petlink.data.local_database.converter
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import petlink.android.petlink.data.local_database.entity.OwnerLocalDb
-import petlink.android.petlink.data.local_database.entity.PetLocalDb
+import petlink.android.petlink.data.local_database.entity.user.OwnerLocalDb
+import petlink.android.petlink.data.local_database.entity.user.PetLocalDb
 
 abstract class Converter<T>(
     private val typeToken: TypeToken<T>

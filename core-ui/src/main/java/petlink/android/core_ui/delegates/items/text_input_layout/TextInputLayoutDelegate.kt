@@ -37,16 +37,15 @@ class TextInputLayoutDelegate : AdapterDelegate {
         fun bind(model: TextInputLayoutModel) {
             with(binding.editText) {
                 textWatcher?.let { removeTextChangedListener(it) }
-                hint = model.hint
+                binding.textInputLayout.hint = model.hint
                 inputType = model.inputType
                 isEnabled = model.editable
                 setText(model.defaultValue)
+                hint = model.hint
+                binding.textInputLayout.error = model.error
                 textWatcher = model.textChangedListener?.let {
                     addTextChangedListener(onTextChanged = { char, p0, p1, p2 ->
                         model.textChangedListener(char.toString())
-                        if (!model.canBeEmpty && char?.isEmpty() == true){
-                            binding.textInputLayout.error = model.error
-                        }
                     })
                 }
                 if (model.endIconMode == TextInputLayout.END_ICON_PASSWORD_TOGGLE) {

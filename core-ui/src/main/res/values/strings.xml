@@ -4,4 +4,9 @@
     <string name="looks_like_something_went_wrong">Looks like something went wrong, please, try again later!</string>
     <string name="try_again">Try again</string>
     <string name="profile">Profile</string>
+    <string name="on" translatable="false">ON</string>
+    <string name="off" translatable="false">OFF</string>
+    <string name="notifications">Notifications</string>
+    <string name="turned_on">turned on</string>
+    <string name="turned_off">turned off</string>
 </resources>
