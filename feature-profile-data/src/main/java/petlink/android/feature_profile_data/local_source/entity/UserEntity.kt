@@ -1,0 +1,14 @@
+package petlink.android.feature_profile_data.local_source.entity
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "users")
+class UserEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = -1,
+    val userId: String,
+    var background: String,
+    val pet: PetLocalDb,
+    val owner: OwnerLocalDb
+)

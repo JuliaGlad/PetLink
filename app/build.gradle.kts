@@ -46,8 +46,21 @@ android {
 }
 
 dependencies {
+    implementation(project(":core-navigation"))
     implementation(project(":core-ui"))
     implementation(project(":core-mvi"))
+    implementation(project(":core-data"))
+    implementation(project(":core-di"))
+    implementation(project(":feature-profile-domain"))
+    implementation(project(":feature-profile-domain-impl"))
+    implementation(project(":feature-profile-data"))
+    implementation(project(":feature-profile-data-impl"))
+    implementation(project(":feature-profile-ui-main"))
+    implementation(project(":feature-profile-ui-auth"))
+    implementation(project(":feature-community-ui-main"))
+    implementation(project(":feature-map-ui-main"))
+    implementation(project(":feature-calendar-ui-main"))
+    implementation(project(":feature-profile-ui-achievement"))
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.firebase.auth)
     implementation(libs.assisted.inject.annotations.dagger2)

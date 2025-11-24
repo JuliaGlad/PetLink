@@ -36,3 +36,13 @@ suspend fun <T1, T2, R> asyncAwait(
         transform(result1.await(), result2.await())
     }
 }
+
+suspend fun <T1, T2, R> runSequentially(
+    s1: suspend () -> T1,
+    s2: suspend () -> T2,
+    transform: suspend (T1, T2) -> R
+): R = coroutineScope {
+    val r1 = s1()
+    val r2 = s2()
+    transform(r1, r2)
+}

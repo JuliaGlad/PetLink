@@ -11,8 +11,33 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/core-data" />
+            <option value="$PROJECT_DIR$/core-di" />
             <option value="$PROJECT_DIR$/core-mvi" />
+            <option value="$PROJECT_DIR$/core-navigation" />
             <option value="$PROJECT_DIR$/core-ui" />
+            <option value="$PROJECT_DIR$/feature-calendar-data" />
+            <option value="$PROJECT_DIR$/feature-calendar-data-impl" />
+            <option value="$PROJECT_DIR$/feature-calendar-domain" />
+            <option value="$PROJECT_DIR$/feature-calendar-domain-impl" />
+            <option value="$PROJECT_DIR$/feature-calendar-ui-add_event" />
+            <option value="$PROJECT_DIR$/feature-calendar-ui-calendar_view" />
+            <option value="$PROJECT_DIR$/feature-calendar-ui-edit_event" />
+            <option value="$PROJECT_DIR$/feature-calendar-ui-history" />
+            <option value="$PROJECT_DIR$/feature-calendar-ui-main" />
+            <option value="$PROJECT_DIR$/feature-community-ui-main" />
+            <option value="$PROJECT_DIR$/feature-map-ui-main" />
+            <option value="$PROJECT_DIR$/feature-profile-data" />
+            <option value="$PROJECT_DIR$/feature-profile-data-impl" />
+            <option value="$PROJECT_DIR$/feature-profile-domain" />
+            <option value="$PROJECT_DIR$/feature-profile-domain-impl" />
+            <option value="$PROJECT_DIR$/feature-profile-ui-achievement" />
+            <option value="$PROJECT_DIR$/feature-profile-ui-auth" />
+            <option value="$PROJECT_DIR$/feature-profile-ui-create_account" />
+            <option value="$PROJECT_DIR$/feature-profile-ui-edit" />
+            <option value="$PROJECT_DIR$/feature-profile-ui-friends" />
+            <option value="$PROJECT_DIR$/feature-profile-ui-main" />
+            <option value="$PROJECT_DIR$/feature-profile-ui-settings" />
           </set>
         </option>
       </GradleProjectSettings>

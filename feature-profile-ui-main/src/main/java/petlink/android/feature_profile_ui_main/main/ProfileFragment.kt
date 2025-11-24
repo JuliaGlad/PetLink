@@ -1,0 +1,408 @@
+package petlink.android.feature_profile_ui_main.main
+
+import android.app.Activity
+import android.content.Intent
+import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
+import android.view.ViewGroup
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.net.toUri
+import androidx.fragment.app.viewModels
+import com.github.dhaval2404.imagepicker.ImagePicker
+import com.github.terrakok.cicerone.Router
+import com.google.android.material.tabs.TabLayout
+import petlink.android.core_di.DaggerAppComponent
+import petlink.android.core_mvi.LceState
+import petlink.android.core_mvi.MviBaseFragment
+import petlink.android.core_mvi.MviStore
+import petlink.android.core_ui.delegates.items.button_primary_variant.PrimaryButtonVariantDelegate
+import petlink.android.core_ui.delegates.items.button_primary_variant.PrimaryButtonVariantDelegateItem
+import petlink.android.core_ui.delegates.items.button_primary_variant.PrimaryButtonVariantModel
+import petlink.android.core_ui.delegates.items.description_button.DescriptionButtonDelegate
+import petlink.android.core_ui.delegates.items.description_button.DescriptionButtonDelegateItem
+import petlink.android.core_ui.delegates.items.description_button.DescriptionButtonModel
+import petlink.android.core_ui.delegates.items.profile_avatars.ProfileAvatarsDelegate
+import petlink.android.core_ui.delegates.items.profile_avatars.ProfileAvatarsDelegateItem
+import petlink.android.core_ui.delegates.items.profile_avatars.ProfileAvatarsModel
+import petlink.android.core_ui.delegates.items.tabs.TabDelegate
+import petlink.android.core_ui.delegates.items.tabs.TabDelegateItem
+import petlink.android.core_ui.delegates.items.tabs.TabItemModel
+import petlink.android.core_ui.delegates.items.tabs.TabModel
+import petlink.android.core_ui.delegates.main.DelegateItem
+import petlink.android.core_ui.delegates.main.MainAdapter
+import petlink.android.core_ui.R
+import petlink.android.feature_profile_ui_main.databinding.FragmentProfileBinding
+import petlink.android.feature_profile_ui_main.main.di.DaggerProfileComponent
+import petlink.android.feature_profile_ui_main.main.model.OwnerMainDataUi
+import petlink.android.feature_profile_ui_main.main.model.PetMainDataUi
+import petlink.android.feature_profile_ui_main.main.model.ProfileMainDataUi
+import petlink.android.feature_profile_ui_main.main.mvi.ProfileEffect
+import petlink.android.feature_profile_ui_main.main.mvi.ProfileIntent
+import petlink.android.feature_profile_ui_main.main.mvi.ProfileLocalDI
+import petlink.android.feature_profile_ui_main.main.mvi.ProfilePartialState
+import petlink.android.feature_profile_ui_main.main.mvi.ProfileState
+import petlink.android.feature_profile_ui_main.main.mvi.ProfileStoreFactory
+import petlink.android.feature_profile_ui_main.navigation.ProfileMainScreens
+import javax.inject.Inject
+import kotlin.reflect.KMutableProperty1
+
+class ProfileFragment : MviBaseFragment<
+        ProfilePartialState,
+        ProfileIntent,
+        ProfileState,
+        ProfileEffect>(petlink.android.feature_profile_ui_main.R.layout.fragment_profile) {
+
+    private var _binding: FragmentProfileBinding? = null
+    private val binding get() = _binding!!
+    private var addCoverImageLauncher: ActivityResultLauncher<Intent>? = null
+    private val mainAdapter: MainAdapter = MainAdapter()
+    private val items: MutableList<DelegateItem> = mutableListOf()
+
+    private lateinit var editProfileActivityResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var settingsActivityResultLauncher: ActivityResultLauncher<Intent>
+
+    @Inject
+    lateinit var localDI: ProfileLocalDI
+
+    @Inject
+    lateinit var router: Router
+
+    override val store: MviStore<ProfilePartialState, ProfileIntent, ProfileState, ProfileEffect>
+            by viewModels {
+                ProfileStoreFactory(
+                    reducer = localDI.reducer,
+                    actor = localDI.actor
+                )
+            }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val appComponent = DaggerAppComponent.factory().create(requireContext())
+        DaggerProfileComponent.factory().create(appComponent).inject(this)
+        addCoverImageLauncher = initCoverImageLauncher()
+        editProfileActivityResultLauncher = initEditProfileImageLauncher()
+        settingsActivityResultLauncher = initSettingLauncher()
+    }
+
+    private fun initSettingLauncher(): ActivityResultLauncher<Intent> = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK){
+            //router.navigateTo(ProfileMainScreens)
+        }
+    }
+
+    private fun initEditProfileImageLauncher() = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+            val userUpdatedData = result.data!!
+            val ownerImage = userUpdatedData.getStringExtra(OWNER_IMAGE)
+            val ownerName = userUpdatedData.getStringExtra(OWNER_NAME)
+            val petName = userUpdatedData.getStringExtra(PET_NAME)
+            val petImage = userUpdatedData.getStringExtra(PET_IMAGE)
+            updatedUiAfterEdit(petName, petImage, ownerImage, ownerName)
+        }
+    }
+
+    private fun updatedUiAfterEdit(
+        petName: String?,
+        petImage: String?,
+        ownerImage: String?,
+        ownerName: String?
+    ) {
+        val updatedItem = (items[0] as ProfileAvatarsDelegateItem).content() as ProfileAvatarsModel
+        updateIfChanged(petName, updatedItem, ProfileAvatarsModel::petName)
+        updateIfChanged(petImage, updatedItem, ProfileAvatarsModel::petImage)
+        updateIfChanged(ownerImage, updatedItem, ProfileAvatarsModel::ownerImage)
+        updateIfChanged(ownerName, updatedItem, ProfileAvatarsModel::ownerName)
+        mainAdapter.notifyItemChanged(0)
+    }
+
+    private fun <R, T> updateIfChanged(newValue: T?, receiver: R, property: KMutableProperty1<R, T>) {
+        if (newValue != null && property.get(receiver) != newValue) {
+            property.set(receiver, newValue)
+        }
+    }
+    private fun initCoverImageLauncher() = registerForActivityResult<Intent, ActivityResult>(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val photoResult = result.data
+            if (photoResult != null) {
+                val uri = photoResult.data.toString()
+                store.sendIntent(ProfileIntent.UpdateBackground(uri))
+                for (i in items) {
+                    if (i is ProfileAvatarsDelegateItem) {
+                        val content = i.content() as ProfileAvatarsModel
+                        content.backgroundImage = uri
+                        mainAdapter.notifyItemChanged(items.indexOf(i))
+                    }
+                }
+            }
+        }
+    }
+
+    private fun initImagePicker() {
+        ImagePicker.with(this)
+            .crop(16f, 11f)
+            .compress(512)
+            .maxResultSize(512, 1024)
+            .createIntent { intent -> addCoverImageLauncher?.launch(intent) }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentProfileBinding.inflate(layoutInflater)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        store.sendIntent(ProfileIntent.LoadUserData)
+    }
+
+    override fun render(state: ProfileState) {
+        when (state.value) {
+            is LceState.Content<ProfileMainDataUi> -> {
+                with(binding) {
+                    loadingScreen.root.visibility = GONE
+                    errorScreen.root.visibility = GONE
+                }
+                with(state.value.data) {
+                    initMainAdapter()
+                    initRecycler(background, petData, ownerData)
+                }
+            }
+            is LceState.Error -> {
+                with(binding) {
+                    loadingScreen.root.visibility = GONE
+                    errorScreen.root.visibility = VISIBLE
+                    Log.i("ProfileError", state.value.throwable.message.toString())
+                    errorScreen.button.setOnClickListener { store.sendIntent(ProfileIntent.LoadUserData) }
+                }
+            }
+            LceState.Loading -> {
+                with(binding) {
+                    loadingScreen.root.visibility = VISIBLE
+                    errorScreen.root.visibility = GONE
+                }
+            }
+        }
+    }
+
+    override fun resolveEffect(effect: ProfileEffect) {
+        when (effect) {
+            ProfileEffect.NavigateToAchievements -> startActivity("app://profile/achievement")
+            ProfileEffect.NavigateToEdit -> startActivity("app://profile/edit")
+            ProfileEffect.NavigateToFriends -> startActivity("app://profile/friends")
+            ProfileEffect.NavigateToMyData -> router.navigateTo(ProfileMainScreens.profileMyData())
+            ProfileEffect.NavigateToSettings -> {
+                val intent = Intent(
+                    Intent.ACTION_VIEW,
+                    "app://profile/settings".toUri()
+                )
+                settingsActivityResultLauncher.launch(intent)
+            }
+            ProfileEffect.ShowPosts -> showPosts()
+        }
+    }
+
+    private fun startActivity(uri: String){
+        val intent = Intent(
+            Intent.ACTION_VIEW,
+            uri.toUri()
+        )
+        requireActivity().startActivity(intent)
+    }
+
+    private fun initMainAdapter() {
+        mainAdapter.apply {
+            addDelegate(ProfileAvatarsDelegate())
+            addDelegate(TabDelegate())
+            addDelegate(DescriptionButtonDelegate())
+            addDelegate(PrimaryButtonVariantDelegate())
+        }
+    }
+
+    private fun initRecycler(background: String, petData: PetMainDataUi, ownerData: OwnerMainDataUi) {
+        items.addAll(
+            listOf(
+                ProfileAvatarsDelegateItem(
+                    ProfileAvatarsModel(
+                        petName = petData.petName,
+                        petImage = petData.imageUri,
+                        ownerName = ownerData.ownerName,
+                        ownerImage = ownerData.imageUri,
+                        backgroundImage = background,
+                        addImageClickListener = { initImagePicker() }
+                    )
+                ),
+                TabDelegateItem(
+                    TabModel(
+                        tabs = listOf(
+                            TabItemModel(
+                                id = MANAGEMENT_ID,
+                                title = getString(R.string.management)
+                            ),
+                            TabItemModel(
+                                id = POSTS_ID,
+                                title = getString(R.string.posts)
+                            )
+                        ),
+                        tabSelectedListener = object : TabLayout.OnTabSelectedListener {
+                            override fun onTabSelected(tab: TabLayout.Tab?) {
+                                if (tab?.id == MANAGEMENT_ID) {
+                                    addManagementButtons()
+                                } else if (tab?.id == POSTS_ID) {
+                                    store.sendEffect(ProfileEffect.ShowPosts)
+                                }
+                            }
+
+                            override fun onTabUnselected(tab: TabLayout.Tab?) {
+                                Log.i("Profile Fragment, tab unselected", tab?.text.toString())
+                            }
+
+                            override fun onTabReselected(tab: TabLayout.Tab?) {
+                                Log.i("Profile Fragment, tab reselected", tab?.text.toString())
+                            }
+                        }
+                    )
+                )
+            ))
+        items.addAll(getManagementButtons())
+        binding.recyclerView.adapter = mainAdapter
+        mainAdapter.submitList(items)
+    }
+
+    private fun getManagementButtons() = listOf<DelegateItem>(
+        DescriptionButtonDelegateItem(
+            DescriptionButtonModel(
+                title = getString(R.string.my_data),
+                description = getString(R.string.data_descriptiond),
+                icon = ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.ic_account,
+                    context?.theme
+                ),
+                click = { store.sendEffect(ProfileEffect.NavigateToMyData) }
+            )
+        ),
+        DescriptionButtonDelegateItem(
+            DescriptionButtonModel(
+                title = getString(R.string.my_friends),
+                description = getString(R.string.friends_description),
+                icon = ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.ic_community,
+                    context?.theme
+                ),
+                click = { store.sendEffect(ProfileEffect.NavigateToFriends) }
+            )
+        ),
+        DescriptionButtonDelegateItem(
+            DescriptionButtonModel(
+                title = getString(R.string.edit),
+                description = getString(R.string.edit_description),
+                icon = ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.ic_edit,
+                    context?.theme
+                ),
+                click = { store.sendEffect(ProfileEffect.NavigateToEdit) }
+            )
+        ),
+        DescriptionButtonDelegateItem(
+            DescriptionButtonModel(
+                title = getString(R.string.achievements),
+                description = getString(R.string.achivments_description),
+                icon = ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.ic_trophey,
+                    context?.theme
+                ),
+                click = { store.sendEffect(ProfileEffect.NavigateToAchievements) }
+            )
+        ),
+        DescriptionButtonDelegateItem(
+            DescriptionButtonModel(
+                title = getString(R.string.settings),
+                description = getString(R.string.settings_description),
+                icon = ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.ic_settings,
+                    context?.theme
+                ),
+                click = { store.sendEffect(ProfileEffect.NavigateToSettings) }
+            )
+        )
+    )
+
+    private fun addManagementButtons() {
+        val newItems = getManagementButtons()
+        val itemsToRemove = mutableListOf<DelegateItem>()
+        var startRemoveIndex: Int = -1
+        for (delegate in items) {
+            if (delegate is PrimaryButtonVariantDelegateItem) {
+                if (startRemoveIndex == -1) startRemoveIndex = items.indexOf(delegate)
+                itemsToRemove.add(delegate)
+            } else if (items.indexOf(delegate) > startRemoveIndex && startRemoveIndex != -1) {
+                itemsToRemove.add(delegate)
+            }
+        }
+        items.removeAll(itemsToRemove)
+        mainAdapter.notifyItemRangeRemoved(startRemoveIndex, itemsToRemove.size)
+        items.addAll(newItems)
+        mainAdapter.notifyItemRangeInserted(startRemoveIndex, newItems.size)
+    }
+
+    private fun showPosts() {
+        //Add posts in params, THIS method after getting post from db
+        val newItems = listOf<DelegateItem>(
+            PrimaryButtonVariantDelegateItem(
+                PrimaryButtonVariantModel(
+                    title = getString(R.string.create),
+                    click = { TODO("Navigate to Post creation") }
+                )
+            )
+        )
+        val itemsToRemove = mutableListOf<DelegateItem>()
+        var startRemoveIndex: Int = -1
+        for (delegate in items) {
+            if (delegate is DescriptionButtonDelegateItem) {
+                if (startRemoveIndex == -1) startRemoveIndex = items.indexOf(delegate)
+                itemsToRemove.add(delegate)
+            }
+        }
+        items.removeAll(itemsToRemove)
+        mainAdapter.notifyItemRangeRemoved(startRemoveIndex, itemsToRemove.size)
+        items.addAll(newItems)
+        mainAdapter.notifyItemRangeInserted(startRemoveIndex, newItems.size)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
+
+    companion object {
+        const val POSTS_ID = 1
+        const val MANAGEMENT_ID = 2
+        const val MY_DATA_BOTTOM_SHEET = "MyDataBottomSheetTAG"
+        const val OWNER_IMAGE = "OwnerImageExtra"
+        const val PET_IMAGE = "PetImageExtra"
+        const val PET_NAME = "PetNameExtra"
+        const val OWNER_NAME = "OwnerNameExtra"
+    }
+
+}

@@ -16,35 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PetLink"
         tools:targetApi="31">
+
         <activity
-            android:name=".ui.calendar.calendar_view.CalendarViewActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.calendar.history.CalendarEventHistoryActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.calendar.edit_event.EditEventActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.calendar.add_event.AddEventActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.profile.settings.SettingsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.profile.friends.FriendActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.profile.edit.EditActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.profile.achievement.AchievementActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.profile.create_account.activity.CreateAccountActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.main.activity.MainActivity"
+            android:name=".activity.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

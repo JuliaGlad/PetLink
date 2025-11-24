@@ -1,0 +1,18 @@
+package petlink.android.feature_profile_data.repository
+
+interface UserAuthRepository {
+
+    fun isAuthenticated(): Boolean
+
+    suspend fun createUserWithEmailAndPassword(email: String, password: String)
+
+    suspend fun signInWithEmailAndPassword(email: String, password: String)
+
+    suspend fun deleteAccount(password: String)
+
+    suspend fun signOut()
+
+    suspend fun updatePassword()
+
+    suspend fun updateEmail(password: String, newEmail: String)
+}
