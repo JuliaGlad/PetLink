@@ -1,5 +1,6 @@
 package petlink.android.feature_profile_ui_create_account.di
 
+import com.github.terrakok.cicerone.Router
 import dagger.Component
 import petlink.android.core_di.AppComponent
 import petlink.android.feature_profile_data_impl.di.ProfileDataModule
@@ -28,6 +29,7 @@ interface CreateAccountComponent {
     interface Factory{
         fun create(appComponent: AppComponent): CreateAccountComponent
     }
+
 }
 
 @Scope

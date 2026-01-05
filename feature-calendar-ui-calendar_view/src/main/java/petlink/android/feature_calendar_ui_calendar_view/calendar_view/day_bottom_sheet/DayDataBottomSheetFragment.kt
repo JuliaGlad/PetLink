@@ -19,6 +19,7 @@ import com.github.terrakok.cicerone.Router
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.Timestamp
+import petlink.android.core_di.AppComponentHolder
 import petlink.android.core_di.DaggerAppComponent
 import petlink.android.core_mvi.LceState
 import petlink.android.core_mvi.MviBaseBottomSheetDialogFragment
@@ -81,7 +82,7 @@ class DayDataBottomSheetFragment : MviBaseBottomSheetDialogFragment<
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val appComponent = DaggerAppComponent.factory().create(requireContext())
+        val appComponent = AppComponentHolder.appComponent
         DaggerDayDataComponent.factory().create(appComponent).inject(this)
         addEventActivityResultLauncher = initAddEventLauncher()
         editEventActivityResultLauncher = initEditEventLauncher()

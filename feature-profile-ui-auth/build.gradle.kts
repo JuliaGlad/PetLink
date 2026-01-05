@@ -46,7 +46,6 @@ dependencies {
     implementation(project(":feature-profile-domain-impl"))
     implementation(project(":feature-profile-data-impl"))
     implementation(project(":feature-profile-data"))
-    implementation(project(":feature-profile-ui-main"))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(platform(libs.firebase.bom))

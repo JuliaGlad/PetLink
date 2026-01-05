@@ -1,10 +1,10 @@
 package petlink.android.feature_profile_ui_edit.mvi
 
 import petlink.android.core_mvi.MviState
-import petlink.android.feature_profile_ui_edit.model.UserFullModel
+import petlink.android.feature_profile_ui_edit.model.UserEditFullModel
 
 data class EditMviState(
-    val value: EditState<UserFullModel>,
+    val value: EditState<UserEditFullModel>,
     val isPetUpdated: Boolean = false,
     val isOwnerUpdated: Boolean = false,
     val emptyFields: List<Int> = emptyList<Int>()

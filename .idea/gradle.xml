@@ -32,7 +32,6 @@
             <option value="$PROJECT_DIR$/feature-profile-domain" />
             <option value="$PROJECT_DIR$/feature-profile-domain-impl" />
             <option value="$PROJECT_DIR$/feature-profile-ui-achievement" />
-            <option value="$PROJECT_DIR$/feature-profile-ui-auth" />
             <option value="$PROJECT_DIR$/feature-profile-ui-create_account" />
             <option value="$PROJECT_DIR$/feature-profile-ui-edit" />
             <option value="$PROJECT_DIR$/feature-profile-ui-friends" />

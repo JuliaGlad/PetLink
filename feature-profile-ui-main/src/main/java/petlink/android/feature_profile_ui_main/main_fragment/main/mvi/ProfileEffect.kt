@@ -1,0 +1,19 @@
+package petlink.android.feature_profile_ui_main.main_fragment.main.mvi
+
+import petlink.android.core_mvi.MviEffect
+
+sealed interface ProfileEffect: MviEffect {
+
+    data object NavigateToEdit: ProfileEffect
+
+    data object NavigateToFriends: ProfileEffect
+
+    data object NavigateToMyData: ProfileEffect
+
+    data object NavigateToAchievements: ProfileEffect
+
+    data object NavigateToSettings: ProfileEffect
+
+    data object ShowPosts: ProfileEffect
+
+}

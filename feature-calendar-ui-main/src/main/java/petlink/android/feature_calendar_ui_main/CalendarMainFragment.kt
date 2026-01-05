@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
+import petlink.android.core_di.AppComponentHolder
 import petlink.android.core_di.DaggerAppComponent
 import petlink.android.core_mvi.LceState
 import petlink.android.core_mvi.MviBaseFragment
@@ -73,7 +74,7 @@ class CalendarMainFragment : MviBaseFragment<
         super.onCreate(savedInstanceState)
         addEventActivityResultLauncher = initAddEventLauncher()
         editEventActivityResultLauncher = initEditEventLauncher()
-        val appComponent = DaggerAppComponent.factory().create(requireContext())
+        val appComponent = AppComponentHolder.appComponent
         DaggerCalendarMainComponent.factory().create(appComponent).inject(this)
     }
 

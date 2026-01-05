@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
+import petlink.android.core_di.AppComponentHolder
 import petlink.android.core_di.DaggerAppComponent
 import petlink.android.feature_profile_ui_settings.databinding.DialogLogoutBinding
 import petlink.android.feature_profile_ui_settings.dialog.logout.di.DaggerLogoutComponent
@@ -29,7 +30,7 @@ class LogoutDialogFragment: DialogFragment() {
     private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val appComponent = DaggerAppComponent.factory().create(requireContext())
+        val appComponent = AppComponentHolder.appComponent
         DaggerLogoutComponent.factory().create(appComponent).inject(this)
         super.onCreate(savedInstanceState)
     }

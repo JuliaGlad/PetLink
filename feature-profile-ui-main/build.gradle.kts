@@ -48,6 +48,7 @@ dependencies {
     implementation(project(":feature-profile-data"))
     implementation(project(":feature-profile-ui-edit"))
     implementation(project(":feature-profile-ui-achievement"))
+    implementation(project(":feature-profile-ui-create_account"))
     implementation(project(":feature-profile-ui-settings"))
     implementation(project(":feature-profile-ui-friends"))
     implementation(libs.cicerone)

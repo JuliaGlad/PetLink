@@ -1,7 +1,7 @@
 package petlink.android.feature_profile_ui_edit.mvi
 
 import petlink.android.core_mvi.MviReducer
-import petlink.android.feature_profile_ui_edit.model.UserFullModel
+import petlink.android.feature_profile_ui_edit.model.UserEditFullModel
 
 class EditProfileReducer : MviReducer<
         EditPartialState,
@@ -37,7 +37,7 @@ class EditProfileReducer : MviReducer<
         return prevState.copy(emptyFields = emptyFields)
     }
 
-    private fun updateDataLoaded(prevState: EditMviState, data: UserFullModel) =
+    private fun updateDataLoaded(prevState: EditMviState, data: UserEditFullModel) =
         prevState.copy(value = EditState.DataLoaded(data))
 
     private fun updateOwnerDataUpdated(prevState: EditMviState) =

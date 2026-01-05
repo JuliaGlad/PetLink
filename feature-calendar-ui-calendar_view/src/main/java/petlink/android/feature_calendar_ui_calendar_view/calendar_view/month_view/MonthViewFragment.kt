@@ -8,6 +8,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import petlink.android.core_di.AppComponentHolder
 import petlink.android.core_di.DaggerAppComponent
 import petlink.android.core_mvi.LceState
 import petlink.android.core_mvi.MviBaseFragment
@@ -58,7 +59,7 @@ class MonthViewFragment : MviBaseFragment<
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val appComponent = DaggerAppComponent.factory().create(requireContext())
+        val appComponent = AppComponentHolder.appComponent
         DaggerMonthViewComponent.factory().create(appComponent).inject(this)
         arguments?.let {
             year = it.getInt(ARG_YEAR)

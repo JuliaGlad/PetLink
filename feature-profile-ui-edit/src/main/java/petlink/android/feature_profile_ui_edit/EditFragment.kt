@@ -19,7 +19,7 @@ import androidx.fragment.app.viewModels
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.android.material.snackbar.Snackbar
 import org.json.JSONArray
-import petlink.android.core_di.DaggerAppComponent
+import petlink.android.core_di.AppComponentHolder
 import petlink.android.core_mvi.MviBaseFragment
 import petlink.android.core_mvi.MviStore
 import petlink.android.core_ui.custom_view.LayoutAlignment
@@ -57,7 +57,7 @@ import petlink.android.feature_profile_ui_edit.databinding.FragmentEditBinding
 import petlink.android.feature_profile_ui_edit.di.DaggerEditProfileComponent
 import petlink.android.feature_profile_ui_edit.model.OwnerFullModel
 import petlink.android.feature_profile_ui_edit.model.PetFullModel
-import petlink.android.feature_profile_ui_edit.model.UserFullModel
+import petlink.android.feature_profile_ui_edit.model.UserEditFullModel
 import petlink.android.feature_profile_ui_edit.mvi.EditMviState
 import petlink.android.feature_profile_ui_edit.mvi.EditPartialState
 import petlink.android.feature_profile_ui_edit.mvi.EditProfileEffect
@@ -85,7 +85,7 @@ class EditFragment : MviBaseFragment<
     @Inject
     lateinit var localDI: EditProfileLocalDI
 
-    private lateinit var updatedUser: UserFullModel
+    private lateinit var updatedUser: UserEditFullModel
     private val recyclerItems: MutableList<DelegateItem> = mutableListOf()
 
     override val store: MviStore<EditPartialState, EditProfileIntent, EditMviState, EditProfileEffect>
@@ -93,7 +93,7 @@ class EditFragment : MviBaseFragment<
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val appComponent = DaggerAppComponent.factory().create(requireContext())
+        val appComponent = AppComponentHolder.appComponent
         DaggerEditProfileComponent.factory().create(appComponent).inject(this)
         photoPickerActivityResultLauncher = initPhotoPickerActivityResultLauncher()
     }
@@ -149,7 +149,7 @@ class EditFragment : MviBaseFragment<
 
     override fun render(state: EditMviState) {
         when (state.value) {
-            is EditState.DataLoaded<UserFullModel> -> {
+            is EditState.DataLoaded<UserEditFullModel> -> {
                 with(binding) {
                     loadingScreen.root.visibility = GONE
                     errorScreen.root.visibility = GONE

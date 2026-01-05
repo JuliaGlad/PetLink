@@ -56,7 +56,6 @@ dependencies {
     implementation(project(":feature-profile-data"))
     implementation(project(":feature-profile-data-impl"))
     implementation(project(":feature-profile-ui-main"))
-    implementation(project(":feature-profile-ui-auth"))
     implementation(project(":feature-community-ui-main"))
     implementation(project(":feature-map-ui-main"))
     implementation(project(":feature-calendar-ui-main"))

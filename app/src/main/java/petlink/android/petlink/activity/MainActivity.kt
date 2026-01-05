@@ -5,10 +5,11 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.github.terrakok.cicerone.Router
-import com.github.terrakok.cicerone.androidx.AppNavigator
+import petlink.android.core_di.AppComponentHolder
 import petlink.android.core_di.DaggerAppComponent
 import petlink.android.core_navigation.AppNavigationHolder
 import petlink.android.core_navigation.CustomNavigator
+import petlink.android.petlink.App.Companion.app
 import petlink.android.petlink.R
 import petlink.android.petlink.databinding.ActivityMainBinding
 import petlink.android.petlink.di.DaggerMainActivityComponent
@@ -35,7 +36,7 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val appComponent = DaggerAppComponent.factory().create(this)
+        val appComponent = AppComponentHolder.appComponent
         DaggerMainActivityComponent.factory().create(appComponent).inject(this)
         super.onCreate(savedInstanceState)
 
