@@ -22,8 +22,8 @@ import com.github.terrakok.cicerone.Router
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import org.json.JSONArray
-import petlink.android.core_di.AppComponentHolder
-import petlink.android.core_di.DaggerAppComponent
+import petlink.android.core_di.app.AppComponentHolder
+import petlink.android.core_di.profile.component.DaggerProfileComponent
 import petlink.android.core_mvi.MviBaseFragment
 import petlink.android.core_mvi.MviStore
 import petlink.android.core_ui.R
@@ -103,8 +103,8 @@ class CreateAccountFragment : MviBaseFragment<
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val appComponent = AppComponentHolder.appComponent
-        DaggerCreateAccountComponent.factory().create(appComponent).inject(this)
+        val profileComponent = DaggerProfileComponent.factory().create(AppComponentHolder.appComponent)
+        DaggerCreateAccountComponent.factory().create(profileComponent).inject(this)
         photoPickerLauncher = initActivityResultLauncher()
     }
 

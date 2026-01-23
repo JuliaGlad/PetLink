@@ -5,11 +5,9 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.github.terrakok.cicerone.Router
-import petlink.android.core_di.AppComponentHolder
-import petlink.android.core_di.DaggerAppComponent
+import petlink.android.core_di.app.AppComponentHolder
 import petlink.android.core_navigation.AppNavigationHolder
 import petlink.android.core_navigation.CustomNavigator
-import petlink.android.petlink.App.Companion.app
 import petlink.android.petlink.R
 import petlink.android.petlink.databinding.ActivityMainBinding
 import petlink.android.petlink.di.DaggerMainActivityComponent

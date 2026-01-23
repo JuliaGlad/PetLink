@@ -37,7 +37,6 @@ dependencies {
     implementation(project(":feature-calendar-data"))
     implementation(project(":feature-calendar-domain"))
     implementation(project(":core-data"))
-    implementation(project(":core-di"))
     implementation(libs.converter.gson)
     kapt(libs.androidx.room.compiler.v283)
     implementation(libs.androidx.room.ktx.v283)

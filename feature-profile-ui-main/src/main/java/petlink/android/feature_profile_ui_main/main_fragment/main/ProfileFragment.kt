@@ -19,8 +19,8 @@ import androidx.fragment.app.viewModels
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.github.terrakok.cicerone.Router
 import com.google.android.material.tabs.TabLayout
-import petlink.android.core_di.AppComponentHolder
-import petlink.android.core_di.DaggerAppComponent
+import petlink.android.core_di.app.AppComponentHolder
+import petlink.android.core_di.profile.component.DaggerProfileComponent
 import petlink.android.core_mvi.LceState
 import petlink.android.core_mvi.MviBaseFragment
 import petlink.android.core_mvi.MviStore
@@ -43,7 +43,7 @@ import petlink.android.core_ui.R
 import petlink.android.feature_profile_ui_main.MainProfileId
 import petlink.android.feature_profile_ui_main.OnFragmentInteractionListener
 import petlink.android.feature_profile_ui_main.databinding.FragmentProfileBinding
-import petlink.android.feature_profile_ui_main.main_fragment.main.di.DaggerProfileComponent
+import petlink.android.feature_profile_ui_main.main_fragment.main.di.DaggerProfileMainComponent
 import petlink.android.feature_profile_ui_main.main_fragment.main.model.OwnerMainDataUi
 import petlink.android.feature_profile_ui_main.main_fragment.main.model.PetMainDataUi
 import petlink.android.feature_profile_ui_main.main_fragment.main.model.ProfileMainDataUi
@@ -95,8 +95,8 @@ class ProfileFragment : MviBaseFragment<
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val appComponent = AppComponentHolder.appComponent
-        DaggerProfileComponent.factory().create(appComponent).inject(this)
+        val profileComponent = DaggerProfileComponent.factory().create(AppComponentHolder.appComponent)
+        DaggerProfileMainComponent.factory().create(profileComponent).inject(this)
         addCoverImageLauncher = initCoverImageLauncher()
         editProfileActivityResultLauncher = initEditProfileImageLauncher()
         settingsActivityResultLauncher = initSettingLauncher()

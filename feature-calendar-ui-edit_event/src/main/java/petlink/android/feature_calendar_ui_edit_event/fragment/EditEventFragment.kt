@@ -11,8 +11,8 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import petlink.android.core_di.AppComponentHolder
-import petlink.android.core_di.DaggerAppComponent
+import petlink.android.core_di.app.AppComponentHolder
+import petlink.android.core_di.calendar.component.DaggerCalendarComponent
 import petlink.android.core_mvi.MviBaseFragment
 import petlink.android.core_mvi.MviStore
 import petlink.android.core_navigation.action.EditEventAction
@@ -74,8 +74,8 @@ class EditEventFragment : MviBaseFragment<
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val appComponent = AppComponentHolder.appComponent
-        DaggerEditEventComponent.factory().create(appComponent).inject(this)
+        val calendarComponent = DaggerCalendarComponent.factory().create( AppComponentHolder.appComponent)
+        DaggerEditEventComponent.factory().create(calendarComponent).inject(this)
         initDefaultUserData()
     }
 

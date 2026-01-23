@@ -34,7 +34,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":core-di"))
     implementation(project(":feature-calendar-data"))
     implementation(project(":feature-calendar-domain"))
     implementation(platform(libs.firebase.bom))

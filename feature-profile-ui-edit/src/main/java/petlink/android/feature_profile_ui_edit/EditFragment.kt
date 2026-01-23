@@ -19,7 +19,8 @@ import androidx.fragment.app.viewModels
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.android.material.snackbar.Snackbar
 import org.json.JSONArray
-import petlink.android.core_di.AppComponentHolder
+import petlink.android.core_di.app.AppComponentHolder
+import petlink.android.core_di.profile.component.DaggerProfileComponent
 import petlink.android.core_mvi.MviBaseFragment
 import petlink.android.core_mvi.MviStore
 import petlink.android.core_ui.custom_view.LayoutAlignment
@@ -93,8 +94,8 @@ class EditFragment : MviBaseFragment<
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val appComponent = AppComponentHolder.appComponent
-        DaggerEditProfileComponent.factory().create(appComponent).inject(this)
+        val profileComponent = DaggerProfileComponent.factory().create(AppComponentHolder.appComponent)
+        DaggerEditProfileComponent.factory().create(profileComponent).inject(this)
         photoPickerActivityResultLauncher = initPhotoPickerActivityResultLauncher()
     }
 

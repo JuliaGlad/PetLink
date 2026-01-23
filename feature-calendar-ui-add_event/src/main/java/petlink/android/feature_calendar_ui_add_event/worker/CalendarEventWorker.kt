@@ -7,7 +7,9 @@ import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import petlink.android.core_di.DaggerAppComponent
+import petlink.android.core_di.app.AppComponentHolder
+import petlink.android.core_di.calendar.component.DaggerCalendarComponent
+import petlink.android.core_di.profile.component.DaggerProfileComponent
 import petlink.android.feature_calendar_domain.usecase.AddEventToHistoryUseCase
 import petlink.android.feature_calendar_ui_add_event.R
 import petlink.android.feature_calendar_ui_add_event.worker.di.DaggerCalendarEventComponent
@@ -23,9 +25,10 @@ class CalendarEventWorker(
     lateinit var addEventToHistoryUseCase: AddEventToHistoryUseCase
 
     init {
-        val appComponent = DaggerAppComponent.factory().create(appContext)
+        val profileComponent = DaggerProfileComponent.factory().create(AppComponentHolder.appComponent)
+        val calendarComponent = DaggerCalendarComponent.factory().create(AppComponentHolder.appComponent)
         DaggerCalendarEventComponent.factory()
-            .create(appComponent)
+            .create(profileComponent, calendarComponent)
             .inject(this)
     }
 

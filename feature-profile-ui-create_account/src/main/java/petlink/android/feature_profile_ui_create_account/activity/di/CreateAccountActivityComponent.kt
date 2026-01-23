@@ -1,7 +1,7 @@
 package petlink.android.feature_profile_ui_create_account.activity.di
 
 import dagger.Component
-import petlink.android.core_di.AppComponent
+import petlink.android.core_di.app.AppComponent
 import petlink.android.feature_profile_ui_create_account.activity.CreateAccountActivity
 import javax.inject.Scope
 

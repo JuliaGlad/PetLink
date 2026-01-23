@@ -1,22 +1,15 @@
 package petlink.android.feature_calendar_ui_calendar_view.calendar_view.day_bottom_sheet.di
 
 import dagger.Component
-import petlink.android.core_di.AppComponent
-import petlink.android.feature_calendar_data_impl.di.CalendarDataModule
-import petlink.android.feature_calendar_data_impl.local_db.db.CalendarDatabaseModule
-import petlink.android.feature_calendar_domain_impl.di.CalendarDomainModule
+import petlink.android.core_di.app.AppComponent
+import petlink.android.core_di.calendar.component.CalendarComponent
 import petlink.android.feature_calendar_ui_calendar_view.calendar_view.day_bottom_sheet.DayDataBottomSheetFragment
 import javax.inject.Scope
 
 @DayDataScope
 @Component(
-    dependencies = [AppComponent::class],
-    modules = [
-        DayDataLocalDIModule::class,
-        CalendarDomainModule::class,
-        CalendarDataModule::class,
-        CalendarDatabaseModule::class
-    ]
+    dependencies = [CalendarComponent::class],
+    modules = [DayDataLocalDIModule::class]
 )
 interface DayDataComponent {
 
@@ -24,7 +17,7 @@ interface DayDataComponent {
 
     @Component.Factory
     interface Factory{
-        fun create(appComponent: AppComponent): DayDataComponent
+        fun create(calendarComponent: CalendarComponent): DayDataComponent
     }
 }
 

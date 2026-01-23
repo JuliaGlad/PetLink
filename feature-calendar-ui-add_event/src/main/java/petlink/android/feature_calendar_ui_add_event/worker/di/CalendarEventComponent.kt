@@ -1,20 +1,16 @@
 package petlink.android.feature_calendar_ui_add_event.worker.di
 
 import dagger.Component
-import petlink.android.core_di.AppComponent
-import petlink.android.feature_calendar_data_impl.di.CalendarDataModule
-import petlink.android.feature_calendar_data_impl.local_db.db.CalendarDatabaseModule
-import petlink.android.feature_calendar_domain_impl.di.CalendarDomainModule
+import petlink.android.core_di.calendar.component.CalendarComponent
+import petlink.android.core_di.profile.component.ProfileComponent
 import petlink.android.feature_calendar_ui_add_event.worker.CalendarEventWorker
 import javax.inject.Scope
 
 @EventWorkerScope
 @Component(
-    dependencies = [AppComponent::class],
-    modules = [
-        CalendarDomainModule::class,
-        CalendarDataModule::class,
-        CalendarDatabaseModule::class
+    dependencies = [
+        ProfileComponent::class,
+        CalendarComponent::class
     ]
 )
 interface CalendarEventComponent {
@@ -22,7 +18,10 @@ interface CalendarEventComponent {
 
     @Component.Factory
     interface Factory {
-        fun create(appComponent: AppComponent): CalendarEventComponent
+        fun create(
+            profileComponent: ProfileComponent,
+            calendarComponent: CalendarComponent
+        ): CalendarEventComponent
     }
 }
 

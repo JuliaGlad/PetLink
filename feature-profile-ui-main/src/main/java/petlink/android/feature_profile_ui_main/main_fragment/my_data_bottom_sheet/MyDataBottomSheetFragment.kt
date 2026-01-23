@@ -12,7 +12,8 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.firestore.auth.User
-import petlink.android.core_di.AppComponentHolder
+import petlink.android.core_di.app.AppComponentHolder
+import petlink.android.core_di.profile.component.DaggerProfileComponent
 import petlink.android.core_mvi.LceState
 import petlink.android.core_mvi.MviBaseBottomSheetDialogFragment
 import petlink.android.core_mvi.MviStore
@@ -90,8 +91,8 @@ class MyDataBottomSheetFragment : MviBaseBottomSheetDialogFragment<
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val appComponent = AppComponentHolder.appComponent
-        DaggerMyDataComponent.factory().create(appComponent).inject(this)
+        val profileComponent = DaggerProfileComponent.factory().create(AppComponentHolder.appComponent)
+        DaggerMyDataComponent.factory().create(profileComponent).inject(this)
     }
 
     override fun onCreateView(

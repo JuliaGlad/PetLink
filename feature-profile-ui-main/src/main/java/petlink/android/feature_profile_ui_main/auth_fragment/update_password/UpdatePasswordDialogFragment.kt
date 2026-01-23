@@ -6,9 +6,10 @@ import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import petlink.android.core_di.DaggerAppComponent
-import petlink.android.feature_profile_ui_main.auth_fragment.update_password.di.DaggerForgotPasswordComponent
+import petlink.android.core_di.app.AppComponentHolder
+import petlink.android.core_di.profile.component.DaggerProfileComponent
 import petlink.android.feature_profile_ui_settings.databinding.DialogUpdatePasswordBinding
+import petlink.android.feature_profile_ui_main.auth_fragment.update_password.di.DaggerForgotPasswordComponent
 import javax.inject.Inject
 
 class UpdatePasswordDialogFragment: DialogFragment() {
@@ -23,7 +24,7 @@ class UpdatePasswordDialogFragment: DialogFragment() {
     private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val appComponent = DaggerAppComponent.factory().create(requireContext())
+        val appComponent = DaggerProfileComponent.factory().create(AppComponentHolder.appComponent)
         DaggerForgotPasswordComponent.factory().create(appComponent).inject(this)
         super.onCreate(savedInstanceState)
     }

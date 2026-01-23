@@ -9,7 +9,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.github.terrakok.cicerone.NavigatorHolder
 import com.github.terrakok.cicerone.Router
 import com.github.terrakok.cicerone.androidx.AppNavigator
-import petlink.android.core_di.AppComponentHolder
+import petlink.android.core_di.app.AppComponentHolder
 import petlink.android.core_navigation.AppNavigationHolder
 import petlink.android.feature_profile_ui_create_account.R
 import petlink.android.feature_profile_ui_create_account.activity.di.DaggerCreateAccountActivityComponent

@@ -1,7 +1,6 @@
-package petlink.android.core_di
+package petlink.android.core_di.app
 
 import android.content.Context
-import com.github.terrakok.cicerone.NavigatorHolder
 import com.github.terrakok.cicerone.Router
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore

@@ -1,4 +1,4 @@
-package petlink.android.core_di
+package petlink.android.core_di.app
 
 object AppComponentHolder {
 

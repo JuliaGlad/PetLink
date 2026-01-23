@@ -16,10 +16,11 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.google.firebase.Timestamp
-import petlink.android.core_di.AppComponentHolder
-import petlink.android.core_di.DaggerAppComponent
+import petlink.android.core_di.app.AppComponentHolder
+import petlink.android.core_di.calendar.component.DaggerCalendarComponent
 import petlink.android.core_mvi.MviBaseFragment
 import petlink.android.core_mvi.MviStore
+import petlink.android.core_ui.R
 import petlink.android.core_ui.custom_view.calendar_event.CalendarEventTheme
 import petlink.android.core_ui.delegates.items.switch.NotificationSwitchDelegate
 import petlink.android.core_ui.delegates.items.switch.NotificationSwitchDelegateItem
@@ -39,6 +40,7 @@ import petlink.android.core_ui.delegates.items.theme_chooser.ThemeChooserModel
 import petlink.android.core_ui.delegates.main.DelegateItem
 import petlink.android.core_ui.delegates.main.MainAdapter
 import petlink.android.feature_calendar_ui_add_event.databinding.FragmentAddEventBinding
+import petlink.android.feature_calendar_ui_add_event.di.DaggerAddEventComponent
 import petlink.android.feature_calendar_ui_add_event.mvi.AddEventEffect
 import petlink.android.feature_calendar_ui_add_event.mvi.AddEventIntent
 import petlink.android.feature_calendar_ui_add_event.mvi.AddEventLocalDI
@@ -46,13 +48,11 @@ import petlink.android.feature_calendar_ui_add_event.mvi.AddEventMviState
 import petlink.android.feature_calendar_ui_add_event.mvi.AddEventPartialState
 import petlink.android.feature_calendar_ui_add_event.mvi.AddEventState
 import petlink.android.feature_calendar_ui_add_event.mvi.AddEventStoreFactory
+import petlink.android.feature_calendar_ui_add_event.worker.CalendarEventWorker
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import petlink.android.core_ui.R
-import petlink.android.feature_calendar_ui_add_event.di.DaggerAddEventComponent
-import petlink.android.feature_calendar_ui_add_event.worker.CalendarEventWorker
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -84,8 +84,8 @@ class AddEventFragment : MviBaseFragment<
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val appComponent = AppComponentHolder.appComponent
-        DaggerAddEventComponent.factory().create(appComponent).inject(this)
+        val calendarComponent = DaggerCalendarComponent.factory().create( AppComponentHolder.appComponent)
+        DaggerAddEventComponent.factory().create(calendarComponent).inject(this)
         val uri = activity?.intent?.data
         date = uri?.getQueryParameter(DATE_QUERY) ?: ""
     }

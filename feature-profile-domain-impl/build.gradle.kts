@@ -34,7 +34,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":core-di"))
     implementation(project(":feature-profile-data"))
     implementation(project(":feature-profile-domain"))
     implementation(libs.dagger)

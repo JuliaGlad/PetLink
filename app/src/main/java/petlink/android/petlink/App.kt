@@ -1,8 +1,8 @@
 package petlink.android.petlink
 
 import android.app.Application
-import petlink.android.core_di.AppComponentHolder
-import petlink.android.core_di.DaggerAppComponent
+import petlink.android.core_di.app.AppComponentHolder
+import petlink.android.core_di.app.DaggerAppComponent
 
 class App: Application() {
 

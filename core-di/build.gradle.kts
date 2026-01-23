@@ -34,8 +34,19 @@ android {
 }
 
 dependencies {
+    implementation(project(":feature-profile-data"))
+    implementation(project(":feature-profile-data-impl"))
+    implementation(project(":feature-profile-domain"))
+    implementation(project(":feature-profile-domain-impl"))
+    implementation(project(":feature-calendar-data"))
+    implementation(project(":feature-calendar-data-impl"))
+    implementation(project(":feature-calendar-domain"))
+    implementation(project(":feature-calendar-domain-impl"))
     implementation(project(":core-navigation"))
     implementation(project(":core-data"))
+    implementation(libs.androidx.room.ktx.v283)
+    implementation(libs.androidx.room.runtime.v283)
+    kapt(libs.androidx.room.compiler.v283)
     implementation(libs.firebase.auth)
     implementation(libs.dagger)
     kapt(libs.dagger.compiler.v255)

@@ -14,8 +14,8 @@ import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
-import petlink.android.core_di.AppComponentHolder
-import petlink.android.core_di.DaggerAppComponent
+import petlink.android.core_di.app.AppComponentHolder
+import petlink.android.core_di.profile.component.DaggerProfileComponent
 import petlink.android.core_mvi.MviBaseFragment
 import petlink.android.core_mvi.MviStore
 import petlink.android.core_ui.R
@@ -80,8 +80,8 @@ class AuthFragment : MviBaseFragment<
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         launcher = setResultLauncher()
-        val appComponent = AppComponentHolder.appComponent
-        DaggerAuthComponent.factory().create(appComponent).inject(this)
+        val profileComponent = DaggerProfileComponent.factory().create(AppComponentHolder.appComponent)
+        DaggerAuthComponent.factory().create(profileComponent).inject(this)
     }
 
     override fun onCreateView(

@@ -1,7 +1,9 @@
-package petlink.android.feature_calendar_domain_impl.di
+package petlink.android.core_di.calendar.modules
 
 import dagger.Binds
 import dagger.Module
+import dagger.Reusable
+import petlink.android.core_di.calendar.component.CalendarScope
 import petlink.android.feature_calendar_domain.usecase.AddCalendarEventUseCase
 import petlink.android.feature_calendar_domain.usecase.AddEventToHistoryUseCase
 import petlink.android.feature_calendar_domain.usecase.DeleteCalendarEventUseCase
@@ -22,27 +24,35 @@ import petlink.android.feature_calendar_domain_impl.usecase.UpdateCalendarEventU
 @Module
 interface CalendarDomainModule {
 
+    @CalendarScope
     @Binds
     fun bindAddCalendarEventUseCase(addCalendarEventUseCaseImpl: AddCalendarEventUseCaseImpl): AddCalendarEventUseCase
 
+    @CalendarScope
     @Binds
     fun bindAddEventToHistory(addEventToHistoryUseCaseImpl: AddEventToHistoryUseCaseImpl): AddEventToHistoryUseCase
 
+    @CalendarScope
     @Binds
     fun bindDeleteCalendarEventUseCase(deleteCalendarEventUseCaseImpl: DeleteCalendarEventUseCaseImpl): DeleteCalendarEventUseCase
 
+    @CalendarScope
     @Binds
     fun bindGetCalendarEventUseCase(getCalendarEventUseCaseImpl: GetCalendarEventUseCaseImpl): GetCalendarEventsUseCase
 
+    @CalendarScope
     @Binds
     fun bindGetEventsByDateUseCase(getEventsByDateUseCaseImpl: GetEventsByDateUseCaseImpl): GetEventsByDateUseCase
 
+    @CalendarScope
     @Binds
     fun bindGetEventsFromMonthUseCase(getEventsFromMonthUseCaseImpl: GetEventsFromMonthUseCaseImpl): GetEventsFromMonthUseCase
 
+    @CalendarScope
     @Binds
     fun bindGetHistoryEventsUseCase(getHistoryEventUseCaseImpl: GetHistoryEventUseCaseImpl): GetHistoryEventsUseCase
 
+    @CalendarScope
     @Binds
     fun bindUpdateCalendarEventUseCase(updateCalendarEventUseCaseImpl: UpdateCalendarEventUseCaseImpl): UpdateCalendarEventUseCase
 
