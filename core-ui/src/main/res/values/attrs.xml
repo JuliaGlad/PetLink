@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <declare-styleable name="CommentView">
+        <attr name="likes_count" format="integer"/>
+        <attr name="replies_count" format="integer"/>
+        <attr name="comment" format="string"/>
+        <attr name="name" format="string"/>
+    </declare-styleable>
+
     <declare-styleable name="ThemeView">
         <attr name="stroke_color" format="integer"/>
         <attr name="background_color" format="integer"/>

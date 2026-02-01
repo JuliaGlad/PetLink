@@ -27,6 +27,9 @@ class CommunityMainFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.comment.setLikesCount(20)
+        binding.comment.setRepliesCount(0)
+        binding.comment.setIsLiked(true)
     }
 
     override fun onDestroy() {

@@ -6,4 +6,23 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
+    <petlink.android.core_ui.custom_view.comment.CommentView
+        android:id="@+id/comment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:name="Гладких Юлия"
+        app:comment="Возможно очень длинный ответ на вопрос пользователя "
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <petlink.android.core_ui.custom_view.comment.marker.CommentMarkerView
+        android:id="@+id/marker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/comment"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

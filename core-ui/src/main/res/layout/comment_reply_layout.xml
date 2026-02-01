@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <petlink.android.core_ui.custom_view.comment.marker.CommentMarkerView
+        android:id="@+id/marker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <petlink.android.core_ui.custom_view.round_avatar.ShapeableImageView
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:background="@drawable/bg_round_image"/>
+
+    <TextView android:id="@+id/user_name"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:fontFamily="@font/roboto_bold"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        tools:text="Юлия Гладких"/>
+
+    <TextView android:id="@+id/comment_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:fontFamily="@font/roboto_regular"
+        android:textColor="@color/black"
+        tools:text="Возможно очень длинный ответ на вопрос пользователя "/>
+
+    <ImageView android:id="@+id/icon_like"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        tools:src="@drawable/ic_like_fill"/>
+
+    <TextView android:id="@+id/likes_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:textSize="12sp"
+        android:fontFamily="@font/roboto_bold"
+        tools:text="15"/>
+
+    <ImageView android:id="@+id/icon_reply"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        tools:src="@drawable/ic_reply"/>
+
+    <TextView android:id="@+id/replies_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:textSize="12sp"
+        android:fontFamily="@font/roboto_bold"
+        tools:text="18"/>
+
+</merge>
