@@ -5,9 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import petlink.android.core_ui.custom_view.comment.reply.CommentReplyView
 import petlink.android.feature_community_ui_main.databinding.FragmentCommunityMainBinding
 
-class CommunityMainFragment: Fragment() {
+class CommunityMainFragment : Fragment() {
 
     private var _binding: FragmentCommunityMainBinding? = null
     private val binding get() = _binding!!
@@ -28,8 +29,21 @@ class CommunityMainFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.comment.setLikesCount(20)
-        binding.comment.setRepliesCount(0)
         binding.comment.setIsLiked(true)
+        binding.comment.addReplies(
+            CommentReplyView(requireContext()).apply {
+                setLikesCount(20)
+                setName("Name2 Test")
+                setMessage("Something Something")
+            }
+        )
+        binding.comment.addReplies(
+            CommentReplyView(requireContext()).apply {
+                setLikesCount(20)
+                setName("Name3 Test")
+                setMessage("Something2 Something2")
+            }
+        )
     }
 
     override fun onDestroy() {

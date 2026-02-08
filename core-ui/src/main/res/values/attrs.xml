@@ -2,9 +2,9 @@
 <resources>
     <declare-styleable name="CommentView">
         <attr name="likes_count" format="integer"/>
-        <attr name="replies_count" format="integer"/>
         <attr name="comment" format="string"/>
         <attr name="name" format="string"/>
+        <attr name="replyTo" format="string"/>
     </declare-styleable>
 
     <declare-styleable name="ThemeView">

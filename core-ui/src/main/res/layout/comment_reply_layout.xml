@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"/>
 
     <petlink.android.core_ui.custom_view.round_avatar.ShapeableImageView
+        android:id="@+id/avatar_view"
         android:layout_width="35dp"
         android:layout_height="35dp"
         android:background="@drawable/bg_round_image"/>
@@ -21,6 +22,14 @@
         android:textSize="14sp"
         android:textColor="@color/black"
         tools:text="Юлия Гладких"/>
+
+    <TextView android:id="@+id/reply_to"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:fontFamily="@font/roboto_regular"
+        android:textSize="14sp"
+        android:textColor="@color/medium_green"
+        tools:text="Юлия"/>
 
     <TextView android:id="@+id/comment_message"
         android:layout_width="match_parent"
@@ -46,7 +55,7 @@
     <ImageView android:id="@+id/icon_reply"
         android:layout_width="22dp"
         android:layout_height="22dp"
-        tools:src="@drawable/ic_reply"/>
+        android:src="@drawable/ic_reply"/>
 
     <TextView android:id="@+id/replies_count"
         android:layout_width="wrap_content"
