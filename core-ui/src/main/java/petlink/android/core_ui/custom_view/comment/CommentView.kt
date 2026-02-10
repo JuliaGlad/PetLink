@@ -108,18 +108,20 @@ class CommentView @JvmOverloads constructor(
         messageTextView.measure(childMaxWidthSpec, heightMeasureSpec)
 
         var repliesHeight = 0
-
+        var repliesWidth = 0
         replies.forEach {
             it.measure(childMaxWidthSpec, heightMeasureSpec)
             repliesHeight += it.measuredHeight
+            repliesWidth = maxOf(repliesWidth, it.measuredWidth)
         }
 
-        val actualWidth = resolveSize(
+        var actualWidth = resolveSize(
             paddingLeft + paddingRight + avatarView.measuredWidth + maxOf(
                 nameTextView.measuredWidth, messageTextView.measuredWidth
             ) + SPACING,
             widthMeasureSpec
         )
+        if (actualWidth < repliesWidth) actualWidth = repliesWidth
         val actualHeight = resolveSize(
             paddingTop + paddingBottom + maxOf(
                 avatarView.measuredHeight,

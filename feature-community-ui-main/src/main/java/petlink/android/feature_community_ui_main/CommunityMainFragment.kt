@@ -35,6 +35,11 @@ class CommunityMainFragment : Fragment() {
                 setLikesCount(20)
                 setName("Name2 Test")
                 setMessage("Something Something")
+                addReplies(CommentReplyView(requireContext()).apply {
+                    setLikesCount(20)
+                    setName("Name2 Test Something Something")
+                    setMessage("Something Something")
+                })
             }
         )
         binding.comment.addReplies(

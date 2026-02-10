@@ -1,4 +1,4 @@
-package petlink.android.core_ui.custom_view.comment.reply
+ package petlink.android.core_ui.custom_view.comment.reply
 
 import android.content.Context
 import android.content.res.TypedArray
@@ -121,18 +121,20 @@ class CommentReplyView @JvmOverloads constructor(
         replyToTextView.measure(replyToMaxWidthSpec, heightMeasureSpec)
 
         var repliesHeight = 0
-
+        var repliesWidth = 0
         replies.forEach {
             measureChild(it, widthMeasureSpec, heightMeasureSpec)
             repliesHeight += it.measuredHeight
+            repliesWidth = maxOf(repliesWidth, it.measuredWidth)
         }
 
-        val actualWidth = resolveSize(
+        var actualWidth = resolveSize(
             paddingLeft + paddingRight + avatarView.measuredWidth + maxOf(
                 nameTextView.measuredWidth+replyToTextView.measuredWidth+SPACING, messageTextView.measuredWidth
             ) + SPACING,
             widthMeasureSpec
         )
+        if (repliesWidth > actualWidth) actualWidth = repliesWidth
         val actualHeight = resolveSize(
             paddingTop + paddingBottom + maxOf(
                 avatarView.measuredHeight,
