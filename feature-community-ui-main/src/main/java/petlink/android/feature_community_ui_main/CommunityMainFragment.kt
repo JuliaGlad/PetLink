@@ -28,6 +28,8 @@ class CommunityMainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.input.setMessage("Something Something")
+
         binding.comment.setLikesCount(20)
         binding.comment.setIsLiked(true)
         binding.comment.addReplies(
