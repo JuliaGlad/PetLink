@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="show_all">Show all</string>
     <string name="error">Error!</string>
     <string name="try_again">Try again</string>
     <string name="on" translatable="false">ON</string>

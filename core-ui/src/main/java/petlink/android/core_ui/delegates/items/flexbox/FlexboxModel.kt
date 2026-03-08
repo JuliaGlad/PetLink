@@ -1,7 +1,5 @@
 package petlink.android.core_ui.delegates.items.flexbox
 
-import petlink.android.core_ui.custom_view.LayoutAlignment
-import petlink.android.core_ui.custom_view.flexbox_item.FlexboxItemView
 import kotlin.random.Random
 
 data class FlexboxModel(
