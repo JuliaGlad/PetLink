@@ -9,7 +9,8 @@ import androidx.room.PrimaryKey
 class NewsCommunityEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = -1,
-    val title: String,
-    val description: String,
-    val avatar: String
+    val communityId: String,
+    var title: String,
+    var description: String,
+    var avatar: String
 )

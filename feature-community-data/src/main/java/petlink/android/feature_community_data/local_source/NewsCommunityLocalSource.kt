@@ -7,12 +7,14 @@ interface NewsCommunityLocalSource {
     suspend fun getNewsCommunity(): List<NewsCommunityDto>?
 
     suspend fun insertNewsCommunity(
+        communityId: String,
         title: String,
         description: String,
         avatar: String
     )
 
     suspend fun updateNewsCommunityData(
+        communityId: String,
         newTitle: String = "",
         newDescription: String = "",
         newAvatar: String = EMPTY_AVATAR

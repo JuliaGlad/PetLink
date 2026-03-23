@@ -43,4 +43,9 @@ class NewsCommunityRepositoryImpl @Inject constructor(
     override suspend fun unsubscribeFromCommunity() {
         TODO("Not yet implemented")
     }
+
+    companion object{
+        
+    }
+
 }
