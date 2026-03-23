@@ -28,6 +28,7 @@
             <option value="$PROJECT_DIR$/feature-community-data" />
             <option value="$PROJECT_DIR$/feature-community-data-impl" />
             <option value="$PROJECT_DIR$/feature-community-domain" />
+            <option value="$PROJECT_DIR$/feature-community-domain-impl" />
             <option value="$PROJECT_DIR$/feature-community-ui-main" />
             <option value="$PROJECT_DIR$/feature-map-ui-main" />
             <option value="$PROJECT_DIR$/feature-profile-data" />

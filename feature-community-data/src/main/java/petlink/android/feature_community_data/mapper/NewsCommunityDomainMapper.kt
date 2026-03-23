@@ -6,6 +6,7 @@ import petlink.android.feature_community_domain.model.NewsCommunityDomainModel
 fun NewsCommunityDto.toDomain() =
     NewsCommunityDomainModel(
         id = id,
+        subscribersCount = subscribersCount,
         title = title,
         description = description,
         avatar = avatar

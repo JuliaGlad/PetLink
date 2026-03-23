@@ -13,14 +13,15 @@ interface NewsCommunityRepository {
     )
 
     suspend fun updateNewsCommunityData(
-        newTitle: String,
-        newDescription: String,
-        newAvatar: String
+        id: String,
+        newTitle: String?,
+        newDescription: String?,
+        newAvatar: String?
     )
 
     suspend fun deleteNewsCommunity(id: String)
 
-    suspend fun subscribeToCommunity()
+    suspend fun subscribeToCommunity(id: String)
 
-    suspend fun unsubscribeFromCommunity()
+    suspend fun unsubscribeFromCommunity(id: String)
 }

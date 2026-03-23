@@ -12,6 +12,7 @@ class NewsCommunityProvider @Inject constructor(
 
     suspend fun insertCommunity(
         communityId: String,
+        subscribersCount: Int,
         title: String,
         description: String,
         avatar: String
@@ -21,16 +22,41 @@ class NewsCommunityProvider @Inject constructor(
                 communityId = communityId,
                 title = title,
                 description = description,
-                avatar = avatar
+                avatar = avatar,
+                subscribersCount = subscribersCount
             )
         )
     }
 
+    suspend fun addSubscriber(id: String){
+        val dao = database.newsCommunityDao()
+        dao.getNewsCommunities()?.forEach {
+            if (it.communityId == id){
+                with(it) {
+                    updateIfChanged(::subscribersCount, subscribersCount + 1)
+                    dao.updateNewsCommunity(it)
+                }
+            }
+        }
+    }
+
+    suspend fun removeSubscriber(id: String){
+        val dao = database.newsCommunityDao()
+        dao.getNewsCommunities()?.forEach {
+            if (it.communityId == id){
+                with(it) {
+                    updateIfChanged(::subscribersCount, subscribersCount - 1)
+                    dao.updateNewsCommunity(it)
+                }
+            }
+        }
+    }
+
     suspend fun updateCommunity(
         id: String,
-        title: String,
-        description: String,
-        avatar: String
+        title: String?,
+        description: String?,
+        avatar: String?
     ){
         val dao = database.newsCommunityDao()
         dao.getNewsCommunities()?.forEach {
@@ -59,7 +85,7 @@ class NewsCommunityProvider @Inject constructor(
     }
 
     private fun <T> updateIfChanged(prev: KMutableProperty0<T>, new: T?) {
-        if (prev != new) {
+        if (prev != new && new != null) {
             prev.set(new as T)
         }
     }

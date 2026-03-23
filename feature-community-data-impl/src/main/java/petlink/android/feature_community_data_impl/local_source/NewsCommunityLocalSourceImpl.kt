@@ -16,15 +16,25 @@ class NewsCommunityLocalSourceImpl @Inject constructor(
         return communities.map { it.toDto() }.toList()
     }
 
+    override suspend fun addSubscriber(communityId: String){
+        NewsCommunityProvider(newsCommunityDatabase).addSubscriber(communityId)
+    }
+
+    override suspend fun removeSubscriber(communityId: String){
+        NewsCommunityProvider(newsCommunityDatabase).removeSubscriber(communityId)
+    }
+
     override suspend fun insertNewsCommunity(
         communityId: String,
         title: String,
+        subscribersCount: Int,
         description: String,
         avatar: String
     ) {
         NewsCommunityProvider(newsCommunityDatabase).insertCommunity(
             communityId = communityId,
             title = title,
+            subscribersCount = subscribersCount,
             description = description,
             avatar = avatar
         )
@@ -32,9 +42,9 @@ class NewsCommunityLocalSourceImpl @Inject constructor(
 
     override suspend fun updateNewsCommunityData(
         communityId: String,
-        newTitle: String,
-        newDescription: String,
-        newAvatar: String
+        newTitle: String?,
+        newDescription: String?,
+        newAvatar: String?
     ) {
         NewsCommunityProvider(newsCommunityDatabase).updateCommunity(
             id = communityId,

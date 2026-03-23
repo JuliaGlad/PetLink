@@ -45,7 +45,8 @@ class UserAccountRepositoryImpl @Inject constructor(
             OWNER_SURNAME to surname,
             OWNER_BIRTHDAY to birthday,
             OWNER_GENDER to gender,
-            OWNER_CITY to city
+            OWNER_CITY to city,
+            SUBSCRIBED_IDS to arrayListOf<String>()
         )
         auth.currentUser?.let {
             val uid = it.uid
@@ -263,5 +264,6 @@ class UserAccountRepositoryImpl @Inject constructor(
         const val PET_FOOD: String = "PetFood"
         const val PET_GAMES = "PetGames"
         const val PET_PLACES = "PetPlaces"
+        const val SUBSCRIBED_IDS = "subscribed_ids"
     }
 }

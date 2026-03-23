@@ -6,26 +6,26 @@ interface NewsCommunityLocalSource {
 
     suspend fun getNewsCommunity(): List<NewsCommunityDto>?
 
+    suspend fun addSubscriber(communityId: String)
+
+    suspend fun removeSubscriber(communityId: String)
+
     suspend fun insertNewsCommunity(
         communityId: String,
         title: String,
+        subscribersCount: Int,
         description: String,
         avatar: String
     )
 
     suspend fun updateNewsCommunityData(
         communityId: String,
-        newTitle: String = "",
-        newDescription: String = "",
-        newAvatar: String = EMPTY_AVATAR
+        newTitle: String?,
+        newDescription: String?,
+        newAvatar: String?
     )
 
     suspend fun deleteNewsCommunity(id: String)
 
     suspend fun deleteAll()
-
-    companion object{
-        const val EMPTY_AVATAR = "EmptyAvatar"
-    }
-
 }
