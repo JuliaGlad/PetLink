@@ -33,7 +33,7 @@ class NewsCommunityProvider @Inject constructor(
         avatar: String
     ){
         val dao = database.newsCommunityDao()
-        dao.getNewsCommunities().forEach {
+        dao.getNewsCommunities()?.forEach {
             if (it.communityId == id){
                 with(it) {
                     updateIfChanged(::title, title)
@@ -47,7 +47,7 @@ class NewsCommunityProvider @Inject constructor(
 
     suspend fun deleteCommunity(id: String){
         val dao = database.newsCommunityDao()
-        dao.getNewsCommunities().forEach {
+        dao.getNewsCommunities()?.forEach {
             if (it.communityId == id){
                 dao.deleteNewsCommunity(it)
             }
