@@ -38,6 +38,7 @@ dependencies {
     implementation(project(":feature-community-domain"))
     implementation(project(":feature-community-data"))
     implementation(platform(libs.firebase.bom))
+    implementation(libs.converter.gson)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth)
     implementation(libs.androidx.room.ktx.v283)

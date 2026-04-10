@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import petlink.android.feature_profile_ui_main.auth_fragment.AuthFragment
 import petlink.android.feature_profile_ui_main.main_fragment.main.ProfileFragment
 
-class ProfileMainFragment : Fragment(), OnFragmentInteractionListener {
+class  ProfileMainFragment : Fragment(), OnFragmentInteractionListener {
 
     private var profileId: MainProfileId = MainProfileId.Auth
 

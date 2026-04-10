@@ -1,6 +1,5 @@
-package petlink.android.feature_community_ui_main.recycler
+package petlink.android.feature_community_ui_main.recycler.item
 
-import android.graphics.drawable.Drawable
 import kotlin.random.Random
 
 data class MenuItemModel(

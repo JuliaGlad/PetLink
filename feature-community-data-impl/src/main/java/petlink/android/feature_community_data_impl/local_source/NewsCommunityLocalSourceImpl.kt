@@ -27,14 +27,16 @@ class NewsCommunityLocalSourceImpl @Inject constructor(
     override suspend fun insertNewsCommunity(
         communityId: String,
         title: String,
-        subscribersCount: Int,
+        ownerId: String,
+        subscribers: MutableList<String>,
         description: String,
         avatar: String
     ) {
         NewsCommunityProvider(newsCommunityDatabase).insertCommunity(
             communityId = communityId,
+            ownerId = ownerId,
             title = title,
-            subscribersCount = subscribersCount,
+            subscribers = subscribers,
             description = description,
             avatar = avatar
         )

@@ -1,6 +1,7 @@
 package petlink.android.feature_community_data_impl.repository
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -8,19 +9,54 @@ import petlink.android.feature_community_data.dto.NewsCommunityDto
 import petlink.android.feature_community_data.local_source.NewsCommunityLocalSource
 import petlink.android.feature_community_data.repository.NewsCommunityRepository
 import javax.inject.Inject
+import kotlin.collections.map
 import kotlin.random.Random
 
 class NewsCommunityRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val store: FirebaseFirestore,
     private val localSource: NewsCommunityLocalSource
-): NewsCommunityRepository {
-    override suspend fun getNewsCommunity(): List<NewsCommunityDto> {
+) : NewsCommunityRepository {
+    override suspend fun getOwnedCommunities(): List<NewsCommunityDto> {
+        val query = auth.currentUser?.let {
+            store.collection(USER_COLLECTION)
+                .document(it.uid)
+                .collection(OWNED_NEWS_COMMUNITIES)
+                .get()
+                .await()
+        }
+        return query?.map {
+            with(it) {
+                NewsCommunityDto(
+                    id = id,
+                    title = getString(COMMUNITY_TITLE).toString(),
+                    description = getString(COMMUNITY_DESCRIPTION).toString(),
+                    avatar = getString(COMMUNITY_AVATAR).toString(),
+                    subscribers = (get(COMMUNITY_SUBSCRIBERS) as List<*>).mapNotNull { it as? String }
+                        .toList(),
+                    ownerId = getString(COMMUNITY_OWNER).toString(),
+                    role = OWNER
+                )
+            }
+        } ?: emptyList()
+    }
+
+    override suspend fun getSubscribedCommunities(): List<NewsCommunityDto> {
+        val subscribedIds: List<String> = auth.currentUser?.let {
+            val snapshot = store.collection(USER_COLLECTION)
+                .document(it.uid)
+                .get()
+                .await()
+            val ids = snapshot.get(SUBSCRIBED_IDS) as? List<*>
+            ids
+                ?.mapNotNull { it as? String }
+                ?.toList()
+                ?: listOf()
+        } ?: emptyList()
         val query = store.collection(NEWS_COMMUNITY)
+            .whereIn(FieldPath.documentId(), subscribedIds)
             .get()
             .await()
-        val local = localSource.getNewsCommunity()
-        if (local != null) return local
         return query.map {
             with(it) {
                 NewsCommunityDto(
@@ -28,7 +64,51 @@ class NewsCommunityRepositoryImpl @Inject constructor(
                     title = getString(COMMUNITY_TITLE).toString(),
                     description = getString(COMMUNITY_DESCRIPTION).toString(),
                     avatar = getString(COMMUNITY_AVATAR).toString(),
-                    subscribersCount = getString(COMMUNITY_SUBSCRIBERS).toString().toInt()
+                    ownerId = getString(COMMUNITY_OWNER).toString(),
+                    subscribers = (get(COMMUNITY_SUBSCRIBERS) as List<*>).mapNotNull { it as? String }
+                        .toList(),
+                    role = OWNER
+                )
+            }
+        }
+    }
+
+    override suspend fun getNewsCommunity(): List<NewsCommunityDto> {
+        val snapshot = auth.currentUser?.let {
+            store.collection(USER_COLLECTION)
+                .document(it.uid)
+                .get()
+                .await()
+        }
+        val subscribedIds = (snapshot?.get(SUBSCRIBED_IDS) as List<*>).map { it as String }.toList()
+        val snapshotOwned = auth.currentUser?.let {
+            store.collection(USER_COLLECTION)
+                .document(it.uid)
+                .collection(OWNED_NEWS_COMMUNITIES)
+                .get()
+                .await()
+        }
+        val owned = snapshotOwned?.mapNotNull { it.id }?.toList() ?: emptyList()
+        val local = localSource.getNewsCommunity()
+        if (local != null) {
+            val filteredLocal =
+                local.filter { !owned.contains(it.id) && !subscribedIds.contains(it.id) }
+            return filteredLocal
+        }
+        val query = store.collection(NEWS_COMMUNITY)
+            .get()
+            .await()
+        return query.filter { !owned.contains(it.id) && !subscribedIds.contains(it.id) }.map {
+            with(it) {
+                NewsCommunityDto(
+                    id = id,
+                    title = getString(COMMUNITY_TITLE).toString(),
+                    description = getString(COMMUNITY_DESCRIPTION).toString(),
+                    ownerId = getString(COMMUNITY_OWNER).toString(),
+                    avatar = getString(COMMUNITY_AVATAR).toString(),
+                    subscribers = (get(COMMUNITY_SUBSCRIBERS) as List<*>).mapNotNull { it as? String }
+                        .toList(),
+                    role = NONE
                 )
             }
         }.toList()
@@ -39,6 +119,7 @@ class NewsCommunityRepositoryImpl @Inject constructor(
         description: String,
         avatar: String
     ) {
+        val uid = auth.currentUser?.uid ?: NONE
         val id = generateId().toString()
         store.collection(NEWS_COMMUNITY)
             .document(id)
@@ -48,7 +129,8 @@ class NewsCommunityRepositoryImpl @Inject constructor(
                     COMMUNITY_TITLE to title,
                     COMMUNITY_DESCRIPTION to description,
                     COMMUNITY_AVATAR to avatar,
-                    COMMUNITY_SUBSCRIBERS to "0"
+                    COMMUNITY_OWNER to uid,
+                    COMMUNITY_SUBSCRIBERS to emptyArray<String>()
                 )
             ).await()
         localSource.insertNewsCommunity(
@@ -56,7 +138,8 @@ class NewsCommunityRepositoryImpl @Inject constructor(
             title = title,
             description = description,
             avatar = avatar,
-            subscribersCount = 0
+            subscribers = mutableListOf<String>(),
+            ownerId = uid
         )
     }
 
@@ -94,11 +177,11 @@ class NewsCommunityRepositoryImpl @Inject constructor(
                 .update(SUBSCRIBED_IDS, FieldValue.arrayUnion(id))
                 .await()
         }
-        val subscribersCount = store.collection(NEWS_COMMUNITY).document(id).get().await().getString(COMMUNITY_SUBSCRIBERS)?.toInt() ?: 0
         store.collection(NEWS_COMMUNITY)
             .document(id)
-            .update(COMMUNITY_SUBSCRIBERS, (subscribersCount + 1).toString())
+            .update(COMMUNITY_SUBSCRIBERS, FieldValue.arrayUnion(id))
             .await()
+        localSource.addSubscriber(id)
     }
 
     override suspend fun unsubscribeFromCommunity(id: String) {
@@ -108,10 +191,9 @@ class NewsCommunityRepositoryImpl @Inject constructor(
                 .update(SUBSCRIBED_IDS, FieldValue.arrayRemove(id))
                 .await()
         }
-        val subscribersCount = store.collection(NEWS_COMMUNITY).document(id).get().await().getString(COMMUNITY_SUBSCRIBERS)?.toInt() ?: 0
         store.collection(NEWS_COMMUNITY)
             .document(id)
-            .update(COMMUNITY_SUBSCRIBERS, (subscribersCount - 1).toString())
+            .update(COMMUNITY_SUBSCRIBERS, FieldValue.arrayRemove(id))
             .await()
         localSource.removeSubscriber(id)
     }
@@ -127,15 +209,21 @@ class NewsCommunityRepositoryImpl @Inject constructor(
 
     private fun generateId() = Random.nextInt()
 
-    companion object{
+    companion object {
+        const val COMMUNITY_OWNER = "owner"
+        const val OWNED_NEWS_COMMUNITIES = "Owned_news_communities"
         const val USER_COLLECTION = "Users"
-        const val NEWS_COMMUNITY = "news_community"
+        const val NEWS_COMMUNITY = "News_community"
         const val COMMUNITY_SUBSCRIBERS = "community_subscribers"
         const val COMMUNITY_ID = "community_id"
         const val COMMUNITY_TITLE = "community_title"
         const val COMMUNITY_DESCRIPTION = "community_description"
         const val COMMUNITY_AVATAR = "community_avatar"
         const val SUBSCRIBED_IDS = "subscribed_ids"
+        const val ROLE = "role"
+        const val SUBSCRIBER = "subscriber"
+        const val OWNER = "owner"
+        const val NONE = "none"
     }
 
 }

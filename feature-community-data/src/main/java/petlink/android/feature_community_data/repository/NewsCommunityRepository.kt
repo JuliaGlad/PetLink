@@ -4,6 +4,10 @@ import petlink.android.feature_community_data.dto.NewsCommunityDto
 
 interface NewsCommunityRepository {
 
+    suspend fun getOwnedCommunities(): List<NewsCommunityDto>
+
+    suspend fun getSubscribedCommunities(): List<NewsCommunityDto>
+
     suspend fun getNewsCommunity(): List<NewsCommunityDto>
 
     suspend fun addNewsCommunity(

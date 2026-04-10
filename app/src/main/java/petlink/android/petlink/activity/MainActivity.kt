@@ -64,7 +64,6 @@ class MainActivity : AppCompatActivity() {
             val screen = when (item.itemId) {
                 R.id.action_community -> BottomScreen.communityFragment()
                 R.id.action_calendar -> BottomScreen.calendarFragment()
-                R.id.action_map -> BottomScreen.mapFragment()
                 R.id.action_profile ->
                     if (viewModel.isAuthenticated())
                         BottomScreen.profileFragment()

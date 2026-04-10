@@ -10,7 +10,8 @@ class NewsCommunityEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = -1,
     val communityId: String,
-    var subscribersCount: Int,
+    val ownerId: String,
+    val subscribers: MutableList<String>,
     var title: String,
     var description: String,
     var avatar: String

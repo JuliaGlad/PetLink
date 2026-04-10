@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    id("kotlin-kapt")
 }
 
 android {
@@ -37,7 +38,24 @@ android {
 
 dependencies {
     implementation(project(":core-ui"))
+    implementation(project(":core-di"))
+    implementation(project(":core-mvi"))
+    implementation(project(":core-navigation"))
+    implementation(project(":feature-community-domain"))
+    implementation(project(":core-data"))
+    implementation(libs.cicerone)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.androidx.room.runtime.v283)
+    kapt(libs.androidx.room.compiler.v283)
+    implementation(libs.androidx.room.ktx.v283)
+    implementation(libs.okhttp)
+    implementation(libs.retrofit.v2100)
+    implementation(libs.dagger)
+    kapt(libs.dagger.compiler.v255)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     testImplementation(libs.junit)

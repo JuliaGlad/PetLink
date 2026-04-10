@@ -7,7 +7,9 @@ fun NewsCommunityEntity.toDto() =
     NewsCommunityDto(
         id = communityId,
         title = title,
-        subscribersCount = subscribersCount,
+        subscribers = subscribers,
         description = description,
-        avatar = avatar
+        avatar = avatar,
+        role = "none",
+        ownerId = ownerId
     )

@@ -1,4 +1,4 @@
-package petlink.android.feature_community_ui_main.recycler
+package petlink.android.feature_community_ui_main.recycler.item
 
 import androidx.recyclerview.widget.DiffUtil
 

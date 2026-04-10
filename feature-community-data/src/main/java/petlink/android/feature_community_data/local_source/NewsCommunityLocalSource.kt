@@ -13,7 +13,8 @@ interface NewsCommunityLocalSource {
     suspend fun insertNewsCommunity(
         communityId: String,
         title: String,
-        subscribersCount: Int,
+        ownerId: String,
+        subscribers: MutableList<String>,
         description: String,
         avatar: String
     )

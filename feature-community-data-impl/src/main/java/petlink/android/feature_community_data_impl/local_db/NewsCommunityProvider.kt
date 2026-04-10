@@ -12,7 +12,8 @@ class NewsCommunityProvider @Inject constructor(
 
     suspend fun insertCommunity(
         communityId: String,
-        subscribersCount: Int,
+        ownerId: String,
+        subscribers: MutableList<String>,
         title: String,
         description: String,
         avatar: String
@@ -23,7 +24,8 @@ class NewsCommunityProvider @Inject constructor(
                 title = title,
                 description = description,
                 avatar = avatar,
-                subscribersCount = subscribersCount
+                subscribers = subscribers,
+                ownerId = ownerId
             )
         )
     }
@@ -33,7 +35,7 @@ class NewsCommunityProvider @Inject constructor(
         dao.getNewsCommunities()?.forEach {
             if (it.communityId == id){
                 with(it) {
-                    updateIfChanged(::subscribersCount, subscribersCount + 1)
+                    subscribers.add(id)
                     dao.updateNewsCommunity(it)
                 }
             }
@@ -45,7 +47,7 @@ class NewsCommunityProvider @Inject constructor(
         dao.getNewsCommunities()?.forEach {
             if (it.communityId == id){
                 with(it) {
-                    updateIfChanged(::subscribersCount, subscribersCount - 1)
+                    subscribers.remove(id)
                     dao.updateNewsCommunity(it)
                 }
             }
