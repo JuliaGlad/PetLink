@@ -13,8 +13,9 @@ interface NewsCommunityRepository {
     suspend fun addNewsCommunity(
         title: String,
         description: String,
-        avatar: String
-    )
+        avatar: String,
+        background: String
+    ): String
 
     suspend fun updateNewsCommunityData(
         id: String,

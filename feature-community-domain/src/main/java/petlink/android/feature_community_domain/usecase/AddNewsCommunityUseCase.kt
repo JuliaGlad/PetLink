@@ -4,6 +4,7 @@ interface AddNewsCommunityUseCase {
     suspend fun invoke(
         title: String,
         description: String,
-        avatar: String
-    )
+        avatar: String,
+        background: String
+    ): String
 }

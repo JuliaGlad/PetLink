@@ -11,5 +11,6 @@ fun NewsCommunityEntity.toDto() =
         description = description,
         avatar = avatar,
         role = "none",
-        ownerId = ownerId
+        ownerId = ownerId,
+        background = background
     )

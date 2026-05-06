@@ -16,7 +16,8 @@ interface NewsCommunityLocalSource {
         ownerId: String,
         subscribers: MutableList<String>,
         description: String,
-        avatar: String
+        avatar: String,
+        background: String
     )
 
     suspend fun updateNewsCommunityData(

@@ -7,5 +7,6 @@ class NewsCommunityFullDomainModel(
     val title: String,
     val description: String,
     val avatar: String,
-    val role: String
+    val role: String,
+    val background: String
 )

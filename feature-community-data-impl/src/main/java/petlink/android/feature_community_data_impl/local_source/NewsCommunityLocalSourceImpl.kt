@@ -30,7 +30,8 @@ class NewsCommunityLocalSourceImpl @Inject constructor(
         ownerId: String,
         subscribers: MutableList<String>,
         description: String,
-        avatar: String
+        avatar: String,
+        background: String
     ) {
         NewsCommunityProvider(newsCommunityDatabase).insertCommunity(
             communityId = communityId,
@@ -38,7 +39,8 @@ class NewsCommunityLocalSourceImpl @Inject constructor(
             title = title,
             subscribers = subscribers,
             description = description,
-            avatar = avatar
+            avatar = avatar,
+            background = background
         )
     }
 

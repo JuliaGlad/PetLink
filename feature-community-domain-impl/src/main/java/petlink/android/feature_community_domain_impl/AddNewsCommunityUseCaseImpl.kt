@@ -6,16 +6,18 @@ import javax.inject.Inject
 
 class AddNewsCommunityUseCaseImpl @Inject constructor(
     val repository: NewsCommunityRepository
-): AddNewsCommunityUseCase {
+) : AddNewsCommunityUseCase {
     override suspend fun invoke(
         title: String,
         description: String,
-        avatar: String
-    ) {
+        avatar: String,
+        background: String
+    ): String =
         repository.addNewsCommunity(
             title = title,
             description = description,
-            avatar = avatar
+            avatar = avatar,
+            background = background
         )
-    }
+
 }

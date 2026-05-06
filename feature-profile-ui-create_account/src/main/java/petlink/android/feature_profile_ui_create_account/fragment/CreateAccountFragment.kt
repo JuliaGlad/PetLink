@@ -128,7 +128,7 @@ class CreateAccountFragment : MviBaseFragment<
             }
 
             is CreateAccountState.Error -> {
-                Log.i("Create account error", state.state.throwable.message.toString())
+                Log.e("Create account error", state.state.throwable.message.toString())
                 Snackbar.make(
                     requireView(),
                     R.string.looks_like_something_went_wrong,

@@ -80,6 +80,7 @@ class NewsFragment : MviBaseFragment<
         with(binding.header) {
             iconBack.setOnClickListener { store.sendEffect(NewsEffect.NavigateBack) }
             title.text = getString(petlink.android.core_ui.R.string.news_group)
+            createButton.setOnClickListener { store.sendEffect(NewsEffect.NavigateToCreateCommunityFragment) }
         }
     }
 

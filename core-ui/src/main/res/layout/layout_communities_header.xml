@@ -29,6 +29,7 @@
         tools:text="Новости"/>
 
     <Button
+        android:id="@+id/create_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/Widget.Material3.Button.TonalButton.PetLink"

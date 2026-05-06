@@ -14,5 +14,6 @@ class NewsCommunityEntity(
     val subscribers: MutableList<String>,
     var title: String,
     var description: String,
-    var avatar: String
+    var avatar: String,
+    var background: String
 )

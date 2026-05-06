@@ -11,5 +11,6 @@ fun NewsCommunityDto.toFullDomain() =
         title = title,
         description = description,
         avatar = avatar,
-        role = role
+        role = role,
+        background = background
     )

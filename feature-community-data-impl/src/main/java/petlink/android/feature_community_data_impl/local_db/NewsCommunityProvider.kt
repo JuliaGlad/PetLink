@@ -16,7 +16,8 @@ class NewsCommunityProvider @Inject constructor(
         subscribers: MutableList<String>,
         title: String,
         description: String,
-        avatar: String
+        avatar: String,
+        background: String
     ) {
         database.newsCommunityDao().insertNewsCommunity(
             NewsCommunityEntity(
@@ -25,7 +26,8 @@ class NewsCommunityProvider @Inject constructor(
                 description = description,
                 avatar = avatar,
                 subscribers = subscribers,
-                ownerId = ownerId
+                ownerId = ownerId,
+                background = background
             )
         )
     }
