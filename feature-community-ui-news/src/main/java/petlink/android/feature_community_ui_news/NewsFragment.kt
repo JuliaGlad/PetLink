@@ -74,7 +74,31 @@ class NewsFragment : MviBaseFragment<
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK && result.data != null){
-
+            for (i in recyclerItems){
+                if (i is SubtitleTextDelegateItem){
+                    val data = result.data!!
+                    val title = data.getStringExtra(NEW_GROUP_TITLE_ARG).toString()
+                    val id = data.getStringExtra(NEW_GROUP_ID_ARG).toString()
+                    val avatar = data.getStringExtra(NEW_GROUP_AVATAR_ARG).toString()
+                    val model = i.content() as SubtitleTextModel
+                    if (model.id == MY_GROUP_ID){
+                        val index = recyclerItems.indexOf(i)
+                        val delegateItem = GroupDelegateItem(
+                            GroupItemModel(
+                                groupTitle = title,
+                                imageUri = avatar.toUri(),
+                                groupStatus = OWNER,
+                                onClick = {
+                                    store.sendEffect(
+                                        NewsEffect.NavigateToNewsCommunityDetailsFragment(id)
+                                    )
+                                }
+                            )
+                        )
+                        recyclerItems.add(index+1, delegateItem)
+                    }
+                }
+            }
         }
     }
 
@@ -141,11 +165,10 @@ class NewsFragment : MviBaseFragment<
     ) {
         initAdapter()
         recyclerItems.add(
-            SubtitleTextDelegateItem(
-                SubtitleTextModel(
-                    title = getString(petlink.android.core_ui.R.string.my_groups)
-                )
-            )
+            SubtitleTextDelegateItem(SubtitleTextModel(
+                id = MY_GROUP_ID,
+                title = getString(petlink.android.core_ui.R.string.my_groups)
+            ))
         )
         if (subscribed.isEmpty() && owned.isEmpty()) {
             recyclerItems.add(
@@ -222,6 +245,10 @@ class NewsFragment : MviBaseFragment<
     }
 
     companion object {
+        const val NEW_GROUP_ID_ARG = "NewGroupIdArg"
+        const val NEW_GROUP_TITLE_ARG = "NewGroupTitleArg"
+        const val NEW_GROUP_AVATAR_ARG = "NewGroupAvatarArg"
+        const val MY_GROUP_ID = 666
         const val NEWS_FRAGMENT_TAG = "NewsFragmentTag"
         const val SUBSCRIBER = "subscriber"
         const val OWNER = "owner"
