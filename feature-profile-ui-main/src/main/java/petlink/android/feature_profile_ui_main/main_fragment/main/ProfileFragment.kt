@@ -215,18 +215,22 @@ class ProfileFragment : MviBaseFragment<
     override fun resolveEffect(effect: ProfileEffect) {
         when (effect) {
             ProfileEffect.NavigateToAchievements -> startActivity("app://profile/achievement")
-            ProfileEffect.NavigateToEdit -> startActivity("app://profile/edit")
+            ProfileEffect.NavigateToEdit -> startActivityForResult("app://profile/edit", editProfileActivityResultLauncher)
             ProfileEffect.NavigateToFriends -> startActivity("app://profile/friends")
             ProfileEffect.NavigateToMyData -> router.navigateTo(ProfileMainScreens.profileMyData())
             ProfileEffect.NavigateToSettings -> {
-                val intent = Intent(
-                    Intent.ACTION_VIEW,
-                    "app://profile/settings".toUri()
-                )
-                settingsActivityResultLauncher.launch(intent)
+                startActivityForResult(uri = "app://profile/settings", launcher = settingsActivityResultLauncher)
             }
             ProfileEffect.ShowPosts -> showPosts()
         }
+    }
+
+    private fun startActivityForResult(uri: String, launcher: ActivityResultLauncher<Intent>){
+        val intent = Intent(
+            Intent.ACTION_VIEW,
+            uri.toUri()
+        )
+        launcher.launch(intent)
     }
 
     private fun startActivity(uri: String){

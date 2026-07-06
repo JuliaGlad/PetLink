@@ -16,7 +16,7 @@ interface CreateNewsCommunityComponent {
 
     @Component.Factory
     interface Factory{
-        fun create(component: CommunityComponent): CreateNewsCommunityFragment
+        fun create(component: CommunityComponent): CreateNewsCommunityComponent
     }
 }
 

@@ -106,7 +106,7 @@ class CommunityMainFragment : MviBaseFragment<
             initMainMenuItems()
             Log.i("Recycler", recyclerItems.size.toString())
             if (model.photos.isNotEmpty() && model.posts.isNotEmpty() && model.question.isNotEmpty() && model.fromFriends.isNotEmpty()) {
-                TODO("Init recycler")
+                TODO("Init recycler with posts, questions and etc.")
             }
             mainAdapter.submitList(recyclerItems)
         }

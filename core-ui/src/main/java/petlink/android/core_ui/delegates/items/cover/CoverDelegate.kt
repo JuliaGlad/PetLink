@@ -2,6 +2,7 @@ package petlink.android.core_ui.delegates.items.cover
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import petlink.android.core_ui.databinding.DelegateCoverBinding
@@ -33,7 +34,14 @@ class CoverDelegate : AdapterDelegate {
     class ViewHolder(private val binding: DelegateCoverBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(model: CoverModel) {
-            binding.coverView.setImageURI(model.uri.toUri())
+            with(binding.coverView) {
+                if (model.uri.isNotEmpty()) {
+                    setImageURI(model.uri.toUri())
+                } else{
+                    setImageDrawable(model.drawable)
+                }
+                setOnClickListener { model.clickListener() }
+            }
         }
     }
 }

@@ -1,5 +1,7 @@
 package petlink.android.feature_community_ui_news
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -7,6 +9,10 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.registerForActivityResult
 import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
 import petlink.android.core_di.app.AppComponentHolder.appComponent
@@ -52,6 +58,8 @@ class NewsFragment : MviBaseFragment<
     @Inject
     lateinit var localDi: NewsLocalDi
 
+    private lateinit var createNewsCommunityLauncher: ActivityResultLauncher<Intent>
+
     override val store: MviStore<NewsPartialState, NewsIntent, NewsState, NewsEffect>
             by viewModels { NewsStoreFactory(localDi.reducer, localDi.actor) }
 
@@ -59,6 +67,15 @@ class NewsFragment : MviBaseFragment<
         super.onCreate(savedInstanceState)
         val communityComponent = DaggerCommunityComponent.factory().create(appComponent)
         DaggerNewsComponent.factory().create(communityComponent).inject(this)
+        createNewsCommunityLauncher = initCreateNewsCommunityLauncher()
+    }
+
+    private fun initCreateNewsCommunityLauncher(): ActivityResultLauncher<Intent> = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK && result.data != null){
+
+        }
     }
 
     override fun onCreateView(
@@ -191,9 +208,17 @@ class NewsFragment : MviBaseFragment<
     override fun resolveEffect(effect: NewsEffect) {
         when (effect) {
             NewsEffect.NavigateBack -> requireActivity().finish()
-            is NewsEffect.NavigateToNewsCommunityDetailsFragment -> TODO()
+            is NewsEffect.NavigateToNewsCommunityDetailsFragment -> startActivityForResult(uri = "app://community/create", launcher = createNewsCommunityLauncher)
             NewsEffect.NavigateToCreateCommunityFragment -> TODO()
         }
+    }
+
+    private fun startActivityForResult(uri: String, launcher: ActivityResultLauncher<Intent>){
+        val intent = Intent(
+            Intent.ACTION_VIEW,
+            uri.toUri()
+        )
+        launcher.launch(intent)
     }
 
     companion object {

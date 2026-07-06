@@ -46,6 +46,9 @@ class TextInputLayoutDelegate : AdapterDelegate {
                 textWatcher = model.textChangedListener?.let {
                     addTextChangedListener(onTextChanged = { char, p0, p1, p2 ->
                         model.textChangedListener(char.toString())
+                        if (char.toString().isEmpty() && model.canBeEmpty){
+                            error = model.error
+                        }
                     })
                 }
                 if (model.endIconMode == TextInputLayout.END_ICON_PASSWORD_TOGGLE) {

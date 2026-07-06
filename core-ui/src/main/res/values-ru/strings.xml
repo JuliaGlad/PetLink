@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="add_participants">Добавить участников</string>
+    <string name="avatar">Аватарка</string>
     <string name="finish">Завершить</string>
     <string name="error">Ошибка!</string>
     <string name="show_all">Смотреть полностью</string>
