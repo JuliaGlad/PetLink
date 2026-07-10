@@ -148,12 +148,18 @@
     </style>
 
     <style name="Widget.Material3.Button.TonalButton.PetLink" parent="Widget.Material3.Button.TonalButton">
-        <item name="backgroundTint">@color/medium_green_grey</item>
+        <item name="backgroundTint">@color/green_grey</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.PetLink</item>
         <item name="fontFamily">@font/roboto_medium</item>
         <item name="android:fontFamily">@font/roboto_medium</item>
         <item name="android:padding">12dp</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/medium_green</item>
+    </style>
+
+    <style name="ShapeAppearance.PetLink" parent="Widget.Material3.Button">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
     </style>
 
     <style name="Widget.Material3.Button.TextButton.Dialog.PetLink" parent="Widget.Material3.Button.TextButton.Dialog">

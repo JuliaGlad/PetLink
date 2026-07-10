@@ -1,17 +1,19 @@
 package petlink.android.feature_community_data_impl.repository
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import okhttp3.Dispatcher
 import petlink.android.feature_community_data.dto.NewsCommunityDto
 import petlink.android.feature_community_data.local_source.NewsCommunityLocalSource
 import petlink.android.feature_community_data.repository.NewsCommunityRepository
 import javax.inject.Inject
 import kotlin.collections.map
-import kotlin.random.Random
-
 class NewsCommunityRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val store: FirebaseFirestore,
@@ -51,42 +53,57 @@ class NewsCommunityRepositoryImpl @Inject constructor(
                 ?.toList()
                 ?: listOf()
         } ?: emptyList()
-        val query = store.collection(NEWS_COMMUNITY)
-            .whereIn(FieldPath.documentId(), subscribedIds)
-            .get()
-            .await()
-        return query.map {
-            with(it) {
-                NewsCommunityDto(
-                    id = id,
-                    title = getString(COMMUNITY_TITLE).toString(),
-                    description = getString(COMMUNITY_DESCRIPTION).toString(),
-                    avatar = getString(COMMUNITY_AVATAR).toString(),
-                    ownerId = getString(COMMUNITY_OWNER).toString(),
-                    subscribers = (get(COMMUNITY_SUBSCRIBERS) as List<*>).mapNotNull { it as? String }
-                        .toList(),
-                    role = OWNER,
-                    background = getString(BACKGROUND).toString()
-                )
+        val result = if (subscribedIds.isNotEmpty()){
+            val query = store.collection(NEWS_COMMUNITY)
+                .whereIn(FieldPath.documentId(), subscribedIds)
+                .get()
+                .await()
+            query.map {
+                with(it) {
+                    NewsCommunityDto(
+                        id = id,
+                        title = getString(COMMUNITY_TITLE).toString(),
+                        description = getString(COMMUNITY_DESCRIPTION).toString(),
+                        avatar = getString(COMMUNITY_AVATAR).toString(),
+                        ownerId = getString(COMMUNITY_OWNER).toString(),
+                        subscribers = (get(COMMUNITY_SUBSCRIBERS) as List<*>).mapNotNull { it as? String }
+                            .toList(),
+                        role = OWNER,
+                        background = getString(BACKGROUND).toString()
+                    )
+                }
             }
+        } else{
+            emptyList()
         }
+        return result
     }
 
     override suspend fun getNewsCommunity(): List<NewsCommunityDto> {
-        val snapshot = auth.currentUser?.let {
-            store.collection(USER_COLLECTION)
+        val subscribedIds: List<String> = auth.currentUser?.let {
+            val snapshot = store.collection(USER_COLLECTION)
                 .document(it.uid)
                 .get()
                 .await()
+            val ids = snapshot.get(SUBSCRIBED_IDS) as? List<*>
+            ids
+                ?.mapNotNull { it as? String }
+                ?.toList()
+                ?: listOf()
+        } ?: emptyList()
+        val query = if (subscribedIds.isNotEmpty()) {
+            store.collection(NEWS_COMMUNITY)
+                .whereNotEqualTo(OWNER, auth.currentUser?.uid)
+                .whereNotIn(FieldPath.documentId(), subscribedIds)
+                .get()
+                .await()
+        } else {
+            store.collection(NEWS_COMMUNITY)
+                .whereNotEqualTo(OWNER, auth.currentUser?.uid)
+                .get()
+                .await()
         }
-        val subscribedIds = (snapshot?.get(SUBSCRIBED_IDS) as List<*>).map { it as String }.toList()
-        val owned = (snapshot.get(OWNED_NEWS_COMMUNITIES) as List<*>).map { it as String }.toList()
-        val query = store.collection(NEWS_COMMUNITY)
-            .whereNotEqualTo(OWNER, auth.currentUser?.uid)
-            .whereNotIn(FieldPath.documentId(), subscribedIds)
-            .get()
-            .await()
-        return query.filter { !owned.contains(it.id) && !subscribedIds.contains(it.id) }.map {
+        val result = query.filter { !subscribedIds.contains(it.id) }.map {
             with(it) {
                 NewsCommunityDto(
                     id = id,
@@ -100,7 +117,8 @@ class NewsCommunityRepositoryImpl @Inject constructor(
                     background = getString(BACKGROUND).toString()
                 )
             }
-        }.toList()
+        }
+        return result
     }
 
     override suspend fun addNewsCommunity(
@@ -109,35 +127,38 @@ class NewsCommunityRepositoryImpl @Inject constructor(
         avatar: String,
         background: String
     ): String {
-        val uid = auth.currentUser?.uid ?: NONE
-        val id = generateId().toString()
-        store.collection(NEWS_COMMUNITY)
-            .document(id)
-            .set(
-                hashMapOf(
-                    COMMUNITY_ID to id,
-                    COMMUNITY_TITLE to title,
-                    COMMUNITY_DESCRIPTION to description,
-                    COMMUNITY_AVATAR to avatar,
-                    COMMUNITY_OWNER to uid,
-                    COMMUNITY_SUBSCRIBERS to emptyArray<String>(),
-                    BACKGROUND to background
-                )
-            ).await()
-        localSource.insertNewsCommunity(
-            communityId = id,
-            title = title,
-            description = description,
-            avatar = avatar,
-            subscribers = mutableListOf<String>(),
-            ownerId = uid,
-            background = background
-        )
-        store.collection(USER_COLLECTION)
-            .document(uid)
-            .update(OWNED_NEWS_COMMUNITIES, FieldValue.arrayUnion(id))
-            .await()
-        return id
+        val communityID = withContext(Dispatchers.IO) {
+            val uid = auth.currentUser?.uid ?: NONE
+            val id = generateId()
+            store.collection(NEWS_COMMUNITY)
+                .document(id)
+                .set(
+                    hashMapOf(
+                        COMMUNITY_ID to id,
+                        COMMUNITY_TITLE to title,
+                        COMMUNITY_DESCRIPTION to description,
+                        COMMUNITY_AVATAR to avatar,
+                        COMMUNITY_OWNER to uid,
+                        COMMUNITY_SUBSCRIBERS to emptyList<String>(),
+                        BACKGROUND to background
+                    )
+                ).await()
+            localSource.insertNewsCommunity(
+                communityId = id,
+                title = title,
+                description = description,
+                avatar = avatar,
+                subscribers = mutableListOf<String>(),
+                ownerId = uid,
+                background = background
+            )
+            store.collection(USER_COLLECTION)
+                .document(uid)
+                .update(OWNED_NEWS_COMMUNITIES, FieldValue.arrayUnion(id))
+                .await()
+            id
+        }
+        return communityID
     }
 
     override suspend fun updateNewsCommunityData(
@@ -204,7 +225,7 @@ class NewsCommunityRepositoryImpl @Inject constructor(
         localSource.addSubscriber(id)
     }
 
-    private fun generateId() = Random.nextInt()
+    private fun generateId(): String = store.collection(NEWS_COMMUNITY).document().id
 
     companion object {
         const val COMMUNITY_OWNER = "owner"

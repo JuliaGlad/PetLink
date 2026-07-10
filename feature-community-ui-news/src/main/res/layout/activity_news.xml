@@ -7,4 +7,10 @@
     android:layout_height="match_parent"
     tools:context=".NewsActivity">
 
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/news_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:name="petlink.android.feature_community_ui_news.NewsFragment"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

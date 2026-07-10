@@ -1,5 +1,6 @@
 package petlink.android.feature_community_ui_main
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -7,6 +8,7 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
 import petlink.android.core_di.app.AppComponentHolder
 import petlink.android.core_di.community.component.DaggerCommunityComponent
@@ -175,11 +177,16 @@ class CommunityMainFragment : MviBaseFragment<
     override fun resolveEffect(effect: CommunityMainEffect) =
         when (effect) {
             CommunityMainEffect.OpenFriendsFragment -> TODO()
-            CommunityMainEffect.OpenNewsFragment -> TODO()
+            CommunityMainEffect.OpenNewsFragment -> startActivity("app://community/news")
             CommunityMainEffect.OpenPhotosFragment -> TODO()
             CommunityMainEffect.OpenQuestionFragment -> TODO()
             CommunityMainEffect.OpenChatsFragment -> TODO()
         }
+
+    private fun startActivity(uri: String){
+        val intent = Intent(Intent.ACTION_VIEW, uri.toUri())
+        requireActivity().startActivity(intent)
+    }
 
     override fun onDestroy() {
         super.onDestroy()

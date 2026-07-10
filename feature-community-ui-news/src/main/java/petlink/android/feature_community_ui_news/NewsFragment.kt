@@ -74,31 +74,32 @@ class NewsFragment : MviBaseFragment<
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK && result.data != null){
+            var index: Int = -2
             for (i in recyclerItems){
                 if (i is SubtitleTextDelegateItem){
-                    val data = result.data!!
-                    val title = data.getStringExtra(NEW_GROUP_TITLE_ARG).toString()
-                    val id = data.getStringExtra(NEW_GROUP_ID_ARG).toString()
-                    val avatar = data.getStringExtra(NEW_GROUP_AVATAR_ARG).toString()
                     val model = i.content() as SubtitleTextModel
                     if (model.id == MY_GROUP_ID){
-                        val index = recyclerItems.indexOf(i)
-                        val delegateItem = GroupDelegateItem(
-                            GroupItemModel(
-                                groupTitle = title,
-                                imageUri = avatar.toUri(),
-                                groupStatus = OWNER,
-                                onClick = {
-                                    store.sendEffect(
-                                        NewsEffect.NavigateToNewsCommunityDetailsFragment(id)
-                                    )
-                                }
-                            )
-                        )
-                        recyclerItems.add(index+1, delegateItem)
+                        index = recyclerItems.indexOf(i)
                     }
                 }
             }
+            val data = result.data!!
+            val title = data.getStringExtra(NEW_GROUP_TITLE_ARG).toString()
+            val id = data.getStringExtra(NEW_GROUP_ID_ARG).toString()
+            val avatar = data.getStringExtra(NEW_GROUP_AVATAR_ARG).toString()
+            val delegateItem = GroupDelegateItem(
+                GroupItemModel(
+                    groupTitle = title,
+                    imageUri = avatar.toUri(),
+                    groupStatus = OWNER,
+                    onClick = {
+                        store.sendEffect(
+                            NewsEffect.NavigateToNewsCommunityDetailsFragment(id)
+                        )
+                    }
+                )
+            )
+            recyclerItems.add(index+1, delegateItem)
         }
     }
 
@@ -231,8 +232,8 @@ class NewsFragment : MviBaseFragment<
     override fun resolveEffect(effect: NewsEffect) {
         when (effect) {
             NewsEffect.NavigateBack -> requireActivity().finish()
-            is NewsEffect.NavigateToNewsCommunityDetailsFragment -> startActivityForResult(uri = "app://community/create", launcher = createNewsCommunityLauncher)
-            NewsEffect.NavigateToCreateCommunityFragment -> TODO()
+            is NewsEffect.NavigateToNewsCommunityDetailsFragment -> TODO()
+            NewsEffect.NavigateToCreateCommunityFragment -> startActivityForResult(uri = "app://community/create", launcher = createNewsCommunityLauncher)
         }
     }
 

@@ -42,14 +42,18 @@ class TextInputLayoutDelegate : AdapterDelegate {
                 isEnabled = model.editable
                 setText(model.defaultValue)
                 hint = model.hint
-                binding.textInputLayout.error = model.error
-                textWatcher = model.textChangedListener?.let {
-                    addTextChangedListener(onTextChanged = { char, p0, p1, p2 ->
-                        model.textChangedListener(char.toString())
-                        if (char.toString().isEmpty() && model.canBeEmpty){
-                            error = model.error
-                        }
+                binding.textInputLayout.error = null
+                textWatcher = model.textChangedListener?.let { listener ->
+                    addTextChangedListener(onTextChanged = { char, _, _, _ ->
+                        listener(char.toString())
                     })
+                }
+                setOnFocusChangeListener { _, hasFocus ->
+                    binding.textInputLayout.error = if (hasFocus) {
+                        null
+                    } else {
+                        validateError(text.toString(), model)
+                    }
                 }
                 if (model.endIconMode == TextInputLayout.END_ICON_PASSWORD_TOGGLE) {
                     transformationMethod = PasswordTransformationMethod.getInstance()
@@ -57,5 +61,8 @@ class TextInputLayoutDelegate : AdapterDelegate {
             }
             binding.textInputLayout.endIconMode = model.endIconMode
         }
+
+        private fun validateError(text: String, model: TextInputLayoutModel): String? =
+            if (text.isEmpty() && !model.canBeEmpty) model.error else null
     }
 }

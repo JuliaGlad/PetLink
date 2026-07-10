@@ -38,6 +38,7 @@ android {
 
 dependencies {
     implementation(project(":core-ui"))
+    implementation(project(":feature-community-ui-create_community"))
     implementation(project(":core-di"))
     implementation(project(":core-mvi"))
     implementation(project(":core-navigation"))

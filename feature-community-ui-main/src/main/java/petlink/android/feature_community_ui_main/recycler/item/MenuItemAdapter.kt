@@ -68,7 +68,7 @@ class MenuItemAdapter : ListAdapter<
                     ContextCompat.getColor(itemView.context, model.bgEndColor)
                 )
                 item.background = drawable
-                item.setOnClickListener { model.clickListener }
+                item.setOnClickListener { model.clickListener() }
             }
         }
     }

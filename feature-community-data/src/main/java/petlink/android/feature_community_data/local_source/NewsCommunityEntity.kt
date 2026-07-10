@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 )
 class NewsCommunityEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = -1,
+    val id: Int = 0,
     val communityId: String,
     val ownerId: String,
     val subscribers: MutableList<String>,

@@ -43,6 +43,7 @@ dependencies {
     implementation(project(":core-navigation"))
     implementation(project(":feature-community-domain"))
     implementation(project(":core-data"))
+    implementation(project(":feature-community-ui-news"))
     implementation(libs.cicerone)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)

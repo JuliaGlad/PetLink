@@ -2,13 +2,12 @@ package petlink.android.feature_community_ui_create_community.fragment
 
 import android.app.Activity
 import android.content.Intent
-import android.icu.text.CaseMap
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResult
@@ -178,7 +177,7 @@ class CreateNewsCommunityFragment : MviBaseFragment<
                     when (it) {
                         CreateNewsCommunityScreenArg.MainInfoArg -> {
                             with((activity as CreateNewsCommunityActivity).viewModel) {
-                                if (mainInfo.title.isEmpty()) {
+                                if (mainInfo.title.isNotEmpty()) {
                                     store.sendEffect(CreateNewsCommunityEffect.NavigateToNextScreen)
                                 }
                             }
@@ -200,11 +199,18 @@ class CreateNewsCommunityFragment : MviBaseFragment<
     override fun render(state: CreateNewsCommunityMviState) {
         when (state.value) {
             is CreateNewsCommunityState.CommunityCreated -> {
-                requireActivity().setResult(Activity.RESULT_OK)
+                val activityViewModel = (activity as CreateNewsCommunityActivity).viewModel
+                val data = Intent().apply {
+                    putExtra(NEW_GROUP_ID_ARG, state.value.communityId)
+                    putExtra(NEW_GROUP_AVATAR_ARG, activityViewModel.visualsModel.avatar)
+                    putExtra(NEW_GROUP_TITLE_ARG, activityViewModel.mainInfo.title)
+                }
+                requireActivity().setResult(Activity.RESULT_OK, data)
                 requireActivity().finish()
             }
 
             is CreateNewsCommunityState.Error -> {
+                binding.loader.visibility = GONE
                 Log.e(CREATE_NEWS_COMMUNITY_TAG, state.value.throwable.message.toString())
                 Snackbar.make(
                     requireView(),
@@ -264,8 +270,7 @@ class CreateNewsCommunityFragment : MviBaseFragment<
                     hint = getString(R.string.description),
                     defaultValue = (activity as CreateNewsCommunityActivity).viewModel.mainInfo.description,
                     textChangedListener = { char ->
-                        (activity as CreateNewsCommunityActivity).viewModel.mainInfo.description =
-                            char
+                        (activity as CreateNewsCommunityActivity).viewModel.mainInfo.description = char
                     }
                 )),
         )
@@ -403,6 +408,9 @@ class CreateNewsCommunityFragment : MviBaseFragment<
         (((currentStep - 1).toFloat() / allSteps) * 100).toInt()
 
     companion object {
+        const val NEW_GROUP_ID_ARG = "NewGroupIdArg"
+        const val NEW_GROUP_TITLE_ARG = "NewGroupTitleArg"
+        const val NEW_GROUP_AVATAR_ARG = "NewGroupAvatarArg"
         const val TITLE_ID = 33
         const val CREATE_NEWS_COMMUNITY_TAG = "CreateNewsCommunity"
         const val ARG = "ScreenArg"

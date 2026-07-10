@@ -36,6 +36,7 @@ class CreateNewsCommunityActor(
         avatar: String,
         background: String
     ) = flow<CreateNewsCommunityPartialState> {
+        emit(CreateNewsCommunityPartialState.Loading)
         runCatching {
             createNewsCommunityUseCase(
                 title = title,
@@ -44,8 +45,8 @@ class CreateNewsCommunityActor(
                 background = background
             )
         }.fold(
-            onSuccess = { CreateNewsCommunityPartialState.CommunityCreated(it) },
-            onFailure = { CreateNewsCommunityPartialState.Error(it) }
+            onSuccess = { emit(CreateNewsCommunityPartialState.CommunityCreated(it)) },
+            onFailure = { emit(CreateNewsCommunityPartialState.Error(it)) }
         )
     }
 
