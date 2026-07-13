@@ -90,7 +90,7 @@ class NewsFragment : MviBaseFragment<
             val delegateItem = GroupDelegateItem(
                 GroupItemModel(
                     groupTitle = title,
-                    imageUri = avatar.toUri(),
+                    imageUri = avatar,
                     groupStatus = OWNER,
                     onClick = {
                         store.sendEffect(
@@ -100,6 +100,7 @@ class NewsFragment : MviBaseFragment<
                 )
             )
             recyclerItems.add(index+1, delegateItem)
+            mainAdapter.notifyItemInserted(index+1)
         }
     }
 
@@ -206,7 +207,7 @@ class NewsFragment : MviBaseFragment<
                 GroupDelegateItem(
                     GroupItemModel(
                         groupTitle = title,
-                        imageUri = avatar.toUri(),
+                        imageUri = avatar,
                         groupStatus = role,
                         onClick = {
                             store.sendEffect(

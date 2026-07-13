@@ -7,6 +7,6 @@ data class GroupItemModel(
     val id: Int = Random.nextInt(),
     val groupTitle: String,
     val groupStatus: String,
-    val imageUri: Uri,
+    val imageUri: String = "",
     val onClick: () -> Unit
 )
