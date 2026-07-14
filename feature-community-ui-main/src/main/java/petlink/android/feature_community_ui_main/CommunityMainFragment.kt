@@ -31,6 +31,7 @@ import petlink.android.feature_community_ui_main.recycler.delegate.ListMenuItems
 import petlink.android.feature_community_ui_main.recycler.delegate.ListMenuItemsDelegateItem
 import petlink.android.feature_community_ui_main.recycler.delegate.ListMenuItemsModel
 import petlink.android.feature_community_ui_main.recycler.item.MenuItemModel
+import petlink.android.feature_community_ui_news.tag.CommunitiesTypeTag
 import javax.inject.Inject
 
 class CommunityMainFragment : MviBaseFragment<
@@ -176,21 +177,28 @@ class CommunityMainFragment : MviBaseFragment<
 
     override fun resolveEffect(effect: CommunityMainEffect) =
         when (effect) {
-            CommunityMainEffect.OpenFriendsFragment -> TODO()
-            CommunityMainEffect.OpenNewsFragment -> startActivity("app://community/news")
-            CommunityMainEffect.OpenPhotosFragment -> TODO()
-            CommunityMainEffect.OpenQuestionFragment -> TODO()
-            CommunityMainEffect.OpenChatsFragment -> TODO()
+            CommunityMainEffect.OpenFriendsFragment -> startActivityWithDetails(CommunitiesTypeTag.FriendsTag)
+            CommunityMainEffect.OpenNewsFragment -> startActivityWithDetails(CommunitiesTypeTag.NewsTag)
+            CommunityMainEffect.OpenPhotosFragment -> startActivityWithDetails(CommunitiesTypeTag.PhotosTag)
+            CommunityMainEffect.OpenQuestionFragment -> startActivityWithDetails(CommunitiesTypeTag.QuestionTag)
+            CommunityMainEffect.OpenChatsFragment -> startActivityWithDetails(CommunitiesTypeTag.ChatsTag)
         }
 
-    private fun startActivity(uri: String){
-        val intent = Intent(Intent.ACTION_VIEW, uri.toUri())
+    private fun startActivityWithDetails(tag: CommunitiesTypeTag){
+        val intent = Intent(Intent.ACTION_VIEW, ACTIVITY_WITH_DETAILS_URI.toUri()).apply {
+            putExtra(INTENT_TYPE_TAG, tag)
+        }
         requireActivity().startActivity(intent)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+    }
+
+    companion object{
+        const val ACTIVITY_WITH_DETAILS_URI = "app://community/list"
+        const val INTENT_TYPE_TAG = "CommunitiesTypeTag"
     }
 
 }

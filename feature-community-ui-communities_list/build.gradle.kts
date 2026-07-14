@@ -2,14 +2,15 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
+    id("kotlin-parcelize")
 }
 
 android {
-    namespace = "petlink.android.feature_community_ui_main"
+    namespace = "petlink.android.feature_community_ui_news"
     compileSdk = 35
 
     defaultConfig {
-        minSdk = 26
+        minSdk = 24
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -24,6 +25,9 @@ android {
             )
         }
     }
+    buildFeatures {
+        viewBinding = true
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -31,19 +35,23 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
-    buildFeatures {
-        viewBinding = true
-    }
 }
 
 dependencies {
     implementation(project(":core-ui"))
+    implementation(project(":feature-community-ui-create_community"))
+    implementation(project(":feature-community-ui-create_question_community"))
+    implementation(project(":feature-community-ui-create_chat"))
+    implementation(project(":feature-community-ui-create_photo_group"))
+    implementation(project(":feature-community-ui-community_details"))
+    implementation(project(":feature-community-ui-chat_details"))
+    implementation(project(":feature-community-friend_details"))
     implementation(project(":core-di"))
     implementation(project(":core-mvi"))
     implementation(project(":core-navigation"))
     implementation(project(":feature-community-domain"))
     implementation(project(":core-data"))
-    implementation(project(":feature-community-ui-communities_list"))
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.cicerone)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
@@ -57,8 +65,11 @@ dependencies {
     kapt(libs.dagger.compiler.v255)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

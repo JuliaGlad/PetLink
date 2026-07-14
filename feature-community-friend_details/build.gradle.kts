@@ -1,15 +1,14 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    id("kotlin-kapt")
 }
 
 android {
-    namespace = "petlink.android.feature_community_ui_main"
+    namespace = "petlink.android.feature_community_friend_details"
     compileSdk = 35
 
     defaultConfig {
-        minSdk = 26
+        minSdk = 24
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -31,34 +30,15 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
-    buildFeatures {
-        viewBinding = true
-    }
 }
 
 dependencies {
-    implementation(project(":core-ui"))
-    implementation(project(":core-di"))
-    implementation(project(":core-mvi"))
-    implementation(project(":core-navigation"))
-    implementation(project(":feature-community-domain"))
-    implementation(project(":core-data"))
-    implementation(project(":feature-community-ui-communities_list"))
-    implementation(libs.cicerone)
-    implementation(libs.firebase.auth)
-    implementation(libs.firebase.firestore)
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.androidx.room.runtime.v283)
-    kapt(libs.androidx.room.compiler.v283)
-    implementation(libs.androidx.room.ktx.v283)
-    implementation(libs.okhttp)
-    implementation(libs.retrofit.v2100)
-    implementation(libs.dagger)
-    kapt(libs.dagger.compiler.v255)
+
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
