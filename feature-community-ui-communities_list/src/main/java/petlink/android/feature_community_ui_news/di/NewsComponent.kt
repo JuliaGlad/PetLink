@@ -16,7 +16,7 @@ interface NewsComponent {
 
     @Component.Factory
     interface Factory{
-        fun create(profileComponent: CommunityComponent): NewsComponent
+        fun create(communityComponent: CommunityComponent): NewsComponent
     }
 
 }

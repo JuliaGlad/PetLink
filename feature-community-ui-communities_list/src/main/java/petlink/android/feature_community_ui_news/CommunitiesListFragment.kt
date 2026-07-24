@@ -94,8 +94,11 @@ class CommunitiesListFragment : MviBaseFragment<
                     }
                 }
                 val data = result.data!!
-                val delegateItem = if (communityType !is CommunitiesTypeTag.FriendsTag) createGroupDelegateItem(data)
-                else TODO("Create friends element")
+                val delegateItem =
+                    if (communityType !is CommunitiesTypeTag.FriendsTag) createGroupDelegateItem(
+                        data
+                    )
+                    else TODO("Create friends element")
 
                 recyclerItems.add(index + 1, delegateItem)
                 mainAdapter.notifyItemInserted(index + 1)
@@ -104,7 +107,7 @@ class CommunitiesListFragment : MviBaseFragment<
 
     private fun createGroupDelegateItem(
         data: Intent
-    ) : GroupDelegateItem {
+    ): GroupDelegateItem {
         val title = data.getStringExtra(NEW_GROUP_TITLE_ARG).toString()
         val id = data.getStringExtra(NEW_GROUP_ID_ARG).toString()
         val avatar = data.getStringExtra(NEW_GROUP_AVATAR_ARG).toString()
@@ -116,7 +119,8 @@ class CommunitiesListFragment : MviBaseFragment<
                 onClick = {
                     store.sendEffect(
                         CommunitiesListEffect.NavigateToCommunityDetailsFragment(
-                            id
+                            id,
+                            OWNER
                         )
                     )
                 }
@@ -149,19 +153,23 @@ class CommunitiesListFragment : MviBaseFragment<
                 titleText = getString(petlink.android.core_ui.R.string.my_chats),
                 createEffect = CommunitiesListEffect.NavigateToCreateChatFragment
             )
+
             CommunitiesTypeTag.FriendsTag -> setHeaderText(titleText = getString(petlink.android.core_ui.R.string.my_friends))
             CommunitiesTypeTag.NewsTag -> setHeaderText(
                 titleText = getString(petlink.android.core_ui.R.string.news_group),
                 createEffect = CommunitiesListEffect.NavigateToCreateNewsCommunityFragment
             )
+
             CommunitiesTypeTag.PhotosTag -> setHeaderText(
                 titleText = getString(petlink.android.core_ui.R.string.my_photo_groups),
                 createEffect = CommunitiesListEffect.NavigateToCreatePhotosCommunityFragment
             )
+
             CommunitiesTypeTag.QuestionTag -> setHeaderText(
                 titleText = getString(petlink.android.core_ui.R.string.my_discussion),
                 createEffect = CommunitiesListEffect.NavigateToCreateQuestionGroupFragment
             )
+
             null -> throw Throwable(message = TYPE_NULL_ERROR)
         }
     }
@@ -265,7 +273,8 @@ class CommunitiesListFragment : MviBaseFragment<
                         onClick = {
                             store.sendEffect(
                                 CommunitiesListEffect.NavigateToCommunityDetailsFragment(
-                                    id
+                                    id,
+                                    currentUserRole
                                 )
                             )
                         }
@@ -286,30 +295,83 @@ class CommunitiesListFragment : MviBaseFragment<
     override fun resolveEffect(effect: CommunitiesListEffect) {
         when (effect) {
             CommunitiesListEffect.NavigateBack -> requireActivity().finish()
-            is CommunitiesListEffect.NavigateToCommunityDetailsFragment -> when(communityType){
-                CommunitiesTypeTag.ChatsTag -> startActivity("app://community/chat_details")
-                CommunitiesTypeTag.FriendsTag -> startActivity("app://community/friend_details")
-                CommunitiesTypeTag.NewsTag -> startActivity("app://community/community_details")
-                CommunitiesTypeTag.PhotosTag -> startActivity("app://community/community_details")
-                CommunitiesTypeTag.QuestionTag -> startActivity("app://community/community_details")
+            is CommunitiesListEffect.NavigateToCommunityDetailsFragment -> when (communityType) {
+                CommunitiesTypeTag.ChatsTag -> startActivity(
+                    "app://community/chat_details",
+                    effect.communityId
+                )
+
+                CommunitiesTypeTag.FriendsTag -> startActivity(
+                    "app://community/friend_details",
+                    effect.communityId
+                )
+
+                CommunitiesTypeTag.NewsTag -> startActivityCommunityDetails(
+                    effect.communityId,
+                    effect.role,
+                    getString(petlink.android.core_ui.R.string.news)
+                )
+
+                CommunitiesTypeTag.PhotosTag -> startActivityCommunityDetails(
+                    effect.communityId,
+                    effect.role,
+                    getString(petlink.android.core_ui.R.string.pet_photos)
+                )
+
+                CommunitiesTypeTag.QuestionTag -> startActivityCommunityDetails(
+                    effect.communityId,
+                    effect.role,
+                    getString(petlink.android.core_ui.R.string.question)
+                )
+
                 null -> throw Throwable(message = TYPE_NULL_ERROR)
             }
-            CommunitiesListEffect.NavigateToCreateNewsCommunityFragment -> startActivityForResult(uri = "app://community/create")
+
+            CommunitiesListEffect.NavigateToCreateNewsCommunityFragment -> startActivityForResult(
+                uri = "app://community/create"
+            )
+
             CommunitiesListEffect.NavigateToCreateChatFragment -> startActivityForResult(uri = "app://community/create_chat")
-            CommunitiesListEffect.NavigateToCreatePhotosCommunityFragment -> startActivityForResult(uri = "app://community/create_photo_group")
-            CommunitiesListEffect.NavigateToCreateQuestionGroupFragment -> startActivityForResult(uri = "app://community/create_question_community")
+            CommunitiesListEffect.NavigateToCreatePhotosCommunityFragment -> startActivityForResult(
+                uri = "app://community/create_photo_group"
+            )
+
+            CommunitiesListEffect.NavigateToCreateQuestionGroupFragment -> startActivityForResult(
+                uri = "app://community/create_question_community"
+            )
         }
     }
 
-    private fun startActivity(uri: String) {
+    private fun startActivity(uri: String, communityId: String) {
         val intent = Intent(
             Intent.ACTION_VIEW,
             uri.toUri()
-        )
+        ).apply {
+            putExtra(COMMUNITY_ID_ARG, communityId)
+        }
         requireActivity().startActivity(intent)
     }
 
-    private fun startActivityForResult(uri: String, launcher: ActivityResultLauncher<Intent> = createCommunityLauncher) {
+    private fun startActivityCommunityDetails(
+        communityId: String,
+        role: String,
+        communityType: String
+    ) {
+        val intent = Intent(
+            Intent.ACTION_VIEW,
+            "app://community/community_details".toUri()
+        ).apply {
+            putExtra(COMMUNITY_ID_ARG, communityId)
+            putExtra(ROLE_IN_COMMUNITY_ARG, role)
+            putExtra(COMMUNITY_TYPE_ARG, communityType)
+        }
+        requireActivity().startActivity(intent)
+    }
+
+    private fun startActivityForResult(
+        uri: String,
+        launcher: ActivityResultLauncher<Intent> = createCommunityLauncher
+    ) {
         val intent = Intent(
             Intent.ACTION_VIEW,
             uri.toUri()
@@ -324,6 +386,9 @@ class CommunitiesListFragment : MviBaseFragment<
         const val NEW_GROUP_TITLE_ARG = "NewGroupTitleArg"
         const val NEW_GROUP_AVATAR_ARG = "NewGroupAvatarArg"
         const val MY_GROUP_ID = 666
+        const val COMMUNITY_ID_ARG = "CommunityIdArg"
+        const val COMMUNITY_TYPE_ARG = "CommunityTypeArg"
+        const val ROLE_IN_COMMUNITY_ARG = "RoleArg"
         const val NEWS_FRAGMENT_TAG = "NewsFragmentTag"
         const val SUBSCRIBER = "subscriber"
         const val OWNER = "owner"

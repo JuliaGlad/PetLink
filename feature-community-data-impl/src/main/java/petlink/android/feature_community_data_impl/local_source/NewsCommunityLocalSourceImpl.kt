@@ -47,14 +47,32 @@ class NewsCommunityLocalSourceImpl @Inject constructor(
     override suspend fun updateNewsCommunityData(
         communityId: String,
         newTitle: String?,
-        newDescription: String?,
-        newAvatar: String?
+        newDescription: String?
     ) {
         NewsCommunityProvider(newsCommunityDatabase).updateCommunity(
             id = communityId,
             title = newTitle,
-            description = newDescription,
-            avatar = newAvatar
+            description = newDescription
+        )
+    }
+
+    override suspend fun updateNewsCommunityAvatar(
+        communityId: String,
+        newAvatar: String
+    ) {
+        NewsCommunityProvider(newsCommunityDatabase).updateCommunityAvatar(
+            id = communityId,
+            newUri = newAvatar
+        )
+    }
+
+    override suspend fun updateNewsCommunityBackground(
+        communityId: String,
+        newBackground: String
+    ) {
+        NewsCommunityProvider(newsCommunityDatabase).updateCommunityBackground(
+            id = communityId,
+            newUri = newBackground
         )
     }
 

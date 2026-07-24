@@ -4,7 +4,7 @@ import petlink.android.core_mvi.MviEffect
 
 sealed interface CommunitiesListEffect: MviEffect {
 
-    class NavigateToCommunityDetailsFragment(val communityId: String): CommunitiesListEffect
+    class NavigateToCommunityDetailsFragment(val communityId: String, val role: String): CommunitiesListEffect
 
     data object NavigateToCreateNewsCommunityFragment: CommunitiesListEffect
 

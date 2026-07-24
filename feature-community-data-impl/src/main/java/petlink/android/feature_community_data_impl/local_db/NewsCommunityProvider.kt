@@ -59,8 +59,7 @@ class NewsCommunityProvider @Inject constructor(
     suspend fun updateCommunity(
         id: String,
         title: String?,
-        description: String?,
-        avatar: String?
+        description: String?
     ){
         val dao = database.newsCommunityDao()
         dao.getNewsCommunities()?.forEach {
@@ -69,6 +68,35 @@ class NewsCommunityProvider @Inject constructor(
                     updateIfChanged(::title, title)
                     updateIfChanged(::description, description)
                     updateIfChanged(::avatar, avatar)
+                }
+                dao.updateNewsCommunity(it)
+            }
+        }
+    }
+
+    suspend fun updateCommunityAvatar(
+        id: String,
+        newUri: String
+    ){
+        val dao = database.newsCommunityDao()
+        dao.getNewsCommunities()?.forEach {
+            if (it.communityId == id){
+                with(it) {
+                    updateIfChanged(::avatar, newUri)
+                }
+                dao.updateNewsCommunity(it)
+            }
+        }
+    }
+    suspend fun updateCommunityBackground(
+        id: String,
+        newUri: String
+    ){
+        val dao = database.newsCommunityDao()
+        dao.getNewsCommunities()?.forEach {
+            if (it.communityId == id){
+                with(it) {
+                    updateIfChanged(::avatar, newUri)
                 }
                 dao.updateNewsCommunity(it)
             }

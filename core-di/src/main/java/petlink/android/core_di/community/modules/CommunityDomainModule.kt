@@ -11,6 +11,8 @@ import petlink.android.feature_community_domain.usecase.GetOwnedCommunitiesUseCa
 import petlink.android.feature_community_domain.usecase.GetSubscribedCommunitiesUseCase
 import petlink.android.feature_community_domain.usecase.SubscribeToNewsCommunityUseCase
 import petlink.android.feature_community_domain.usecase.UnsubscribeFromNewsCommunityUseCase
+import petlink.android.feature_community_domain.usecase.UpdateNewsCommunityAvatarUseCase
+import petlink.android.feature_community_domain.usecase.UpdateNewsCommunityBackgroundUseCase
 import petlink.android.feature_community_domain.usecase.UpdateNewsCommunityUseCase
 import petlink.android.feature_community_domain_impl.AddNewsCommunityUseCaseImpl
 import petlink.android.feature_community_domain_impl.DeleteCommunityUseCaseImpl
@@ -20,6 +22,8 @@ import petlink.android.feature_community_domain_impl.GetOwnedCommunitiesUseCaseI
 import petlink.android.feature_community_domain_impl.GetSubscribedCommunitiesUseCaseImpl
 import petlink.android.feature_community_domain_impl.SubscribeToNewsCommunityUseCaseImpl
 import petlink.android.feature_community_domain_impl.UnsubscribeFromNewsCommunityUseCaseImpl
+import petlink.android.feature_community_domain_impl.UpdateNewsCommunityAvatarUseCaseImpl
+import petlink.android.feature_community_domain_impl.UpdateNewsCommunityBackgroundUseCaseImpl
 import petlink.android.feature_community_domain_impl.UpdateNewsCommunityUseCaseImpl
 
 @Module
@@ -78,4 +82,16 @@ interface CommunityDomainModule {
     fun bindUpdateNewsCommunityUseCase(
         updateNewsCommunityUseCaseImpl: UpdateNewsCommunityUseCaseImpl
     ): UpdateNewsCommunityUseCase
+
+    @CommunityScope
+    @Binds
+    fun bindUpdateNewsCommunityAvatarUseCase(
+        updateNewsCommunityAvatarUseCaseImpl: UpdateNewsCommunityAvatarUseCaseImpl
+    ): UpdateNewsCommunityAvatarUseCase
+
+    @CommunityScope
+    @Binds
+    fun bindUpdateNewsCommunityBackgroundUseCase(
+        updateNewsCommunityBackgroundUseCaseImpl: UpdateNewsCommunityBackgroundUseCaseImpl
+    ): UpdateNewsCommunityBackgroundUseCase
 }

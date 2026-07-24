@@ -164,20 +164,39 @@ class NewsCommunityRepositoryImpl @Inject constructor(
     override suspend fun updateNewsCommunityData(
         id: String,
         newTitle: String?,
-        newDescription: String?,
-        newAvatar: String?
+        newDescription: String?
     ) {
         val updates = mapOf(
             COMMUNITY_TITLE to newTitle,
-            COMMUNITY_DESCRIPTION to newDescription,
-            COMMUNITY_AVATAR to newAvatar
+            COMMUNITY_DESCRIPTION to newDescription
         )
         updateCommunityDataFields(id, updates)
         localSource.updateNewsCommunityData(
             communityId = id,
             newTitle = newTitle,
-            newDescription = newDescription,
-            newAvatar = newAvatar
+            newDescription = newDescription
+        )
+    }
+
+    override suspend fun updateNewsCommunityAvatar(id: String, newUri: String) {
+        val updates = mapOf(
+            COMMUNITY_AVATAR to newUri
+        )
+        updateCommunityDataFields(id, updates)
+        localSource.updateNewsCommunityAvatar(
+            communityId = id,
+            newAvatar = newUri
+        )
+    }
+
+    override suspend fun updateNewsCommunityBackground(id: String, newUri: String) {
+        val updates = mapOf(
+            BACKGROUND to newUri
+        )
+        updateCommunityDataFields(id, updates)
+        localSource.updateNewsCommunityBackground(
+            communityId = id,
+            newBackground = newUri
         )
     }
 

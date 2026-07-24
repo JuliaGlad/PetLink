@@ -5,12 +5,12 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".NewsCommunityDetailsActivity">
+    tools:context=".CommunityDetailsActivity">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/news_details_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="petlink.android.feature_community_ui_news_details.fragment.NewsCommunityDetailsFragment"/>
+        android:name="petlink.android.feature_community_ui_news_details.fragment.CommunityDetailsFragment"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

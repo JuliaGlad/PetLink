@@ -10,14 +10,12 @@ class UpdateNewsCommunityUseCaseImpl @Inject constructor(
     override suspend fun invoke(
         id: String,
         newTitle: String?,
-        newDescription: String?,
-        newAvatar: String?
+        newDescription: String?
     ) {
         repository.updateNewsCommunityData(
             id = id,
             newTitle = newTitle,
-            newDescription = newDescription,
-            newAvatar = newAvatar
+            newDescription = newDescription
         )
     }
 }

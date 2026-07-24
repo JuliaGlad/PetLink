@@ -4,7 +4,6 @@ interface UpdateNewsCommunityUseCase {
     suspend fun invoke(
         id: String,
         newTitle: String?,
-        newDescription: String?,
-        newAvatar: String?
+        newDescription: String?
     )
 }

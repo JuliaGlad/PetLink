@@ -23,8 +23,17 @@ interface NewsCommunityLocalSource {
     suspend fun updateNewsCommunityData(
         communityId: String,
         newTitle: String?,
-        newDescription: String?,
-        newAvatar: String?
+        newDescription: String?
+    )
+
+    suspend fun updateNewsCommunityAvatar(
+        communityId: String,
+        newAvatar: String
+    )
+
+    suspend fun updateNewsCommunityBackground(
+        communityId: String,
+        newBackground: String
     )
 
     suspend fun deleteNewsCommunity(id: String)

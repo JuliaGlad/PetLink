@@ -3,7 +3,7 @@
 
     <application>
         <activity
-            android:name=".NewsCommunityDetailsActivity"
+            android:name=".CommunityDetailsActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

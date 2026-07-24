@@ -55,6 +55,8 @@
 
     <declare-styleable name="ShapableImageView">
         <attr name="android:background" />
+        <attr name="shapeable_border_width" format="float"/>
+        <attr name="shapeable_border_color" format="color"/>
     </declare-styleable>
 
     <declare-styleable name="ChooserView">
