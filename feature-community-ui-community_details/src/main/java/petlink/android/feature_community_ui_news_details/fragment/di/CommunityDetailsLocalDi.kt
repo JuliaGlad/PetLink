@@ -19,7 +19,7 @@ class CommunityDetailsLocalDi @Inject constructor(
     updateNewsCommunityBackgroundUseCase: UpdateNewsCommunityBackgroundUseCase
 ) {
 
-    private val actor by lazy {
+    val actor by lazy {
         CommunityDetailsActor(
             getNewsCommunityByIdUseCase = getNewsCommunityByIdUseCase,
             subscribeToNewsCommunityUseCase = subscribeToNewsCommunityUseCase,
@@ -29,6 +29,6 @@ class CommunityDetailsLocalDi @Inject constructor(
         )
     }
 
-    private val reducer by lazy { CommunityDetailsReducer() }
+    val reducer by lazy { CommunityDetailsReducer() }
 
 }

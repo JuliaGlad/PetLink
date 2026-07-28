@@ -34,6 +34,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":feature-community-core"))
     implementation(project(":core-data"))
     implementation(project(":feature-community-domain"))
     implementation(project(":feature-community-data"))

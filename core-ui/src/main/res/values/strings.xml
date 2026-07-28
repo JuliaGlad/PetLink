@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="create_post">Create post</string>
     <string name="add_participants">Add participants</string>
     <string name="avatar">Avatar</string>
     <string name="finish">Finish</string>
@@ -182,6 +183,7 @@
     <string name="log_out">Log out</string>
     <string name="delete_account">Delete account</string>
     <string name="are_you_sure">Are you sure?</string>
+    <string name="are_you_sure_you_want_to_delete_this_community">Are you sure you want to delete this community?</string>
     <string name="are_you_sure_you_want_to_log_out">Are you sure you want to logout?</string>
     <string name="add">Add</string>
     <string-array name="pet_types">

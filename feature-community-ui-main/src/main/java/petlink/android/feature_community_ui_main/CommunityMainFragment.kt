@@ -18,6 +18,7 @@ import petlink.android.core_mvi.MviStore
 import petlink.android.core_ui.R
 import petlink.android.core_ui.delegates.main.DelegateItem
 import petlink.android.core_ui.delegates.main.MainAdapter
+import petlink.android.feature_community_core.AllSocialTypeTag
 import petlink.android.feature_community_ui_main.databinding.FragmentCommunityMainBinding
 import petlink.android.feature_community_ui_main.di.DaggerCommunityMainComponent
 import petlink.android.feature_community_ui_main.model.DiffCommunitiesModel
@@ -31,7 +32,6 @@ import petlink.android.feature_community_ui_main.recycler.delegate.ListMenuItems
 import petlink.android.feature_community_ui_main.recycler.delegate.ListMenuItemsDelegateItem
 import petlink.android.feature_community_ui_main.recycler.delegate.ListMenuItemsModel
 import petlink.android.feature_community_ui_main.recycler.item.MenuItemModel
-import petlink.android.feature_community_ui_news.tag.CommunitiesTypeTag
 import javax.inject.Inject
 
 class CommunityMainFragment : MviBaseFragment<
@@ -177,14 +177,14 @@ class CommunityMainFragment : MviBaseFragment<
 
     override fun resolveEffect(effect: CommunityMainEffect) =
         when (effect) {
-            CommunityMainEffect.OpenFriendsFragment -> startActivityWithDetails(CommunitiesTypeTag.FriendsTag)
-            CommunityMainEffect.OpenNewsFragment -> startActivityWithDetails(CommunitiesTypeTag.NewsTag)
-            CommunityMainEffect.OpenPhotosFragment -> startActivityWithDetails(CommunitiesTypeTag.PhotosTag)
-            CommunityMainEffect.OpenQuestionFragment -> startActivityWithDetails(CommunitiesTypeTag.QuestionTag)
-            CommunityMainEffect.OpenChatsFragment -> startActivityWithDetails(CommunitiesTypeTag.ChatsTag)
+            CommunityMainEffect.OpenFriendsFragment -> startActivityWithDetails(AllSocialTypeTag.FriendsTag)
+            CommunityMainEffect.OpenNewsFragment -> startActivityWithDetails(AllSocialTypeTag.NewsTag)
+            CommunityMainEffect.OpenPhotosFragment -> startActivityWithDetails(AllSocialTypeTag.PhotosTag)
+            CommunityMainEffect.OpenQuestionFragment -> startActivityWithDetails(AllSocialTypeTag.QuestionTag)
+            CommunityMainEffect.OpenChatsFragment -> startActivityWithDetails(AllSocialTypeTag.ChatsTag)
         }
 
-    private fun startActivityWithDetails(tag: CommunitiesTypeTag){
+    private fun startActivityWithDetails(tag: AllSocialTypeTag){
         val intent = Intent(Intent.ACTION_VIEW, ACTIVITY_WITH_DETAILS_URI.toUri()).apply {
             putExtra(INTENT_TYPE_TAG, tag)
         }

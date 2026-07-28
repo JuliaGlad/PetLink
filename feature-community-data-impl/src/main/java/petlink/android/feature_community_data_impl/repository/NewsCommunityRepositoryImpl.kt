@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import okhttp3.Dispatcher
+import petlink.android.feature_community_core.RoleInCommunityTag
 import petlink.android.feature_community_data.dto.NewsCommunityDto
 import petlink.android.feature_community_data.local_source.NewsCommunityLocalSource
 import petlink.android.feature_community_data.repository.NewsCommunityRepository
@@ -34,7 +35,7 @@ class NewsCommunityRepositoryImpl @Inject constructor(
                     subscribers = (get(COMMUNITY_SUBSCRIBERS) as List<*>).mapNotNull { it as? String }
                         .toList(),
                     ownerId = getString(COMMUNITY_OWNER).toString(),
-                    role = OWNER,
+                    role = RoleInCommunityTag.Owner,
                     background = getString(BACKGROUND).toString()
                 )
             }
@@ -68,7 +69,7 @@ class NewsCommunityRepositoryImpl @Inject constructor(
                         ownerId = getString(COMMUNITY_OWNER).toString(),
                         subscribers = (get(COMMUNITY_SUBSCRIBERS) as List<*>).mapNotNull { it as? String }
                             .toList(),
-                        role = OWNER,
+                        role = RoleInCommunityTag.Subscribed,
                         background = getString(BACKGROUND).toString()
                     )
                 }
@@ -113,7 +114,7 @@ class NewsCommunityRepositoryImpl @Inject constructor(
                     avatar = getString(COMMUNITY_AVATAR).toString(),
                     subscribers = (get(COMMUNITY_SUBSCRIBERS) as List<*>).mapNotNull { it as? String }
                         .toList(),
-                    role = NONE,
+                    role = RoleInCommunityTag.Unsubscribed,
                     background = getString(BACKGROUND).toString()
                 )
             }

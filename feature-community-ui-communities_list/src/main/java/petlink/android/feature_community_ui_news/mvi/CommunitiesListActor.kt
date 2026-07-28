@@ -5,13 +5,13 @@ import kotlinx.coroutines.flow.flow
 import petlink.android.core_mvi.MviActor
 import petlink.android.core_mvi.asyncAwait
 import petlink.android.core_mvi.runCatchingNonCancellation
+import petlink.android.feature_community_core.AllSocialTypeTag
 import petlink.android.feature_community_domain.usecase.GetNewsCommunityUseCase
 import petlink.android.feature_community_domain.usecase.GetOwnedCommunitiesUseCase
 import petlink.android.feature_community_domain.usecase.GetSubscribedCommunitiesUseCase
 import petlink.android.feature_community_ui_news.mapper.toUi
 import petlink.android.feature_community_ui_news.model.ListNewsCommunitiesUiModel
 import petlink.android.feature_community_ui_news.model.NewsStateModel
-import petlink.android.feature_community_ui_news.tag.CommunitiesTypeTag
 
 class CommunitiesListActor(
     private val getOwnedCommunitiesUseCase: GetOwnedCommunitiesUseCase,
@@ -30,21 +30,21 @@ class CommunitiesListActor(
             is CommunitiesListIntent.GetCommunitiesListCommunities -> loadCommunities(intent.communityType)
         }
 
-    private fun loadCommunities(communityType: CommunitiesTypeTag): Flow<CommunitiesListPartialState> =
+    private fun loadCommunities(communityType: AllSocialTypeTag): Flow<CommunitiesListPartialState> =
         flow {
             runCatching {
                 when(communityType){
-                    CommunitiesTypeTag.ChatsTag -> TODO()
-                    CommunitiesTypeTag.FriendsTag -> TODO()
-                    CommunitiesTypeTag.NewsTag -> {
+                    AllSocialTypeTag.ChatsTag -> TODO()
+                    AllSocialTypeTag.FriendsTag -> TODO()
+                    AllSocialTypeTag.NewsTag -> {
                         NewsStateModel(
                             subscribedCommunities = getSubscribedCommunitiesUseCase(),
                             ownedCommunities = getOwnedCommunitiesUseCase(),
                             otherCommunities = getOtherCommunitiesUseCase()
                         )
                     }
-                    CommunitiesTypeTag.PhotosTag -> TODO()
-                    CommunitiesTypeTag.QuestionTag -> TODO()
+                    AllSocialTypeTag.PhotosTag -> TODO()
+                    AllSocialTypeTag.QuestionTag -> TODO()
                 }
             }.fold(
                 onSuccess = { data ->

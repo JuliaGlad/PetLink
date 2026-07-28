@@ -64,4 +64,5 @@
     <color name="medium_orange">#C28547</color>
     <color name="dark_orange">#57350A</color>
     <color name="switch_start_green">#74AF74</color>
+    <color name="handle_color">#549D54</color>
 </resources>

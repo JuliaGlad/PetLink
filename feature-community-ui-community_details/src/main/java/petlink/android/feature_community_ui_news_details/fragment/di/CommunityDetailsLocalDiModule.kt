@@ -3,9 +3,6 @@ package petlink.android.feature_community_ui_news_details.fragment.di
 import dagger.Module
 import dagger.Provides
 import petlink.android.feature_community_domain.usecase.GetNewsCommunityByIdUseCase
-import petlink.android.feature_community_domain.usecase.GetNewsCommunityUseCase
-import petlink.android.feature_community_domain.usecase.GetOwnedCommunitiesUseCase
-import petlink.android.feature_community_domain.usecase.GetSubscribedCommunitiesUseCase
 import petlink.android.feature_community_domain.usecase.SubscribeToNewsCommunityUseCase
 import petlink.android.feature_community_domain.usecase.UnsubscribeFromNewsCommunityUseCase
 import petlink.android.feature_community_domain.usecase.UpdateNewsCommunityAvatarUseCase

@@ -40,6 +40,7 @@ dependencies {
     implementation(project(":core-ui"))
     implementation(project(":core-di"))
     implementation(project(":core-mvi"))
+    implementation(project(":feature-community-core"))
     implementation(project(":core-navigation"))
     implementation(project(":feature-community-domain"))
     implementation(project(":core-data"))

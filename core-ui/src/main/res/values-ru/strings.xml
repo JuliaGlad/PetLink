@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="create_post">Создать пост</string>
     <string name="add_participants">Добавить участников</string>
     <string name="avatar">Аватарка</string>
     <string name="finish">Завершить</string>
@@ -48,6 +49,7 @@
     <string name="about_group">О сообществе</string>
     <string name="subscribe">Подписаться</string>
     <string name="subscribed_in_group">Подписан(-а)</string>
+    <string name="are_you_sure_you_want_to_delete_this_community">Вы уверены что хотите удалить это сообщество?</string>
     <string name="edit">Редактировать</string>
     <string name="make_a_post">Создать пост</string>
     <string name="description">Описание</string>

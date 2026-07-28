@@ -5,12 +5,12 @@ import kotlinx.coroutines.flow.flow
 import petlink.android.core_mvi.MviActor
 import petlink.android.core_mvi.asyncAwait
 import petlink.android.core_mvi.runCatchingNonCancellation
+import petlink.android.feature_community_core.CommunitiesTypeTag
 import petlink.android.feature_community_domain.usecase.GetNewsCommunityByIdUseCase
 import petlink.android.feature_community_domain.usecase.SubscribeToNewsCommunityUseCase
 import petlink.android.feature_community_domain.usecase.UnsubscribeFromNewsCommunityUseCase
 import petlink.android.feature_community_domain.usecase.UpdateNewsCommunityAvatarUseCase
 import petlink.android.feature_community_domain.usecase.UpdateNewsCommunityBackgroundUseCase
-import petlink.android.feature_community_domain.usecase.UpdateNewsCommunityUseCase
 import petlink.android.feature_community_ui_news_details.fragment.mapper.toUi
 
 class CommunityDetailsActor(
@@ -29,25 +29,25 @@ class CommunityDetailsActor(
         state: CommunityDetailsState
     ): Flow<CommunityDetailsPartialState> =
         when (intent) {
-            is CommunityDetailsIntent.GetCommunityDetails -> when (state.communityType) {
+            is CommunityDetailsIntent.GetCommunityDetails -> when (intent.communityTypeTag) {
                 CommunitiesTypeTag.NewsTag -> getNewsCommunityData(intent.id)
                 CommunitiesTypeTag.PhotosTag -> TODO()
                 CommunitiesTypeTag.QuestionTag -> TODO()
             }
 
-            is CommunityDetailsIntent.Subscribe -> when (state.communityType) {
+            is CommunityDetailsIntent.Subscribe -> when (intent.communityTypeTag) {
                 CommunitiesTypeTag.NewsTag -> subscribeToNewsCommunity(intent.id)
                 CommunitiesTypeTag.PhotosTag -> TODO()
                 CommunitiesTypeTag.QuestionTag -> TODO()
             }
 
-            is CommunityDetailsIntent.Unsubscribe -> when (state.communityType) {
+            is CommunityDetailsIntent.Unsubscribe -> when (intent.communityTypeTag) {
                 CommunitiesTypeTag.NewsTag -> unsubscribeFromNewsCommunity(intent.id)
                 CommunitiesTypeTag.PhotosTag -> TODO()
                 CommunitiesTypeTag.QuestionTag -> TODO()
             }
 
-            is CommunityDetailsIntent.UpdateAvatar -> when (state.communityType) {
+            is CommunityDetailsIntent.UpdateAvatar -> when (intent.communityTypeTag) {
                 CommunitiesTypeTag.NewsTag -> updateAvatar(
                     communityId = intent.id,
                     newUri = intent.uri
@@ -57,7 +57,7 @@ class CommunityDetailsActor(
                 CommunitiesTypeTag.QuestionTag -> TODO()
             }
 
-            is CommunityDetailsIntent.UpdateBackground -> when (state.communityType) {
+            is CommunityDetailsIntent.UpdateBackground -> when (intent.communityTypeTag) {
                 CommunitiesTypeTag.NewsTag -> updateBackground(
                     communityId = intent.id,
                     newUri = intent.uri

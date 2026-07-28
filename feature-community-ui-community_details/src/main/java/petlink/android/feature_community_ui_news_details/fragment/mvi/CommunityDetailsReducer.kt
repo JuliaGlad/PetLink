@@ -21,11 +21,9 @@ class CommunityDetailsReducer: MviReducer<
             CommunityDetailsPartialState.Unsubscribed -> updateUnsubscribe(prevState)
         }
 
-    private fun updateSubscribe(prevState: CommunityDetailsState) =
-        prevState.copy(role = RoleInCommunityTag.Subscribed)
+    private fun updateSubscribe(prevState: CommunityDetailsState) = prevState.copy()
 
-    private fun updateUnsubscribe(prevState: CommunityDetailsState) =
-        prevState.copy(role = RoleInCommunityTag.Unsubscribed)
+    private fun updateUnsubscribe(prevState: CommunityDetailsState) = prevState.copy()
 
     private fun updateLoading(prevState: CommunityDetailsState) =
         prevState.copy(value = LceState.Loading)

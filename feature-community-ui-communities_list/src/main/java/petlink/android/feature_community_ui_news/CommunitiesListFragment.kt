@@ -30,6 +30,9 @@ import petlink.android.core_ui.delegates.items.text.subtitle.SubtitleTextDelegat
 import petlink.android.core_ui.delegates.items.text.subtitle.SubtitleTextModel
 import petlink.android.core_ui.delegates.main.DelegateItem
 import petlink.android.core_ui.delegates.main.MainAdapter
+import petlink.android.feature_community_core.AllSocialTypeTag
+import petlink.android.feature_community_core.CommunitiesTypeTag
+import petlink.android.feature_community_core.RoleInCommunityTag
 import petlink.android.feature_community_ui_news.databinding.FragmentNewsBinding
 import petlink.android.feature_community_ui_news.di.DaggerNewsComponent
 import petlink.android.feature_community_ui_news.di.NewsLocalDi
@@ -40,7 +43,6 @@ import petlink.android.feature_community_ui_news.mvi.CommunitiesListIntent
 import petlink.android.feature_community_ui_news.mvi.CommunitiesListPartialState
 import petlink.android.feature_community_ui_news.mvi.CommunitiesListState
 import petlink.android.feature_community_ui_news.mvi.CommunitiesListStoreFactory
-import petlink.android.feature_community_ui_news.tag.CommunitiesTypeTag
 import javax.inject.Inject
 
 class CommunitiesListFragment : MviBaseFragment<
@@ -58,10 +60,10 @@ class CommunitiesListFragment : MviBaseFragment<
     @Inject
     lateinit var localDi: NewsLocalDi
 
-    private val communityType: CommunitiesTypeTag? by lazy {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) activity?.intent?.getParcelableExtra<CommunitiesTypeTag>(
+    private val communityType: AllSocialTypeTag? by lazy {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) activity?.intent?.getParcelableExtra<AllSocialTypeTag>(
             INTENT_TYPE_TAG,
-            CommunitiesTypeTag::class.java
+            AllSocialTypeTag::class.java
         )
         else activity?.intent?.getParcelableExtra(INTENT_TYPE_TAG)
     }
@@ -95,7 +97,7 @@ class CommunitiesListFragment : MviBaseFragment<
                 }
                 val data = result.data!!
                 val delegateItem =
-                    if (communityType !is CommunitiesTypeTag.FriendsTag) createGroupDelegateItem(
+                    if (communityType !is AllSocialTypeTag.FriendsTag) createGroupDelegateItem(
                         data
                     )
                     else TODO("Create friends element")
@@ -120,7 +122,7 @@ class CommunitiesListFragment : MviBaseFragment<
                     store.sendEffect(
                         CommunitiesListEffect.NavigateToCommunityDetailsFragment(
                             id,
-                            OWNER
+                            RoleInCommunityTag.Owner
                         )
                     )
                 }
@@ -146,26 +148,31 @@ class CommunitiesListFragment : MviBaseFragment<
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
+
     private fun initHeader() {
         binding.header.iconBack.setOnClickListener { store.sendEffect(CommunitiesListEffect.NavigateBack) }
         when (communityType) {
-            CommunitiesTypeTag.ChatsTag -> setHeaderText(
+            AllSocialTypeTag.ChatsTag -> setHeaderText(
                 titleText = getString(petlink.android.core_ui.R.string.my_chats),
                 createEffect = CommunitiesListEffect.NavigateToCreateChatFragment
             )
 
-            CommunitiesTypeTag.FriendsTag -> setHeaderText(titleText = getString(petlink.android.core_ui.R.string.my_friends))
-            CommunitiesTypeTag.NewsTag -> setHeaderText(
+            AllSocialTypeTag.FriendsTag -> setHeaderText(titleText = getString(petlink.android.core_ui.R.string.my_friends))
+            AllSocialTypeTag.NewsTag -> setHeaderText(
                 titleText = getString(petlink.android.core_ui.R.string.news_group),
                 createEffect = CommunitiesListEffect.NavigateToCreateNewsCommunityFragment
             )
 
-            CommunitiesTypeTag.PhotosTag -> setHeaderText(
+            AllSocialTypeTag.PhotosTag -> setHeaderText(
                 titleText = getString(petlink.android.core_ui.R.string.my_photo_groups),
                 createEffect = CommunitiesListEffect.NavigateToCreatePhotosCommunityFragment
             )
 
-            CommunitiesTypeTag.QuestionTag -> setHeaderText(
+            AllSocialTypeTag.QuestionTag -> setHeaderText(
                 titleText = getString(petlink.android.core_ui.R.string.my_discussion),
                 createEffect = CommunitiesListEffect.NavigateToCreateQuestionGroupFragment
             )
@@ -262,8 +269,8 @@ class CommunitiesListFragment : MviBaseFragment<
         groupsList.forEach {
             val item = with(it) {
                 val role =
-                    if (currentUserRole == SUBSCRIBER) getString(petlink.android.core_ui.R.string.subscribed_in_group)
-                    else if (currentUserRole == OWNER) getString(petlink.android.core_ui.R.string.owner)
+                    if (currentUserRole is RoleInCommunityTag.Subscribed) getString(petlink.android.core_ui.R.string.subscribed_in_group)
+                    else if (currentUserRole is RoleInCommunityTag.Owner) getString(petlink.android.core_ui.R.string.owner)
                     else "${it.subscribers.size}" + getString(petlink.android.core_ui.R.string.subscribers)
                 GroupDelegateItem(
                     GroupItemModel(
@@ -296,32 +303,29 @@ class CommunitiesListFragment : MviBaseFragment<
         when (effect) {
             CommunitiesListEffect.NavigateBack -> requireActivity().finish()
             is CommunitiesListEffect.NavigateToCommunityDetailsFragment -> when (communityType) {
-                CommunitiesTypeTag.ChatsTag -> startActivity(
+                AllSocialTypeTag.ChatsTag -> startActivity(
                     "app://community/chat_details",
                     effect.communityId
                 )
 
-                CommunitiesTypeTag.FriendsTag -> startActivity(
+                AllSocialTypeTag.FriendsTag -> startActivity(
                     "app://community/friend_details",
                     effect.communityId
                 )
 
-                CommunitiesTypeTag.NewsTag -> startActivityCommunityDetails(
+                AllSocialTypeTag.NewsTag -> startActivityCommunityDetails(
                     effect.communityId,
-                    effect.role,
-                    getString(petlink.android.core_ui.R.string.news)
+                    CommunitiesTypeTag.NewsTag
                 )
 
-                CommunitiesTypeTag.PhotosTag -> startActivityCommunityDetails(
+                AllSocialTypeTag.PhotosTag -> startActivityCommunityDetails(
                     effect.communityId,
-                    effect.role,
-                    getString(petlink.android.core_ui.R.string.pet_photos)
+                    CommunitiesTypeTag.PhotosTag
                 )
 
-                CommunitiesTypeTag.QuestionTag -> startActivityCommunityDetails(
+                AllSocialTypeTag.QuestionTag -> startActivityCommunityDetails(
                     effect.communityId,
-                    effect.role,
-                    getString(petlink.android.core_ui.R.string.question)
+                    CommunitiesTypeTag.QuestionTag
                 )
 
                 null -> throw Throwable(message = TYPE_NULL_ERROR)
@@ -354,15 +358,13 @@ class CommunitiesListFragment : MviBaseFragment<
 
     private fun startActivityCommunityDetails(
         communityId: String,
-        role: String,
-        communityType: String
+        communityType: CommunitiesTypeTag
     ) {
         val intent = Intent(
             Intent.ACTION_VIEW,
             "app://community/community_details".toUri()
         ).apply {
             putExtra(COMMUNITY_ID_ARG, communityId)
-            putExtra(ROLE_IN_COMMUNITY_ARG, role)
             putExtra(COMMUNITY_TYPE_ARG, communityType)
         }
         requireActivity().startActivity(intent)
@@ -389,6 +391,9 @@ class CommunitiesListFragment : MviBaseFragment<
         const val COMMUNITY_ID_ARG = "CommunityIdArg"
         const val COMMUNITY_TYPE_ARG = "CommunityTypeArg"
         const val ROLE_IN_COMMUNITY_ARG = "RoleArg"
+        const val COMMUNITY_TYPE_NEWS = "news"
+        const val COMMUNITY_TYPE_PHOTOS = "photos"
+        const val COMMUNITY_TYPE_QUESTION = "question"
         const val NEWS_FRAGMENT_TAG = "NewsFragmentTag"
         const val SUBSCRIBER = "subscriber"
         const val OWNER = "owner"

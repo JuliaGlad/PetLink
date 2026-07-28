@@ -1,4 +1,4 @@
-package petlink.android.feature_community_ui_news.tag
+package petlink.android.feature_community_core
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
@@ -14,11 +14,5 @@ sealed interface CommunitiesTypeTag: Parcelable {
 
     @Parcelize
     data object PhotosTag: CommunitiesTypeTag
-
-    @Parcelize
-    data object ChatsTag: CommunitiesTypeTag
-
-    @Parcelize
-    data object FriendsTag: CommunitiesTypeTag
 
 }

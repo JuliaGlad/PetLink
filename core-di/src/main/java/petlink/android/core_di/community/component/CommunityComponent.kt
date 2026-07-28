@@ -1,15 +1,13 @@
 package petlink.android.core_di.community.component
 
 import com.github.terrakok.cicerone.Router
-import com.google.api.Context
 import dagger.Component
 import petlink.android.core_di.app.AppComponent
 import petlink.android.core_di.community.modules.CommunityDataModule
 import petlink.android.core_di.community.modules.CommunityDatabaseModule
 import petlink.android.core_di.community.modules.CommunityDomainModule
-import petlink.android.feature_community_data_impl.local_db.db.NewsCommunityDatabase
 import petlink.android.feature_community_domain.usecase.AddNewsCommunityUseCase
-import petlink.android.feature_community_domain.usecase.DeleteCommunityUseCase
+import petlink.android.feature_community_domain.usecase.DeleteNewsCommunityUseCase
 import petlink.android.feature_community_domain.usecase.GetNewsCommunityByIdUseCase
 import petlink.android.feature_community_domain.usecase.GetNewsCommunityUseCase
 import petlink.android.feature_community_domain.usecase.GetOwnedCommunitiesUseCase
@@ -43,7 +41,7 @@ interface CommunityComponent {
 
     fun addNewsCommunityUseCase(): AddNewsCommunityUseCase
 
-    fun deleteCommunityUseCase(): DeleteCommunityUseCase
+    fun deleteCommunityUseCase(): DeleteNewsCommunityUseCase
 
     fun getNewsCommunityByIdUseCase(): GetNewsCommunityByIdUseCase
 

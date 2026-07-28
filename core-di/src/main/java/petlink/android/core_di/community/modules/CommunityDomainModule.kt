@@ -4,7 +4,7 @@ import dagger.Binds
 import dagger.Module
 import petlink.android.core_di.community.component.CommunityScope
 import petlink.android.feature_community_domain.usecase.AddNewsCommunityUseCase
-import petlink.android.feature_community_domain.usecase.DeleteCommunityUseCase
+import petlink.android.feature_community_domain.usecase.DeleteNewsCommunityUseCase
 import petlink.android.feature_community_domain.usecase.GetNewsCommunityByIdUseCase
 import petlink.android.feature_community_domain.usecase.GetNewsCommunityUseCase
 import petlink.android.feature_community_domain.usecase.GetOwnedCommunitiesUseCase
@@ -15,7 +15,7 @@ import petlink.android.feature_community_domain.usecase.UpdateNewsCommunityAvata
 import petlink.android.feature_community_domain.usecase.UpdateNewsCommunityBackgroundUseCase
 import petlink.android.feature_community_domain.usecase.UpdateNewsCommunityUseCase
 import petlink.android.feature_community_domain_impl.AddNewsCommunityUseCaseImpl
-import petlink.android.feature_community_domain_impl.DeleteCommunityUseCaseImpl
+import petlink.android.feature_community_domain_impl.DeleteNewsCommunityUseCaseImpl
 import petlink.android.feature_community_domain_impl.GetNewsCommunityByIdUseCaseImpl
 import petlink.android.feature_community_domain_impl.GetNewsCommunityUseCaseImpl
 import petlink.android.feature_community_domain_impl.GetOwnedCommunitiesUseCaseImpl
@@ -50,8 +50,8 @@ interface CommunityDomainModule {
     @CommunityScope
     @Binds
     fun bindDeleteCommunityUseCase(
-        deleteCommunityUseCaseImpl: DeleteCommunityUseCaseImpl
-    ): DeleteCommunityUseCase
+        deleteCommunityUseCaseImpl: DeleteNewsCommunityUseCaseImpl
+    ): DeleteNewsCommunityUseCase
 
     @CommunityScope
     @Binds
