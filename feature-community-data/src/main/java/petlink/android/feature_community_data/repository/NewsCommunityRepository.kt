@@ -1,6 +1,7 @@
 package petlink.android.feature_community_data.repository
 
 import petlink.android.feature_community_data.dto.NewsCommunityDto
+import petlink.android.feature_community_data.dto.NewsPostDto
 
 interface NewsCommunityRepository {
 
@@ -9,6 +10,30 @@ interface NewsCommunityRepository {
     suspend fun getSubscribedCommunities(): List<NewsCommunityDto>
 
     suspend fun getNewsCommunity(): List<NewsCommunityDto>
+
+    suspend fun getCommunityPosts(communityId: String): List<NewsPostDto>
+
+    suspend fun createPost(
+        communityId: String,
+        title: String,
+        description: String,
+        photos: List<String>
+    ): NewsPostDto
+
+    suspend fun getPost(
+        communityId: String,
+        postId: String
+    ): NewsPostDto
+
+    suspend fun deletePost(communityId: String, postId: String)
+
+    suspend fun editPost(
+        communityId: String,
+        postId: String,
+        title: String,
+        description: String,
+        photos: List<String>
+    )
 
     suspend fun addNewsCommunity(
         title: String,

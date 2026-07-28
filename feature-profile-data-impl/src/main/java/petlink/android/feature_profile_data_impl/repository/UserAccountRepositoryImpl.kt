@@ -22,12 +22,14 @@ class UserAccountRepositoryImpl @Inject constructor(
 ) : UserAccountRepository {
 
     override suspend fun updateBackground(uri: String) {
-        auth.currentUser?.uid?.let { uid ->
-            store.collection(USER_COLLECTION)
-                .document(uid)
-                .update(BACKGROUND, uri)
-                .await()
-            localSource.updateBackground(uid, uri)
+        withContext(Dispatchers.IO) {
+            auth.currentUser?.uid?.let { uid ->
+                store.collection(USER_COLLECTION)
+                    .document(uid)
+                    .update(BACKGROUND, uri)
+                    .await()
+                localSource.updateBackground(uid, uri)
+            }
         }
     }
 
@@ -48,18 +50,20 @@ class UserAccountRepositoryImpl @Inject constructor(
             OWNER_CITY to city,
             SUBSCRIBED_IDS to arrayListOf<String>()
         )
-        auth.currentUser?.let {
-            val uid = it.uid
-            updateUserDataFields(uid, updates)
-            localSource.updateOwnerData(
-                userId = uid,
-                imageUri = imageUri,
-                name = name,
-                surname = surname,
-                birthday = birthday,
-                gender = gender,
-                city = city
-            )
+        withContext(Dispatchers.IO) {
+            auth.currentUser?.let {
+                val uid = it.uid
+                updateUserDataFields(uid, updates)
+                localSource.updateOwnerData(
+                    userId = uid,
+                    imageUri = imageUri,
+                    name = name,
+                    surname = surname,
+                    birthday = birthday,
+                    gender = gender,
+                    city = city
+                )
+            }
         }
     }
 
@@ -85,20 +89,22 @@ class UserAccountRepositoryImpl @Inject constructor(
             PET_PLACES to places,
             PET_FOOD to food
         )
-        auth.currentUser?.let {
-            updateUserDataFields(it.uid, updates)
-            localSource.updatePetData(
-                userId = it.uid,
-                imageUri = imageUri,
-                name = name,
-                birthday = birthday,
-                petType = petType,
-                gender = gender,
-                description = description,
-                games = games,
-                places = places,
-                food = food
-            )
+        withContext(Dispatchers.IO) {
+            auth.currentUser?.let {
+                updateUserDataFields(it.uid, updates)
+                localSource.updatePetData(
+                    userId = it.uid,
+                    imageUri = imageUri,
+                    name = name,
+                    birthday = birthday,
+                    petType = petType,
+                    gender = gender,
+                    description = description,
+                    games = games,
+                    places = places,
+                    food = food
+                )
+            }
         }
     }
 
@@ -237,10 +243,12 @@ class UserAccountRepositoryImpl @Inject constructor(
     private suspend fun updateUserDataFields(userId: String, updates: Map<String, Any?>) {
         val filteredUpdates = updates.filterValues { it != null }.mapValues { it.value!! }
 
-        store.collection(USER_COLLECTION)
-            .document(userId)
-            .update(filteredUpdates)
-            .await()
+        withContext(Dispatchers.IO) {
+            store.collection(USER_COLLECTION)
+                .document(userId)
+                .update(filteredUpdates)
+                .await()
+        }
     }
 
     private fun DocumentSnapshot.getStringOrEmpty(field: String): String =

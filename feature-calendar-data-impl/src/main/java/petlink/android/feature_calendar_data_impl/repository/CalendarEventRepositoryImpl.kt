@@ -4,7 +4,9 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import petlink.android.feature_calendar_data.dto.CalendarEventDto
 import petlink.android.feature_calendar_data.local_source.CalendarLocalSource
 import petlink.android.feature_calendar_data.mapper.toDomain
@@ -25,120 +27,14 @@ class CalendarRepositoryImpl @Inject constructor(
     private val localSource: CalendarLocalSource
 ) : CalendarRepository {
     override suspend fun getEventsByDate(date: String): List<CalendarEventDomainModel> {
-        val snapshot = auth.currentUser?.uid?.let { uid ->
-            store.collection(USER_COLLECTION)
-                .document(uid)
-                .collection(CALENDAR_EVENT)
-                .whereEqualTo(EVENT_DATE, date)
-                .get()
-                .await()
-        }
-        return snapshot?.documents?.map { document ->
-            CalendarEventDto(
-                id = document.id,
-                title = document.getString(EVENT_TITLE).toString(),
-                date = document.get(EVENT_DATE).toString(),
-                theme = document.get(EVENT_THEME).toString(),
-                time = document.get(EVENT_TIME).toString(),
-                timestamp = document.getTimestamp(EVENT_DATE_TIME_STAMP)!!,
-                isNotificationOn = document.getBoolean(IS_NOTIFICATION_ON) == true
-            ).toDomain()
-        }?.toList() ?: emptyList()
-    }
-
-    override suspend fun addEvent(
-        title: String,
-        date: String,
-        theme: String,
-        time: String,
-        dateForTimestamp: String,
-        isNotificationOn: Boolean
-    ): String {
-        val sdf = SimpleDateFormat(DATE_FORMAT, Locale.getDefault())
-        val parsedDate: Date = sdf.parse(dateForTimestamp)!!
-
-        val id = auth.currentUser?.uid?.let { uid ->
-            val event = hashMapOf(
-                EVENT_TITLE to title,
-                EVENT_DATE to date,
-                EVENT_TIME to time,
-                EVENT_THEME to theme,
-                EVENT_DATE_TIME_STAMP to Timestamp(parsedDate),
-                IS_NOTIFICATION_ON to isNotificationOn
-            )
-            val eventId = store.collection(USER_COLLECTION)
-                .document(uid)
-                .collection(CALENDAR_EVENT)
-                .document()
-                .id
-            store.collection(USER_COLLECTION)
-                .document(uid)
-                .collection(CALENDAR_EVENT)
-                .document(eventId)
-                .set(event)
-                .await()
-            eventId
-        }
-        return id.toString()
-    }
-
-    override suspend fun getEventsFromMonth(
-        year: Int,
-        month: Int
-    ): List<CalendarEventWithTimeStampDomain> {
-
-        val startOfMonth = LocalDate.of(year, month, 1)
-            .atStartOfDay(ZoneId.systemDefault())
-            .toInstant()
-        val startTimestamp = Timestamp(Date.from(startOfMonth))
-
-        val startOfNextMonth = startOfMonth
-            .atZone(ZoneId.systemDefault())
-            .toLocalDate()
-            .plusMonths(1)
-            .atStartOfDay(ZoneId.systemDefault())
-            .toInstant()
-
-        val endTimestamp = Timestamp(Date.from(startOfNextMonth))
-
-        val snapshot = auth.currentUser?.uid?.let { uid ->
-            store.collection(USER_COLLECTION)
-                .document(uid)
-                .collection(CALENDAR_EVENT)
-                .whereGreaterThanOrEqualTo(EVENT_DATE_TIME_STAMP, startTimestamp)
-                .whereLessThan(EVENT_DATE_TIME_STAMP, endTimestamp)
-                .get()
-                .await()
-        }
-        return snapshot?.documents?.map { document ->
-            CalendarEventDto(
-                id = document.id,
-                title = document.getString(EVENT_TITLE).toString(),
-                date = document.get(EVENT_DATE).toString(),
-                theme = document.get(EVENT_THEME).toString(),
-                time = document.get(EVENT_TIME).toString(),
-                timestamp = document.getTimestamp(EVENT_DATE_TIME_STAMP)!!,
-                isNotificationOn = document.getBoolean(IS_NOTIFICATION_ON) == true
-            ).toTimeStampDomain()
-        }?.toList() ?: emptyList()
-    }
-
-
-    override suspend fun getEvents(
-        orderByDate: Boolean,
-        limit: Long?
-    ): List<CalendarEventDomainModel> {
-        val local = localSource.getEvents(orderByDate, limit)
-        return if (local.isNullOrEmpty()) {
+        return withContext(Dispatchers.IO) {
             val snapshot = auth.currentUser?.uid?.let { uid ->
-                var query = store.collection(USER_COLLECTION)
+                store.collection(USER_COLLECTION)
                     .document(uid)
-                    .collection(CALENDAR_EVENT) as Query
-
-                if (orderByDate) query = query.orderBy(EVENT_DATE_TIME_STAMP)
-                if (limit != null) query = query.limit(limit)
-
-                query.get().await()
+                    .collection(CALENDAR_EVENT)
+                    .whereEqualTo(EVENT_DATE, date)
+                    .get()
+                    .await()
             }
             snapshot?.documents?.map { document ->
                 CalendarEventDto(
@@ -151,17 +47,133 @@ class CalendarRepositoryImpl @Inject constructor(
                     isNotificationOn = document.getBoolean(IS_NOTIFICATION_ON) == true
                 ).toDomain()
             }?.toList() ?: emptyList()
-        } else local
+        }
+
+    }
+
+    override suspend fun addEvent(
+        title: String,
+        date: String,
+        theme: String,
+        time: String,
+        dateForTimestamp: String,
+        isNotificationOn: Boolean
+    ): String {
+        return withContext(Dispatchers.IO) {
+            val sdf = SimpleDateFormat(DATE_FORMAT, Locale.getDefault())
+            val parsedDate: Date = sdf.parse(dateForTimestamp)!!
+
+            val id = auth.currentUser?.uid?.let { uid ->
+                val event = hashMapOf(
+                    EVENT_TITLE to title,
+                    EVENT_DATE to date,
+                    EVENT_TIME to time,
+                    EVENT_THEME to theme,
+                    EVENT_DATE_TIME_STAMP to Timestamp(parsedDate),
+                    IS_NOTIFICATION_ON to isNotificationOn
+                )
+                val eventId = store.collection(USER_COLLECTION)
+                    .document(uid)
+                    .collection(CALENDAR_EVENT)
+                    .document()
+                    .id
+                store.collection(USER_COLLECTION)
+                    .document(uid)
+                    .collection(CALENDAR_EVENT)
+                    .document(eventId)
+                    .set(event)
+                    .await()
+                eventId
+            }
+            id.toString()
+        }
+    }
+
+    override suspend fun getEventsFromMonth(
+        year: Int,
+        month: Int
+    ): List<CalendarEventWithTimeStampDomain> {
+        return withContext(Dispatchers.IO) {
+            val startOfMonth = LocalDate.of(year, month, 1)
+                .atStartOfDay(ZoneId.systemDefault())
+                .toInstant()
+            val startTimestamp = Timestamp(Date.from(startOfMonth))
+
+            val startOfNextMonth = startOfMonth
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+                .plusMonths(1)
+                .atStartOfDay(ZoneId.systemDefault())
+                .toInstant()
+
+            val endTimestamp = Timestamp(Date.from(startOfNextMonth))
+
+            val snapshot = auth.currentUser?.uid?.let { uid ->
+                store.collection(USER_COLLECTION)
+                    .document(uid)
+                    .collection(CALENDAR_EVENT)
+                    .whereGreaterThanOrEqualTo(EVENT_DATE_TIME_STAMP, startTimestamp)
+                    .whereLessThan(EVENT_DATE_TIME_STAMP, endTimestamp)
+                    .get()
+                    .await()
+            }
+            snapshot?.documents?.map { document ->
+                CalendarEventDto(
+                    id = document.id,
+                    title = document.getString(EVENT_TITLE).toString(),
+                    date = document.get(EVENT_DATE).toString(),
+                    theme = document.get(EVENT_THEME).toString(),
+                    time = document.get(EVENT_TIME).toString(),
+                    timestamp = document.getTimestamp(EVENT_DATE_TIME_STAMP)!!,
+                    isNotificationOn = document.getBoolean(IS_NOTIFICATION_ON) == true
+                ).toTimeStampDomain()
+            }?.toList() ?: emptyList()
+        }
+    }
+
+
+    override suspend fun getEvents(
+        orderByDate: Boolean,
+        limit: Long?
+    ): List<CalendarEventDomainModel> {
+        return withContext(Dispatchers.IO) {
+            val local = localSource.getEvents(orderByDate, limit)
+            if (local.isNullOrEmpty()) {
+                val snapshot = auth.currentUser?.uid?.let { uid ->
+                    var query = store.collection(USER_COLLECTION)
+                        .document(uid)
+                        .collection(CALENDAR_EVENT) as Query
+
+                    if (orderByDate) query = query.orderBy(EVENT_DATE_TIME_STAMP)
+                    if (limit != null) query = query.limit(limit)
+
+                    query.get().await()
+                }
+                snapshot?.documents?.map { document ->
+                    CalendarEventDto(
+                        id = document.id,
+                        title = document.getString(EVENT_TITLE).toString(),
+                        date = document.get(EVENT_DATE).toString(),
+                        theme = document.get(EVENT_THEME).toString(),
+                        time = document.get(EVENT_TIME).toString(),
+                        timestamp = document.getTimestamp(EVENT_DATE_TIME_STAMP)!!,
+                        isNotificationOn = document.getBoolean(IS_NOTIFICATION_ON) == true
+                    ).toDomain()
+                }?.toList() ?: emptyList()
+            } else local
+        }
     }
 
     override suspend fun deleteEvent(id: String) {
-        auth.currentUser?.uid?.let { uid ->
-            store.collection(USER_COLLECTION)
-                .document(uid)
-                .collection(CALENDAR_EVENT)
-                .document(id)
-                .delete()
-                .await()
+        withContext(Dispatchers.IO) {
+            auth.currentUser?.uid?.let { uid ->
+                store.collection(USER_COLLECTION)
+                    .document(uid)
+                    .collection(CALENDAR_EVENT)
+                    .document(id)
+                    .delete()
+                    .await()
+            }
         }
     }
 
@@ -174,63 +186,69 @@ class CalendarRepositoryImpl @Inject constructor(
         dateForTimestamp: String,
         isNotificationOn: Boolean
     ) {
-        auth.currentUser?.uid?.let { uid ->
-            updateEventDataFields(
-                uid,
-                eventId,
-                updates = mapOf(
-                    EVENT_TITLE to title,
-                    EVENT_DATE to date,
-                    EVENT_THEME to theme,
-                    IS_NOTIFICATION_ON to isNotificationOn
+        withContext(Dispatchers.IO) {
+            auth.currentUser?.uid?.let { uid ->
+                updateEventDataFields(
+                    uid,
+                    eventId,
+                    updates = mapOf(
+                        EVENT_TITLE to title,
+                        EVENT_DATE to date,
+                        EVENT_THEME to theme,
+                        IS_NOTIFICATION_ON to isNotificationOn
+                    )
                 )
-            )
+            }
         }
     }
 
     override suspend fun addEventToHistory(eventId: String) {
-        auth.currentUser?.uid?.let { uid ->
-            val userDocument = store.collection(USER_COLLECTION)
-                .document(uid)
-            val calendarEventDocument = userDocument.collection(CALENDAR_EVENT).document(eventId)
-            val eventDocumentSnapshot = calendarEventDocument.get().await()
+        withContext(Dispatchers.IO) {
+            auth.currentUser?.uid?.let { uid ->
+                val userDocument = store.collection(USER_COLLECTION)
+                    .document(uid)
+                val calendarEventDocument = userDocument.collection(CALENDAR_EVENT).document(eventId)
+                val eventDocumentSnapshot = calendarEventDocument.get().await()
 
-            userDocument
-                .collection(CALENDAR_EVENT_HISTORY)
-                .document(eventId)
-                .set(
-                    hashMapOf(
-                        EVENT_TITLE to eventDocumentSnapshot.getString(EVENT_TITLE),
-                        EVENT_DATE to eventDocumentSnapshot.getString(EVENT_DATE),
-                        EVENT_TIME to eventDocumentSnapshot.getString(EVENT_TIME),
-                        EVENT_THEME to eventDocumentSnapshot.getString(EVENT_THEME),
-                        IS_NOTIFICATION_ON to eventDocumentSnapshot.getBoolean(IS_NOTIFICATION_ON)
-                    )
-                ).await()
+                userDocument
+                    .collection(CALENDAR_EVENT_HISTORY)
+                    .document(eventId)
+                    .set(
+                        hashMapOf(
+                            EVENT_TITLE to eventDocumentSnapshot.getString(EVENT_TITLE),
+                            EVENT_DATE to eventDocumentSnapshot.getString(EVENT_DATE),
+                            EVENT_TIME to eventDocumentSnapshot.getString(EVENT_TIME),
+                            EVENT_THEME to eventDocumentSnapshot.getString(EVENT_THEME),
+                            IS_NOTIFICATION_ON to eventDocumentSnapshot.getBoolean(IS_NOTIFICATION_ON)
+                        )
+                    ).await()
 
-            calendarEventDocument.delete().await()
+                calendarEventDocument.delete().await()
+            }
         }
     }
 
     override suspend fun getHistoryEvents(): List<CalendarEventDomainModel> {
-        val snapshot = auth.currentUser?.uid?.let { uid ->
-            store.collection(USER_COLLECTION)
-                .document(uid)
-                .collection(CALENDAR_EVENT_HISTORY)
-                .get()
-                .await()
+        return withContext(Dispatchers.IO) {
+            val snapshot = auth.currentUser?.uid?.let { uid ->
+                store.collection(USER_COLLECTION)
+                    .document(uid)
+                    .collection(CALENDAR_EVENT_HISTORY)
+                    .get()
+                    .await()
+            }
+            snapshot?.documents?.map { document ->
+                CalendarEventDto(
+                    id = document.id,
+                    title = document.getString(EVENT_TITLE).toString(),
+                    date = document.get(EVENT_DATE).toString(),
+                    theme = document.get(EVENT_THEME).toString(),
+                    time = document.get(EVENT_TIME).toString(),
+                    timestamp = document.getTimestamp(EVENT_DATE_TIME_STAMP)!!,
+                    isNotificationOn = document.getBoolean(IS_NOTIFICATION_ON) == true
+                ).toDomain()
+            }?.toList() ?: emptyList()
         }
-        return snapshot?.documents?.map { document ->
-            CalendarEventDto(
-                id = document.id,
-                title = document.getString(EVENT_TITLE).toString(),
-                date = document.get(EVENT_DATE).toString(),
-                theme = document.get(EVENT_THEME).toString(),
-                time = document.get(EVENT_TIME).toString(),
-                timestamp = document.getTimestamp(EVENT_DATE_TIME_STAMP)!!,
-                isNotificationOn = document.getBoolean(IS_NOTIFICATION_ON) == true
-            ).toDomain()
-        }?.toList() ?: emptyList()
     }
 
     private suspend fun updateEventDataFields(
@@ -240,12 +258,14 @@ class CalendarRepositoryImpl @Inject constructor(
     ) {
         val filteredUpdates = updates.filterValues { it != null }.mapValues { it.value!! }
 
-        store.collection(USER_COLLECTION)
-            .document(userId)
-            .collection(CALENDAR_EVENT)
-            .document(eventId)
-            .update(filteredUpdates)
-            .await()
+        withContext(Dispatchers.IO) {
+            store.collection(USER_COLLECTION)
+                .document(userId)
+                .collection(CALENDAR_EVENT)
+                .document(eventId)
+                .update(filteredUpdates)
+                .await()
+        }
     }
 
     companion object {
