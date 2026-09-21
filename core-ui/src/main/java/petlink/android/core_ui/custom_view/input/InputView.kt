@@ -8,10 +8,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import petlink.android.core_ui.R
-import androidx.core.graphics.withClip
 import androidx.core.view.setPadding
 
 class InputView @JvmOverloads constructor(
@@ -33,16 +31,38 @@ class InputView @JvmOverloads constructor(
         style = Paint.Style.FILL
     }
 
-    fun setMessage(newValue: String) {
-        if (newValue != message) {
-            message = newValue
-            messageTextView.setText(newValue)
-            requestLayout()
+    fun setHint(value: String) {
+        hint = value
+        if (::messageTextView.isInitialized) {
+            messageTextView.hint = value
         }
+    }
+
+    fun getMessage(): String = messageTextView.text?.toString().orEmpty()
+
+    fun setMessage(value: String) {
+        message = value
+        if (::messageTextView.isInitialized) {
+            messageTextView.setText(value)
+        }
+    }
+
+    fun clearMessage() {
+        setMessage("")
     }
 
     fun onSendClickListener(listener: () -> Unit) {
         sendIcon.setOnClickListener { listener() }
+    }
+
+    fun onAddClickListener(listener: () -> Unit) {
+        addIcon.isClickable = true
+        addIcon.isFocusable = true
+        addIcon.setOnClickListener { listener() }
+    }
+
+    fun focusInput() {
+        messageTextView.requestFocus()
     }
 
     init {
@@ -50,6 +70,15 @@ class InputView @JvmOverloads constructor(
         initMessageTextView()
         initAddIcon()
         sendIcon = findViewById(R.id.send_icon)
+        sendIcon.isClickable = true
+        sendIcon.isFocusable = true
+        messageTextView.imeOptions = android.view.inputmethod.EditorInfo.IME_ACTION_SEND
+        messageTextView.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEND) {
+                sendIcon.performClick()
+                true
+            } else false
+        }
     }
 
     private fun initAddIcon() {

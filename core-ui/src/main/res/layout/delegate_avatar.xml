@@ -10,6 +10,9 @@
         android:layout_width="110dp"
         android:layout_height="110dp"
         android:background="@drawable/bg_round_image"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="@drawable/ripple_round"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>

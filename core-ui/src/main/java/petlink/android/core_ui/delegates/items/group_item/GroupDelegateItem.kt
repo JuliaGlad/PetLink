@@ -7,7 +7,7 @@ class GroupDelegateItem(
 ): DelegateItem {
     override fun content(): Any = model
 
-    override fun id(): Int = model.hashCode()
+    override fun id(): Int = model.id
 
     override fun compareToOther(other: DelegateItem): Boolean =
         model == other.content()

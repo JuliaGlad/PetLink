@@ -25,7 +25,8 @@ class CreateNewsCommunityActor(
                         title = title,
                         description = description,
                         avatar = avatar,
-                        background = background
+                        background = background,
+                        type = type
                     )
                 }
         }
@@ -34,7 +35,8 @@ class CreateNewsCommunityActor(
         title: String,
         description: String,
         avatar: String,
-        background: String
+        background: String,
+        type: petlink.android.feature_community_core.CommunitiesTypeTag
     ) = flow<CreateNewsCommunityPartialState> {
         emit(CreateNewsCommunityPartialState.Loading)
         runCatching {
@@ -42,7 +44,8 @@ class CreateNewsCommunityActor(
                 title = title,
                 description = description,
                 avatar = avatar,
-                background = background
+                background = background,
+                type = type
             )
         }.fold(
             onSuccess = { emit(CreateNewsCommunityPartialState.CommunityCreated(it)) },
@@ -54,14 +57,16 @@ class CreateNewsCommunityActor(
         title: String,
         description: String,
         avatar: String,
-        background: String
+        background: String,
+        type: petlink.android.feature_community_core.CommunitiesTypeTag
     ) = runCatchingNonCancellation {
         asyncAwait({
             addNewsCommunityUseCase.invoke(
                 title = title,
                 description = description,
                 avatar = avatar,
-                background = background
+                background = background,
+                type = type
             )
         }) { it }
     }.getOrThrow()

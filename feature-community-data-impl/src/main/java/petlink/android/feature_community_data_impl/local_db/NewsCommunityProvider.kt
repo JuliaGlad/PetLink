@@ -32,24 +32,24 @@ class NewsCommunityProvider @Inject constructor(
         )
     }
 
-    suspend fun addSubscriber(id: String){
+    suspend fun addSubscriber(id: String, userId: String){
         val dao = database.newsCommunityDao()
         dao.getNewsCommunities()?.forEach {
             if (it.communityId == id){
                 with(it) {
-                    subscribers.add(id)
+                    if (!subscribers.contains(userId)) subscribers.add(userId)
                     dao.updateNewsCommunity(it)
                 }
             }
         }
     }
 
-    suspend fun removeSubscriber(id: String){
+    suspend fun removeSubscriber(id: String, userId: String){
         val dao = database.newsCommunityDao()
         dao.getNewsCommunities()?.forEach {
             if (it.communityId == id){
                 with(it) {
-                    subscribers.remove(id)
+                    subscribers.remove(userId)
                     dao.updateNewsCommunity(it)
                 }
             }
@@ -96,7 +96,7 @@ class NewsCommunityProvider @Inject constructor(
         dao.getNewsCommunities()?.forEach {
             if (it.communityId == id){
                 with(it) {
-                    updateIfChanged(::avatar, newUri)
+                    updateIfChanged(::background, newUri)
                 }
                 dao.updateNewsCommunity(it)
             }

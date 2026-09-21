@@ -17,4 +17,8 @@ class FriendDetailsActivity : AppCompatActivity() {
             insets
         }
     }
+
+    companion object {
+        const val COMMUNITY_ID_ARG = "CommunityIdArg"
+    }
 }

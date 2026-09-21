@@ -3,6 +3,8 @@ package petlink.android.feature_community_ui_news_details.delete_dialog
 import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -45,11 +47,16 @@ class DeleteCommunityDialogFragment : DialogFragment() {
         collectData()
         initCancel()
         initDeleteButton()
-        return builder.setView(binding.root).create()
+        return builder.setView(binding.root).create().apply {
+            window?.setBackgroundDrawableResource(android.R.color.transparent)
+        }
     }
 
     private fun initDeleteButton() {
         binding.buttonDelete.setOnClickListener {
+            binding.loader.visibility = VISIBLE
+            binding.buttonDelete.isEnabled = false
+            binding.buttonCancel.isEnabled = false
             viewModel.deleteCommunity(communityId = communityId, communityType = typeTag)
         }
     }
@@ -61,8 +68,18 @@ class DeleteCommunityDialogFragment : DialogFragment() {
     private fun collectData() {
         lifecycleScope.launch {
             viewModel.deleteCommunity.collect { isDeleted ->
-                this@DeleteCommunityDialogFragment.isDeleted = isDeleted
-                if (isDeleted) dismiss()
+                when (isDeleted) {
+                    true -> {
+                        this@DeleteCommunityDialogFragment.isDeleted = true
+                        dismiss()
+                    }
+                    false -> {
+                        _binding?.loader?.visibility = GONE
+                        _binding?.buttonDelete?.isEnabled = true
+                        _binding?.buttonCancel?.isEnabled = true
+                    }
+                    null -> Unit
+                }
             }
         }
     }

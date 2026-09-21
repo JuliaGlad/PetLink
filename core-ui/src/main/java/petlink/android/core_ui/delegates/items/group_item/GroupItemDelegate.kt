@@ -9,6 +9,7 @@ import petlink.android.core_ui.R
 import petlink.android.core_ui.databinding.DelegateGroupItemBinding
 import petlink.android.core_ui.delegates.main.AdapterDelegate
 import petlink.android.core_ui.delegates.main.DelegateItem
+import petlink.android.core_ui.playPressAnimation
 
 class GroupItemDelegate : AdapterDelegate {
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
@@ -37,11 +38,16 @@ class GroupItemDelegate : AdapterDelegate {
             with(binding) {
                 groupTitle.text = model.groupTitle
                 groupStatus.text = model.groupStatus
+                groupStatus.visibility = if (model.groupStatus.isBlank()) {
+                    android.view.View.GONE
+                } else {
+                    android.view.View.VISIBLE
+                }
                 if (model.imageUri.isNotEmpty()) {
-                    image.setImageUri(model.imageUri.toUri())
+                    image.setImageUri(model.imageUri.toUri(), R.drawable.add_image_icon)
                 } else {
                     image.setImageDrawable(
-                        ResourcesCompat.getDrawable(
+                        model.placeholder ?: ResourcesCompat.getDrawable(
                             item.context.resources,
                             R.drawable.add_image_icon,
                             item.context.theme
@@ -49,7 +55,21 @@ class GroupItemDelegate : AdapterDelegate {
                     )
                 }
 
-                item.setOnClickListener { model.onClick() }
+                item.setOnClickListener {
+                    item.playPressAnimation()
+                    model.onClick()
+                }
+                if (model.actionIcon != null) {
+                    action.visibility = android.view.View.VISIBLE
+                    action.setImageResource(model.actionIcon)
+                    action.setOnClickListener {
+                        it.playPressAnimation()
+                        model.onActionClick?.invoke()
+                    }
+                } else {
+                    action.visibility = android.view.View.GONE
+                    action.setOnClickListener(null)
+                }
             }
         }
 

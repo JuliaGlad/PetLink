@@ -15,5 +15,6 @@ fun NewsCommunityDomainModel.toUi() =
         subscribers = subscribers,
         title = title,
         avatar = avatar,
-        currentUserRole = currentUsersRole
+        currentUserRole = currentUsersRole,
+        description = description
     )

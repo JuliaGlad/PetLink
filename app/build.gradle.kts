@@ -64,8 +64,6 @@ dependencies {
     implementation(libs.assisted.inject.annotations.dagger2)
     kapt(libs.assisted.inject.processor.dagger2)
     implementation(libs.firebase.firestore)
-    implementation(libs.firebase.ml.natural.language)
-    implementation(libs.firebase.ml.natural.language.translate.model)
     implementation(libs.androidx.viewpager2)
     implementation(libs.cicerone)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)

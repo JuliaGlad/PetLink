@@ -12,6 +12,8 @@ sealed interface CommunityDetailsEffect: MviEffect {
 
     class ShowDeleteCommunityDialog(val communityId: String): CommunityDetailsEffect
 
+    class OpenComments(val postId: String): CommunityDetailsEffect
+
     data object UpdateAvatar: CommunityDetailsEffect
 
     data object UpdateBackground: CommunityDetailsEffect

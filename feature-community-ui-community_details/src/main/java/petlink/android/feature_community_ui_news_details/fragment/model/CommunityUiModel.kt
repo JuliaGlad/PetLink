@@ -10,15 +10,27 @@ class CommunityUiModel(
     var role: RoleInCommunityTag,
     var avatar: String,
     var background: String,
-    val content: MutableList<CommunitiesContent>
+    val subscriberIds: List<String> = emptyList(),
+    var subscribers: List<SubscriberUi> = emptyList(),
+    val content: MutableList<CommunitiesContent> = mutableListOf()
 )
 
-sealed interface CommunitiesContent{
+class SubscriberUi(
+    val id: String,
+    val name: String,
+    val avatar: String
+)
 
-    class NewsCommunityPosts(): CommunitiesContent
+sealed interface CommunitiesContent {
 
-    class Question(): CommunitiesContent
-
-    class Photo(): CommunitiesContent
-
+    class Post(
+        val id: String,
+        val title: String,
+        val description: String,
+        val photos: List<String>,
+        var likesCount: Int = 0,
+        var likedByMe: Boolean = false,
+        var commentsCount: Int = 0,
+        var viewsCount: Int = 0
+    ) : CommunitiesContent
 }

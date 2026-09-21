@@ -5,6 +5,13 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".FriendActivity">
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/friends_container"
+        android:name="petlink.android.feature_profile_ui_friends.FriendFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

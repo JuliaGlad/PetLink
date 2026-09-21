@@ -11,6 +11,10 @@
         android:src="@drawable/ic_arrow_back"
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
+        android:background="@drawable/ripple_round"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="4dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/icon_color"/>
@@ -33,6 +37,7 @@
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layoutAnimation="@anim/layout_animation_list"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

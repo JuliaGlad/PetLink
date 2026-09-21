@@ -13,6 +13,8 @@ import petlink.android.core_navigation.AppNavigationHolder
 import petlink.android.feature_community_ui_create_community.R
 import petlink.android.feature_community_ui_create_community.activity.di.DaggerCreateNewsCommunityActivityComponent
 import petlink.android.feature_community_ui_create_community.databinding.ActivityCreateNewsCommunityBinding
+import petlink.android.feature_community_core.CommunitiesTypeTag
+import petlink.android.feature_community_core.CommunityStorageType
 import petlink.android.feature_community_ui_create_community.screen.CreateNewsCommunityScreen
 import petlink.android.feature_community_ui_create_community.screen.CreateNewsCommunityScreenArg
 import javax.inject.Inject
@@ -36,6 +38,11 @@ class CreateNewsCommunityActivity : AppCompatActivity() {
         _binding = ActivityCreateNewsCommunityBinding.inflate(layoutInflater)
         DaggerCreateNewsCommunityActivityComponent.factory().create(AppComponentHolder.appComponent)
             .inject(this)
+        viewModel.communityType = when (intent.getStringExtra(CommunityStorageType.ARG)) {
+            CommunityStorageType.QUESTION -> CommunitiesTypeTag.QuestionTag
+            CommunityStorageType.PHOTOS -> CommunitiesTypeTag.PhotosTag
+            else -> CommunitiesTypeTag.NewsTag
+        }
         setContentView(binding.root)
         if (savedInstanceState == null) {
             router.newRootScreen(

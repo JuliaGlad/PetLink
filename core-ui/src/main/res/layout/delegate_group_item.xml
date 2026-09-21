@@ -4,7 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/item"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="@drawable/ripple_rect">
     
     <petlink.android.core_ui.custom_view.round_avatar.ShapeableImageView
         android:id="@+id/image"
@@ -17,13 +20,16 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_marginStart="14dp"
+        android:layout_marginEnd="12dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@id/image"
+        app:layout_constraintEnd_toStartOf="@id/action"
         app:layout_constraintStart_toEndOf="@id/image"
         app:layout_constraintTop_toTopOf="@id/image"
-        app:layout_constraintBottom_toBottomOf="@id/image">
+        app:layout_goneMarginEnd="20dp">
 
         <TextView
             android:id="@+id/group_title"
@@ -44,9 +50,22 @@
             android:textSize="12sp"
             tools:text='Подписан/владелец'/>
 
-    </LinearLayout>
+        </LinearLayout>
 
-
-
+    <ImageView
+        android:id="@+id/action"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/ripple_round"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/image"
+        tools:src="@drawable/ic_add_friend"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

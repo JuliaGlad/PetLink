@@ -16,4 +16,6 @@ sealed interface ProfileEffect: MviEffect {
 
     data object ShowPosts: ProfileEffect
 
+    data object OpenCreatePost: ProfileEffect
+
 }

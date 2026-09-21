@@ -1,8 +1,11 @@
 package petlink.android.feature_community_ui_news_details.fragment.recycler
 
 import android.view.LayoutInflater
+import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
@@ -36,16 +39,18 @@ class HeaderDelegate : AdapterDelegate {
         RecyclerView.ViewHolder(binding.root) {
         fun bind(model: HeaderModel) {
             with(binding) {
+                val isPhotoCommunity = model.communityType is CommunitiesTypeTag.PhotosTag
+                applyHeaderStyle(isPhotoCommunity)
                 title.text = model.title
                 communityType.text = when (model.communityType) {
                     CommunitiesTypeTag.NewsTag -> itemView.context.getString(R.string.news)
-                    CommunitiesTypeTag.PhotosTag -> itemView.context.getString(R.string.pet_photos)
+                    CommunitiesTypeTag.PhotosTag -> itemView.context.getString(R.string.Photos)
                     CommunitiesTypeTag.QuestionTag -> itemView.context.getString(R.string.question)
                 }
                 if (model.avatar.isNotEmpty()) {
-                    avatar.setImageUri(model.avatar.toUri())
+                    avatar.setImageUri(model.avatar.toUri(), R.drawable.add_image_icon)
                 } else {
-                    avatar.setImageDrawable(
+                    avatar.setDrawableImage(
                         ResourcesCompat.getDrawable(
                             itemView.context.resources,
                             R.drawable.add_image_icon,
@@ -54,9 +59,9 @@ class HeaderDelegate : AdapterDelegate {
                     )
                 }
                 if (model.background.isNotEmpty()) {
-                    background.setImageURI(model.avatar.toUri())
+                    background.setImageUri(model.background.toUri(), R.drawable.add_cover)
                 } else {
-                    background.setImageDrawable(
+                    background.setDrawableImage(
                         ResourcesCompat.getDrawable(
                             itemView.context.resources,
                             R.drawable.add_cover,
@@ -65,19 +70,56 @@ class HeaderDelegate : AdapterDelegate {
                     )
                 }
                 subscribersCount.text = model.subscribersCount.toString()
-                aboutCommunity.text =
-                    if (model.isOwner) itemView.context.getString(R.string.about_group)
-                    else itemView.context.getString(R.string.edit)
+                aboutCommunity.text = when {
+                    isPhotoCommunity || model.communityType is CommunitiesTypeTag.QuestionTag ->
+                        itemView.context.getString(R.string.about_discussion)
+                    model.isOwner -> itemView.context.getString(R.string.edit)
+                    else -> itemView.context.getString(R.string.about_group)
+                }
                 aboutCommunity.setOnClickListener { model.aboutClickListener() }
                 if (model.isOwner) {
                     deleteIcon.visibility = VISIBLE
                     model.deleteClickListener?.let {
                         deleteIcon.setOnClickListener { it() }
                     }
+                } else {
+                    deleteIcon.visibility = GONE
                 }
-
                 model.backgroundClickListener?.let { background.setOnClickListener { it() } }
+                background.isClickable = model.backgroundClickListener != null
+                background.isFocusable = model.backgroundClickListener != null
                 model.avatarClickListener?.let { avatar.setOnClickListener { it() } }
+                avatar.isClickable = model.avatarClickListener != null
+                avatar.isFocusable = model.avatarClickListener != null
+            }
+        }
+
+        private fun applyHeaderStyle(isPhotoCommunity: Boolean) {
+            val coverLp = binding.background.layoutParams as ConstraintLayout.LayoutParams
+            coverLp.marginStart = 0
+            coverLp.marginEnd = 0
+            coverLp.topMargin = 0
+            binding.background.background = ContextCompat.getDrawable(
+                itemView.context,
+                R.drawable.bg_cover_fullbleed
+            )
+            binding.background.layoutParams = coverLp
+            if (isPhotoCommunity) {
+                binding.aboutCommunity.setTextColor(
+                    ContextCompat.getColor(itemView.context, R.color.icon_color)
+                )
+                binding.deleteIcon.background = ContextCompat.getDrawable(
+                    itemView.context,
+                    R.drawable.bg_cover_owner_action
+                )
+            } else {
+                binding.aboutCommunity.setTextColor(
+                    ContextCompat.getColor(itemView.context, R.color.black)
+                )
+                binding.deleteIcon.background = ContextCompat.getDrawable(
+                    itemView.context,
+                    R.drawable.ripple_delete_icon
+                )
             }
         }
     }

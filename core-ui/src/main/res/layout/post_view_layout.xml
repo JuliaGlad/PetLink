@@ -9,7 +9,8 @@
         android:id="@+id/post_image"
         android:layout_width="match_parent"
         android:layout_height="206dp"
-        android:background="@drawable/bg_round_rectangle" />
+        android:background="@drawable/bg_round_rectangle"
+        android:clipToOutline="true" />
 
     <TextView
         android:id="@+id/post_title"

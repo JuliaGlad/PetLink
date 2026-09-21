@@ -9,5 +9,9 @@ fun NewsPostDto.toDomain() =
         communityId = communityId,
         description = description,
         title = title,
-        photos = photos
+        photos = photos,
+        likesCount = likes.size,
+        likedByMe = likedByMe,
+        viewsCount = views,
+        commentsCount = commentsCount
     )

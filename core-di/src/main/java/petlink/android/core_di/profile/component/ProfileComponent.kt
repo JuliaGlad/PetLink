@@ -9,10 +9,17 @@ import petlink.android.core_di.profile.modules.ProfileDatabaseModule
 import petlink.android.core_di.profile.modules.UserAccountDomainModule
 import petlink.android.core_di.profile.modules.UserAuthDomainModule
 import petlink.android.feature_profile_domain.usecase.user_account.AddUserDataUseCase
+import petlink.android.feature_profile_domain.usecase.user_account.AddUserPostCommentUseCase
+import petlink.android.feature_profile_domain.usecase.user_account.CreateUserPostUseCase
 import petlink.android.feature_profile_domain.usecase.user_account.EditOwnerDataUseCase
 import petlink.android.feature_profile_domain.usecase.user_account.EditPetDataUseCase
 import petlink.android.feature_profile_domain.usecase.user_account.GetUserFullDataUseCase
 import petlink.android.feature_profile_domain.usecase.user_account.GetUserMainDataDomainUseCase
+import petlink.android.feature_profile_domain.usecase.user_account.GetUserPostCommentsUseCase
+import petlink.android.feature_profile_domain.usecase.user_account.GetUserPostsUseCase
+import petlink.android.feature_profile_domain.usecase.user_account.MarkUserPostViewedUseCase
+import petlink.android.feature_profile_domain.usecase.user_account.ToggleUserPostCommentLikeUseCase
+import petlink.android.feature_profile_domain.usecase.user_account.ToggleUserPostLikeUseCase
 import petlink.android.feature_profile_domain.usecase.user_account.UpdateBackgroundUseCase
 import petlink.android.feature_profile_domain.usecase.user_auth.CheckIsAuthenticatedUseCase
 import petlink.android.feature_profile_domain.usecase.user_auth.CreateUserUseCase
@@ -53,6 +60,20 @@ interface ProfileComponent {
     fun getUserMainDataUseCase(): GetUserMainDataDomainUseCase
 
     fun updateBackgroundUseCase(): UpdateBackgroundUseCase
+
+    fun createUserPostUseCase(): CreateUserPostUseCase
+
+    fun getUserPostsUseCase(): GetUserPostsUseCase
+
+    fun toggleUserPostLikeUseCase(): ToggleUserPostLikeUseCase
+
+    fun markUserPostViewedUseCase(): MarkUserPostViewedUseCase
+
+    fun getUserPostCommentsUseCase(): GetUserPostCommentsUseCase
+
+    fun addUserPostCommentUseCase(): AddUserPostCommentUseCase
+
+    fun toggleUserPostCommentLikeUseCase(): ToggleUserPostCommentLikeUseCase
 
     fun checkIsAuthenticatedUseCase(): CheckIsAuthenticatedUseCase
 

@@ -2,7 +2,6 @@ package petlink.android.feature_community_ui_main
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -16,12 +15,20 @@ import petlink.android.core_mvi.LceState
 import petlink.android.core_mvi.MviBaseFragment
 import petlink.android.core_mvi.MviStore
 import petlink.android.core_ui.R
+import petlink.android.core_ui.delegates.items.post.PostDelegate
+import petlink.android.core_ui.delegates.items.post.PostDelegateItem
+import petlink.android.core_ui.delegates.items.post.PostModel
+import petlink.android.core_ui.photo_preview.showPhotoPreview
+import petlink.android.core_ui.delegates.items.text.extra_small.ExtraSmallTextDelegate
 import petlink.android.core_ui.delegates.main.DelegateItem
 import petlink.android.core_ui.delegates.main.MainAdapter
 import petlink.android.feature_community_core.AllSocialTypeTag
+import petlink.android.feature_community_core.CommunitiesTypeTag
+import petlink.android.feature_community_core.RoleInCommunityTag
 import petlink.android.feature_community_ui_main.databinding.FragmentCommunityMainBinding
 import petlink.android.feature_community_ui_main.di.DaggerCommunityMainComponent
 import petlink.android.feature_community_ui_main.model.DiffCommunitiesModel
+import petlink.android.feature_community_ui_main.model.FeedPostModel
 import petlink.android.feature_community_ui_main.mvi.CommunityMainEffect
 import petlink.android.feature_community_ui_main.mvi.CommunityMainIntent
 import petlink.android.feature_community_ui_main.mvi.CommunityMainLocalDI
@@ -32,6 +39,7 @@ import petlink.android.feature_community_ui_main.recycler.delegate.ListMenuItems
 import petlink.android.feature_community_ui_main.recycler.delegate.ListMenuItemsDelegateItem
 import petlink.android.feature_community_ui_main.recycler.delegate.ListMenuItemsModel
 import petlink.android.feature_community_ui_main.recycler.item.MenuItemModel
+import petlink.android.feature_community_ui_news_details.comments.PostCommentsBottomSheet
 import javax.inject.Inject
 
 class CommunityMainFragment : MviBaseFragment<
@@ -45,6 +53,8 @@ class CommunityMainFragment : MviBaseFragment<
 
     private val mainAdapter = MainAdapter()
     private val recyclerItems: MutableList<DelegateItem> = mutableListOf()
+    private var adapterInitialized = false
+    private val viewedPostIds = mutableSetOf<String>()
 
     @Inject
     lateinit var localDI: CommunityMainLocalDI
@@ -62,7 +72,7 @@ class CommunityMainFragment : MviBaseFragment<
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentCommunityMainBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -79,6 +89,8 @@ class CommunityMainFragment : MviBaseFragment<
                 with(binding) {
                     errorScreen.root.visibility = GONE
                     loadingScreen.root.visibility = GONE
+                    emptyScreen.root.visibility = GONE
+                    recyclerView.visibility = VISIBLE
                     initRecycler(state.value.data)
                 }
             }
@@ -87,6 +99,8 @@ class CommunityMainFragment : MviBaseFragment<
                 with(binding) {
                     errorScreen.root.visibility = VISIBLE
                     loadingScreen.root.visibility = GONE
+                    emptyScreen.root.visibility = GONE
+                    recyclerView.visibility = GONE
                 }
             }
 
@@ -94,6 +108,8 @@ class CommunityMainFragment : MviBaseFragment<
                 with(binding) {
                     loadingScreen.root.visibility = VISIBLE
                     errorScreen.root.visibility = GONE
+                    emptyScreen.root.visibility = GONE
+                    recyclerView.visibility = GONE
                 }
             }
         }
@@ -104,15 +120,59 @@ class CommunityMainFragment : MviBaseFragment<
 
     private fun initRecycler(model: DiffCommunitiesModel) {
         with(binding) {
-            recyclerView.adapter = mainAdapter
-            initAdapter()
-            initMainMenuItems()
-            Log.i("Recycler", recyclerItems.size.toString())
-            if (model.photos.isNotEmpty() && model.posts.isNotEmpty() && model.question.isNotEmpty() && model.fromFriends.isNotEmpty()) {
-                TODO("Init recycler with posts, questions and etc.")
+            if (!adapterInitialized) {
+                recyclerView.adapter = mainAdapter
+                initAdapter()
+                adapterInitialized = true
             }
-            mainAdapter.submitList(recyclerItems)
+            recyclerItems.clear()
+            initMainMenuItems()
+            initFeed(model.feed)
+            mainAdapter.submitList(recyclerItems.toList())
         }
+    }
+
+    private fun initFeed(feed: List<FeedPostModel>) {
+        if (feed.isEmpty()) {
+            with(binding.emptyScreen) {
+                root.visibility = VISIBLE
+                errorText.text = getString(R.string.there_are_no_posts_yet)
+            }
+            return
+        }
+        feed.forEach { post ->
+            if (post.communityType is CommunitiesTypeTag.PhotosTag) return@forEach
+            recyclerItems.add(getPostDelegateItem(post))
+        }
+    }
+
+    private fun getPostDelegateItem(post: FeedPostModel): PostDelegateItem {
+        val type = when (post.communityType) {
+            CommunitiesTypeTag.NewsTag -> getString(R.string.news_group)
+            CommunitiesTypeTag.QuestionTag -> getString(R.string.questions_and_advices)
+            CommunitiesTypeTag.PhotosTag -> getString(R.string.Photos)
+        }
+        return PostDelegateItem(
+            PostModel(
+                postId = post.postId,
+                title = post.title,
+                description = post.description,
+                photos = post.photos,
+                communityTitle = post.communityTitle,
+                communityAvatar = post.communityAvatar,
+                communityType = type,
+                isQuestion = post.communityType is CommunitiesTypeTag.QuestionTag,
+                isOwner = post.role is RoleInCommunityTag.Owner,
+                likesCount = post.likesCount,
+                likedByMe = post.likedByMe,
+                commentsCount = post.commentsCount,
+                viewsCount = post.viewsCount,
+                onLikeClick = { item -> updatePostLike(item, post.communityId, post.communityType) },
+                onCommentClick = { item -> showComments(post.communityId, item.postId, post.communityType) },
+                onViewed = { item -> updatePostViews(post.communityId, item.postId, post.communityType) },
+                onPhotoClick = { uri -> showPhotoPreview(uri) }
+            )
+        )
     }
 
     private fun initMainMenuItems() {
@@ -173,22 +233,102 @@ class CommunityMainFragment : MviBaseFragment<
 
     private fun initAdapter() {
         mainAdapter.addDelegate(ListMenuItemsDelegate())
+        mainAdapter.addDelegate(PostDelegate())
+        mainAdapter.addDelegate(ExtraSmallTextDelegate())
     }
 
     override fun resolveEffect(effect: CommunityMainEffect) =
         when (effect) {
-            CommunityMainEffect.OpenFriendsFragment -> startActivityWithDetails(AllSocialTypeTag.FriendsTag)
+            CommunityMainEffect.OpenFriendsFragment -> {
+                val intent = Intent(Intent.ACTION_VIEW, FRIENDS_URI.toUri())
+                requireActivity().startActivity(intent)
+            }
             CommunityMainEffect.OpenNewsFragment -> startActivityWithDetails(AllSocialTypeTag.NewsTag)
             CommunityMainEffect.OpenPhotosFragment -> startActivityWithDetails(AllSocialTypeTag.PhotosTag)
             CommunityMainEffect.OpenQuestionFragment -> startActivityWithDetails(AllSocialTypeTag.QuestionTag)
             CommunityMainEffect.OpenChatsFragment -> startActivityWithDetails(AllSocialTypeTag.ChatsTag)
+            is CommunityMainEffect.OpenCommunityDetails -> startCommunityDetails(
+                communityId = effect.communityId,
+                communityType = effect.communityType
+            )
         }
 
-    private fun startActivityWithDetails(tag: AllSocialTypeTag){
+    private fun startActivityWithDetails(tag: AllSocialTypeTag) {
         val intent = Intent(Intent.ACTION_VIEW, ACTIVITY_WITH_DETAILS_URI.toUri()).apply {
             putExtra(INTENT_TYPE_TAG, tag)
         }
         requireActivity().startActivity(intent)
+    }
+
+    private fun startCommunityDetails(communityId: String, communityType: CommunitiesTypeTag) {
+        val intent = Intent(Intent.ACTION_VIEW, COMMUNITY_DETAILS_URI.toUri()).apply {
+            putExtra(COMMUNITY_ID_ARG, communityId)
+            putExtra(COMMUNITY_TYPE_ARG, communityType)
+        }
+        requireActivity().startActivity(intent)
+    }
+
+    private fun updatePostLike(
+        model: PostModel,
+        communityId: String,
+        communityType: CommunitiesTypeTag
+    ) {
+        if (model.postId.isBlank()) return
+        model.likedByMe = !model.likedByMe
+        model.likesCount = (model.likesCount + if (model.likedByMe) 1 else -1).coerceAtLeast(0)
+        for (item in recyclerItems) {
+            if (item is PostDelegateItem) {
+                val content = item.content() as PostModel
+                if (content.postId == model.postId) {
+                    mainAdapter.notifyItemChanged(recyclerItems.indexOf(item))
+                    break
+                }
+            }
+        }
+        store.sendIntent(
+            CommunityMainIntent.TogglePostLike(
+                communityId = communityId,
+                postId = model.postId,
+                communityType = communityType
+            )
+        )
+    }
+
+    private fun updatePostViews(
+        communityId: String,
+        postId: String,
+        communityType: CommunitiesTypeTag
+    ) {
+        if (postId.isBlank() || !viewedPostIds.add(postId)) return
+        store.sendIntent(
+            CommunityMainIntent.MarkPostViewed(
+                communityId = communityId,
+                postId = postId,
+                communityType = communityType
+            )
+        )
+    }
+
+    private fun showComments(
+        communityId: String,
+        postId: String,
+        communityType: CommunitiesTypeTag
+    ) {
+        if (postId.isBlank()) return
+        val sheet = PostCommentsBottomSheet.newInstance(communityId, postId, communityType)
+        sheet.onCommentAdded = {
+            for (item in recyclerItems) {
+                if (item is PostDelegateItem) {
+                    val content = item.content() as PostModel
+                    if (content.postId == postId) {
+                        content.commentsCount += 1
+                        mainAdapter.notifyItemChanged(recyclerItems.indexOf(item))
+                        break
+                    }
+                }
+            }
+        }
+        activity?.supportFragmentManager?.let { sheet.show(it, POST_COMMENTS_BOTTOM_SHEET) }
     }
 
     override fun onDestroy() {
@@ -196,9 +336,13 @@ class CommunityMainFragment : MviBaseFragment<
         _binding = null
     }
 
-    companion object{
+    companion object {
         const val ACTIVITY_WITH_DETAILS_URI = "app://community/list"
+        const val FRIENDS_URI = "app://profile/friends"
+        const val COMMUNITY_DETAILS_URI = "app://community/community_details"
         const val INTENT_TYPE_TAG = "CommunitiesTypeTag"
+        const val COMMUNITY_ID_ARG = "CommunityIdArg"
+        const val COMMUNITY_TYPE_ARG = "CommunityTypeArg"
+        const val POST_COMMENTS_BOTTOM_SHEET = "PostCommentsBottomSheet"
     }
-
 }

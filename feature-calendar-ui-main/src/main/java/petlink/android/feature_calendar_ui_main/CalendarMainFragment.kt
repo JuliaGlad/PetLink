@@ -158,7 +158,10 @@ class CalendarMainFragment : MviBaseFragment<
 
             }
             CalendarMainEffect.OpenHistoryFragment -> startActivity("app://calendar/history")
-            CalendarMainEffect.NavigateToAddCalendarEvent -> startActivity("app://calendar/add_event")
+            CalendarMainEffect.NavigateToAddCalendarEvent -> {
+                val intent = Intent(Intent.ACTION_VIEW, "app://calendar/add_event".toUri())
+                addEventActivityResultLauncher.launch(intent)
+            }
         }
     }
 

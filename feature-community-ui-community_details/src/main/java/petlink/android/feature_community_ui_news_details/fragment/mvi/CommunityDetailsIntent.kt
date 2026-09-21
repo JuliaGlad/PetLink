@@ -25,4 +25,24 @@ sealed interface CommunityDetailsIntent : MviIntent {
 
     class Unsubscribe(val communityTypeTag: CommunitiesTypeTag, val id: String) :
         CommunityDetailsIntent
+
+    class CreatePost(
+        val communityId: String,
+        val title: String,
+        val description: String,
+        val photos: List<String>,
+        val communityTypeTag: CommunitiesTypeTag
+    ) : CommunityDetailsIntent
+
+    class TogglePostLike(
+        val postId: String,
+        val communityTypeTag: CommunitiesTypeTag
+    ) : CommunityDetailsIntent
+
+    class MarkPostViewed(
+        val postId: String,
+        val communityTypeTag: CommunitiesTypeTag
+    ) : CommunityDetailsIntent
+
+    class CommentAdded(val postId: String) : CommunityDetailsIntent
 }

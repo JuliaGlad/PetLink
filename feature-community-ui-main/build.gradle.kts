@@ -45,6 +45,7 @@ dependencies {
     implementation(project(":feature-community-domain"))
     implementation(project(":core-data"))
     implementation(project(":feature-community-ui-communities_list"))
+    implementation(project(":feature-community-ui-community_details"))
     implementation(libs.cicerone)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)

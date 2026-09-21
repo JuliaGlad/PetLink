@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import petlink.android.core_ui.databinding.RecyclerItemCalendarEventBinding
+import petlink.android.core_ui.playPressAnimation
 
 class CalendarEventAdapter : ListAdapter<
         CalendarEventModel,
@@ -40,7 +41,12 @@ class CalendarEventAdapter : ListAdapter<
                 eventDateText = "${model.time} ${model.eventDate}"
                 eventTheme = model.theme
                 isNotificationOn = model.isNotificationOn
-                model.clickListener?.let { setOnClickListener { it() }}
+                model.clickListener?.let { click ->
+                    setOnClickListener {
+                        playPressAnimation()
+                        click()
+                    }
+                }
             }
         }
     }

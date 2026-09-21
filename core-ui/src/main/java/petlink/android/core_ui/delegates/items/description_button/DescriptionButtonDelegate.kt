@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import petlink.android.core_ui.databinding.DelegateDescriptionButtonBinding
 import petlink.android.core_ui.delegates.main.AdapterDelegate
 import petlink.android.core_ui.delegates.main.DelegateItem
+import petlink.android.core_ui.playPressAnimation
 
 class DescriptionButtonDelegate : AdapterDelegate {
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
@@ -36,7 +37,10 @@ class DescriptionButtonDelegate : AdapterDelegate {
                 icon = model.icon
                 descriptionText = model.description
                 titleText = model.title
-                setOnClickListener { model.click() }
+                setOnClickListener {
+                    playPressAnimation()
+                    model.click()
+                }
             }
         }
     }

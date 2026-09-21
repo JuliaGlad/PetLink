@@ -11,18 +11,15 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.viewModels
-import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.android.material.snackbar.Snackbar
 import org.json.JSONArray
 import petlink.android.core_di.app.AppComponentHolder
 import petlink.android.core_di.profile.component.DaggerProfileComponent
 import petlink.android.core_mvi.MviBaseFragment
 import petlink.android.core_mvi.MviStore
+import petlink.android.core_ui.image_picker.ImagePickerHelper
 import petlink.android.core_ui.custom_view.LayoutAlignment
 import petlink.android.core_ui.delegates.items.autocomple_text_view.AutoCompleteTextDelegate
 import petlink.android.core_ui.delegates.items.autocomple_text_view.AutoCompleteTextDelegateItem
@@ -80,7 +77,7 @@ class EditFragment : MviBaseFragment<
     private var _binding: FragmentEditBinding? = null
     private val binding: FragmentEditBinding get() = _binding!!
 
-    private lateinit var photoPickerActivityResultLauncher: ActivityResultLauncher<Intent>
+    private val imagePicker = ImagePickerHelper(this)
     private val mainAdapter: MainAdapter = MainAdapter()
 
     @Inject
@@ -96,42 +93,33 @@ class EditFragment : MviBaseFragment<
         super.onCreate(savedInstanceState)
         val profileComponent = DaggerProfileComponent.factory().create(AppComponentHolder.appComponent)
         DaggerEditProfileComponent.factory().create(profileComponent).inject(this)
-        photoPickerActivityResultLauncher = initPhotoPickerActivityResultLauncher()
     }
 
-    private fun initPhotoPickerActivityResultLauncher() =
-        registerForActivityResult<Intent, ActivityResult>(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val uri = result.data?.data.toString()
-                for (i in recyclerItems) {
-                    if (i is AvatarDelegateItem) {
-                        val content = i.content() as AvatarModel
-                        if (content.isUpdating == true) {
-                            with(content) {
-                                this.uri = uri
-                                isUpdating = false
-                                if (id == PET_AVATAR_ID) updatedUser.petFullModel.petImageUri = uri
-                                else if (id == OWNER_AVATAR_ID) updatedUser.ownerFullModel.ownerImageUri =
-                                    uri
-                            }
-                        }
-                        mainAdapter.notifyItemChanged(recyclerItems.indexOf(i))
-                        break
+    private fun applyPickedAvatar(uri: String) {
+        for (i in recyclerItems) {
+            if (i is AvatarDelegateItem) {
+                val content = i.content() as AvatarModel
+                if (content.isUpdating == true) {
+                    with(content) {
+                        this.uri = uri
+                        isUpdating = false
+                        if (id == PET_AVATAR_ID) updatedUser.petFullModel.petImageUri = uri
+                        else if (id == OWNER_AVATAR_ID) updatedUser.ownerFullModel.ownerImageUri =
+                            uri
                     }
                 }
+                mainAdapter.notifyItemChanged(recyclerItems.indexOf(i))
+                break
             }
         }
+    }
 
-    private fun initImagePicker() {
-        ImagePicker.with(this)
-            .crop()
-            .compress(512)
-            .maxResultSize(512, 512)
-            .createIntent { intent ->
-                photoPickerActivityResultLauncher.launch(intent)
+    private fun pickAvatar() {
+        imagePicker.ensurePermissions {
+            imagePicker.pick(cropWidth = 1f, cropHeight = 1f) { uri ->
+                applyPickedAvatar(uri.toString())
             }
+        }
     }
 
     override fun onCreateView(
@@ -574,7 +562,7 @@ class EditFragment : MviBaseFragment<
                 activity?.finish()
             }
 
-            is EditProfileEffect.LaunchImagePicker -> initImagePicker()
+            is EditProfileEffect.LaunchImagePicker -> pickAvatar()
             is EditProfileEffect.ShowDataPickerDialog -> {
                 showDialog { date ->
                     updateDateTextInputLayout(effect.itemId, date, mainAdapter)

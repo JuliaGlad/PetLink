@@ -23,7 +23,6 @@
     <string name="update">Обновить</string>
     <string name="this_field_cannot_be_empty">Это поле не может быть пустым!</string>
     <string name="calendar">Календарь</string>
-    <string name="map">Карта</string>
     <string name="profile">Профиль</string>
     <string name="useful">Полезный</string>
     <string name="news">Новости</string>
@@ -44,6 +43,7 @@
     <string name="my_groups">Мои сообщества</string>
     <string name="owner">Владелец</string>
     <string name="not_subscribed_to_any_news_groups_yet">Пока что вы не подписаны на новостные сообщества!</string>
+    <string name="no_such_groups_yet">Пока что нет таких групп</string>
     <string name="search">Поиск…</string>
     <string name="nothing_found_for_query">По запросу ничего не найдено:</string>
     <string name="about_group">О сообществе</string>
@@ -56,6 +56,13 @@
     <string name="title">Название</string>
     <string name="post_creation">Создание поста</string>
     <string name="post_description">Описание поста</string>
+    <string name="post_text">Текст поста</string>
+    <string name="description_optional">Описание (дополнительно)</string>
+    <string name="question_creation">Создание вопроса</string>
+    <string name="question_text">Вопрос</string>
+    <string name="describe_your_question">Подробно опишите ваш вопрос</string>
+    <string name="create_question">Задать вопрос</string>
+    <string name="create_question_submit">Создать вопрос</string>
     <string name="load_picture">Загрузить изображение</string>
     <string name="owners">Авторы</string>
     <string name="admin">Админ</string>
@@ -77,14 +84,24 @@
     <string name="my_chats">Мои чаты</string>
     <string name="you_dont_have_any_chats_yet">Пока что вы не являетесь участником чата!</string>
     <string name="reply">Ответить</string>
+    <string name="reply_to_user">Ответ: %1$s</string>
+    <string name="back">Назад</string>
     <string name="reaction">Реакция</string>
     <string name="delete">Удалить</string>
     <string name="join">Присоединиться</string>
     <string name="leave_chat">Выйти из чата</string>
     <string name="other_people">Другие пользователи</string>
-    <string name="you_dont_have_friends_yet">У вас пока что нет друзей!</string>
+    <string name="you_dont_have_friends_yet">У вас пока что нет друзей</string>
     <string name="add_friend">Добавить в друзья</string>
     <string name="frinds">В друзьях</string>
+    <string name="no_such_users_yet">Пока что нет таких пользователей</string>
+    <string name="are_you_sure_you_want_to_delete_user_from_friends">Вы точно хотите удалить %1$s из друзей</string>
+    <plurals name="friends_count">
+        <item quantity="one">%d друг</item>
+        <item quantity="few">%d друга</item>
+        <item quantity="many">%d друзей</item>
+        <item quantity="other">%d друзей</item>
+    </plurals>
     <string name="care_calendar">Календарь ухода</string>
     <string name="monday">Понедельник</string>
     <string name="tuesday">Вторник</string>
@@ -99,6 +116,7 @@
     <string name="birthday">День рождения</string>
     <string name="events_history">История событий</string>
     <string name="you_dont_have_any_events_yet">У вас пока что нет событий</string>
+    <string name="there_are_no_posts_yet">Пока что нет постов</string>
     <string name="date">Дата</string>
     <string name="change_date">Сменить дату</string>
     <string name="change_time">Сменить время</string>
@@ -112,8 +130,6 @@
     <string name="notification_souns">Звук уведомления</string>
     <string name="event_details">Детали события</string>
     <string name="all">Все</string>
-    <string name="my_marks">Мои метки</string>
-    <string name="google_marks">Google-метки</string>
     <string name="email">Почта</string>
     <string name="password">Пароль</string>
     <string name="sign_in">Войти</string>
@@ -183,6 +199,7 @@
     <string name="are_you_sure_you_want_to_delete_this_event">Вы уверены, что хотите удалить это событие? Его нельзя будет восстановить</string>
     <string name="are_you_sure_you_want_to_delete_your_account">Вы уверены что хотите удалить свой аккаунт? Это действие нельзя будет отменить</string>
     <string name="add">Добавить</string>
+    <string name="image_permission_denied">Чтобы сделать или выбрать фото, нужно разрешение</string>
     <string-array name="pet_types">
         <item>Кошка</item>
         <item>Собака</item>

@@ -25,18 +25,15 @@ class DeleteCommunityViewModel @Inject constructor(
         }
     }
 
-    private val _deletedCommunity: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val deleteCommunity: StateFlow<Boolean> = _deletedCommunity.asStateFlow()
+    private val _deletedCommunity: MutableStateFlow<Boolean?> = MutableStateFlow(null)
+    val deleteCommunity: StateFlow<Boolean?> = _deletedCommunity.asStateFlow()
 
     fun deleteCommunity(communityType: CommunitiesTypeTag, communityId: String){
         viewModelScope.launch {
             runCatching {
-                when(communityType){
-                    CommunitiesTypeTag.NewsTag -> deleteNewsCommunityUseCase.invoke(communityId)
-                    CommunitiesTypeTag.PhotosTag -> TODO()
-                    CommunitiesTypeTag.QuestionTag -> TODO()
-                }
+                deleteNewsCommunityUseCase.invoke(communityId, communityType)
             }.onSuccess { _deletedCommunity.emit(true) }
+                .onFailure { _deletedCommunity.emit(false) }
         }
     }
 }

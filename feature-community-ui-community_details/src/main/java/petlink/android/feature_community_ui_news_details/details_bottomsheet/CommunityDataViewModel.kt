@@ -24,8 +24,8 @@ class CommunityDataViewModel @Inject constructor(
         }
     }
 
-    private val _updated : MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val updated = _updated.asStateFlow()
+    private val _updateResult: MutableStateFlow<Boolean?> = MutableStateFlow(null)
+    val updateResult = _updateResult.asStateFlow()
 
     fun updateCommunity(
         communityType: CommunitiesTypeTag,
@@ -35,16 +35,14 @@ class CommunityDataViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             runCatching {
-                when(communityType){
-                    CommunitiesTypeTag.NewsTag -> updateNewsCommunityUseCase.invoke(
-                        communityId,
-                        newTitle = newTitle,
-                        newDescription = newDescription
-                    )
-                    CommunitiesTypeTag.PhotosTag -> TODO()
-                    CommunitiesTypeTag.QuestionTag -> TODO()
-                }
-            }.onSuccess { _updated.emit(true) }
+                updateNewsCommunityUseCase.invoke(
+                    communityId,
+                    newTitle = newTitle,
+                    newDescription = newDescription,
+                    type = communityType
+                )
+            }.onSuccess { _updateResult.emit(true) }
+                .onFailure { _updateResult.emit(false) }
         }
     }
 }

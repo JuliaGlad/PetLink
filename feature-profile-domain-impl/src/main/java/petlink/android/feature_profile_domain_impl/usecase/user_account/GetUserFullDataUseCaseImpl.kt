@@ -9,4 +9,7 @@ class GetUserFullDataUseCaseImpl @Inject constructor(
     private val repository: UserAccountRepository
 ): GetUserFullDataUseCase {
     override suspend fun invoke(): UserDomain = repository.getUserData()!!
+
+    override suspend fun invoke(userId: String): UserDomain =
+        repository.getUserData(userId) ?: error("User not found")
 }

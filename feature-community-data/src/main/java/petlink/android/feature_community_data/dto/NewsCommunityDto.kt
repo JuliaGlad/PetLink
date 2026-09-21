@@ -10,5 +10,6 @@ class NewsCommunityDto(
     val description: String,
     val avatar: String,
     val role: RoleInCommunityTag,
-    val background: String
+    val background: String,
+    val communityType: String = "news"
 )

@@ -1,20 +1,24 @@
 package petlink.android.feature_community_ui_create_question_community
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 
 class CreateQuestionCommunityActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_create_question_community)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+        startActivity(
+            Intent(Intent.ACTION_VIEW, Uri.parse("app://community/create")).apply {
+                putExtra(COMMUNITY_TYPE_ARG, QUESTION)
+                flags = Intent.FLAG_ACTIVITY_FORWARD_RESULT
+            }
+        )
+        finish()
+    }
+
+    companion object {
+        private const val COMMUNITY_TYPE_ARG = "CommunityTypeArg"
+        private const val QUESTION = "question"
     }
 }

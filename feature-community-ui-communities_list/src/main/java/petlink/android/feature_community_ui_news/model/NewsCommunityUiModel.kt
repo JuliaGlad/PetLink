@@ -7,5 +7,6 @@ class NewsCommunityUiModel(
     val subscribers: List<String>,
     val title: String,
     val avatar: String,
-    val currentUserRole: RoleInCommunityTag
+    val currentUserRole: RoleInCommunityTag,
+    val description: String = ""
 )

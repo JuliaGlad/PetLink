@@ -16,7 +16,6 @@
     <string name="update">Обновить</string>
     <string name="this_field_cannot_be_empty">Это поле не может быть пустым!</string>
     <string name="calendar">Календарь</string>
-    <string name="map">Карта</string>
     <string name="profile">Профиль</string>
     <string name="useful">Полезный</string>
     <string name="news">Новости</string>
@@ -37,6 +36,7 @@
     <string name="my_groups">Мои сообщества</string>
     <string name="owner">Владелец</string>
     <string name="not_subscribed_to_any_news_groups_yet">Пока что вы не подписаны на новостные сообщества!</string>
+    <string name="no_such_groups_yet">Пока что нет таких групп</string>
     <string name="search">Поиск…</string>
     <string name="nothing_found_for_query">По запросу ничего не найдено:</string>
     <string name="about_group">О сообществе</string>
@@ -104,8 +104,6 @@
     <string name="notification_souns">Звук уведомления</string>
     <string name="event_details">Детали события</string>
     <string name="all">Все</string>
-    <string name="my_marks">Мои метки</string>
-    <string name="google_marks">Google-метки</string>
     <string name="email">Почта</string>
     <string name="password">Пароль</string>
     <string name="sign_in">Войти</string>

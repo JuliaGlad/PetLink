@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@drawable/bg_bottom_sheet"
     android:paddingHorizontal="24dp"
     android:paddingTop="16dp"
     android:paddingBottom="24dp">
@@ -59,9 +59,9 @@
                 android:id="@+id/title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/title"
-                android:textColor="@color/black"
-                android:textSize="16sp"
+            android:text="@string/title"
+            android:textColor="@color/black"
+            android:textSize="16sp"
                 android:fontFamily="@font/roboto_bold" />
 
             <com.google.android.material.textfield.TextInputLayout
@@ -86,9 +86,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="@string/description"
-                android:textColor="@color/black"
-                android:textSize="16sp"
+            android:text="@string/description"
+            android:textColor="@color/black"
+            android:textSize="16sp"
                 android:fontFamily="@font/roboto_bold" />
 
             <com.google.android.material.textfield.TextInputLayout

@@ -7,4 +7,10 @@
     android:layout_height="match_parent"
     tools:context=".FriendDetailsActivity">
 
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/friend_details_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:name="petlink.android.feature_community_friend_details.fragment.FriendDetailsFragment" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

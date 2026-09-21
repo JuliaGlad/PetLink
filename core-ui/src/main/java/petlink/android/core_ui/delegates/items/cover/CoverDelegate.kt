@@ -2,9 +2,9 @@ package petlink.android.core_ui.delegates.items.cover
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
+import petlink.android.core_ui.R
 import petlink.android.core_ui.databinding.DelegateCoverBinding
 import petlink.android.core_ui.delegates.main.AdapterDelegate
 import petlink.android.core_ui.delegates.main.DelegateItem
@@ -36,9 +36,9 @@ class CoverDelegate : AdapterDelegate {
         fun bind(model: CoverModel) {
             with(binding.coverView) {
                 if (model.uri.isNotEmpty()) {
-                    setImageURI(model.uri.toUri())
-                } else{
-                    setImageDrawable(model.drawable)
+                    setImageUri(model.uri.toUri(), R.drawable.add_cover)
+                } else {
+                    setDrawableImage(model.drawable ?: context.getDrawable(R.drawable.add_cover))
                 }
                 setOnClickListener { model.clickListener() }
             }

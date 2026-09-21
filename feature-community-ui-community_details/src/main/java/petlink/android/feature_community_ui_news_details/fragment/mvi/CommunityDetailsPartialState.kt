@@ -18,4 +18,19 @@ sealed interface CommunityDetailsPartialState: MviPartialState {
     class AvatarUpdated(val newUri: String): CommunityDetailsPartialState
 
     class BackgroundUpdated(val newUri: String): CommunityDetailsPartialState
+
+    class PostCreated(
+        val id: String,
+        val title: String,
+        val description: String,
+        val photos: List<String>
+    ) : CommunityDetailsPartialState
+
+    class PostUpdated(
+        val postId: String,
+        val likesCount: Int? = null,
+        val likedByMe: Boolean? = null,
+        val viewsCount: Int? = null,
+        val commentsCount: Int? = null
+    ) : CommunityDetailsPartialState
 }

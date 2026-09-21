@@ -28,6 +28,7 @@ import petlink.android.feature_calendar_ui_calendar_view.calendar_view.month_vie
 import petlink.android.feature_calendar_ui_calendar_view.calendar_view.month_view.recycler_view.CalendarDayModel
 import petlink.android.feature_calendar_ui_calendar_view.databinding.FragmentMonthViewBinding
 import java.util.Calendar
+import java.util.Locale
 import javax.inject.Inject
 
 class MonthViewFragment : MviBaseFragment<
@@ -170,13 +171,15 @@ class MonthViewFragment : MviBaseFragment<
                         calendar.get(Calendar.MONTH) == month - 1 &&
                         calendar.get(Calendar.DAY_OF_MONTH) == day
             }
+            val formattedDate = formatDate(year, month, day)
             result.add(
                 CalendarDayModel(
                     day = day.toString(),
+                    year = year,
+                    month = month,
                     events = dayEvents,
                     clickListener = {
-                        val date = "$year-$month-$day"
-                        store.sendEffect(MonthViewEffect.ShowDayBottomSheet(date))
+                        store.sendEffect(MonthViewEffect.ShowDayBottomSheet(formattedDate))
                     }
                 )
             )
@@ -184,9 +187,13 @@ class MonthViewFragment : MviBaseFragment<
         return result
     }
 
+    private fun formatDate(year: Int, month: Int, day: Int): String =
+        String.format(Locale.getDefault(), "%d-%02d-%02d", year, month, day)
+
     private fun addNewItemsToRecycler(date: String, items: List<CalendarEventWithTimestampUiModel>) {
         recyclerItems.forEach { item ->
-            if ("$year-$month-${item.day}" == date){
+            val itemDay = item.day.toIntOrNull() ?: return@forEach
+            if (formatDate(year, month, itemDay) == date) {
                 val previousItems = item.events
                 val newEventsList: MutableList<CalendarEventWithTimestampUiModel> = mutableListOf()
                 newEventsList.apply {
