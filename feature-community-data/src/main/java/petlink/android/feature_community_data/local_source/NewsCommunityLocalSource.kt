@@ -6,9 +6,9 @@ interface NewsCommunityLocalSource {
 
     suspend fun getNewsCommunity(): List<NewsCommunityDto>?
 
-    suspend fun addSubscriber(communityId: String)
+    suspend fun addSubscriber(communityId: String, userId: String)
 
-    suspend fun removeSubscriber(communityId: String)
+    suspend fun removeSubscriber(communityId: String, userId: String)
 
     suspend fun insertNewsCommunity(
         communityId: String,

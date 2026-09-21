@@ -9,5 +9,6 @@ fun NewsCommunityDto.toDomain() =
         subscribers = subscribers,
         title = title,
         avatar = avatar,
-        currentUsersRole = role
+        currentUsersRole = role,
+        description = description
     )

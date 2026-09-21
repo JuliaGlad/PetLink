@@ -39,13 +39,14 @@ android {
 
 dependencies {
     implementation(project(":core-ui"))
+    implementation(project(":feature-community-core"))
     implementation(project(":feature-community-ui-create_community"))
     implementation(project(":feature-community-ui-create_question_community"))
     implementation(project(":feature-community-ui-create_chat"))
     implementation(project(":feature-community-ui-create_photo_group"))
     implementation(project(":feature-community-ui-community_details"))
     implementation(project(":feature-community-ui-chat_details"))
-    implementation(project(":feature-community-friend_details"))
+    implementation(project(":feature-community-ui-friend_details"))
     implementation(project(":core-di"))
     implementation(project(":core-mvi"))
     implementation(project(":core-navigation"))

@@ -32,8 +32,15 @@ class AvatarDelegate : AdapterDelegate {
         RecyclerView.ViewHolder(binding.root) {
         fun bind(model: AvatarModel) {
             with(binding) {
-                if (!model.uri.isNullOrEmpty()) { model.uri?.let { image.setImageUri(it.toUri()) }
-                } else if (model.drawable != null) { image.setDrawableImage(model.drawable) }
+                when {
+                    !model.uri.isNullOrEmpty() -> model.uri?.let {
+                        image.setImageUri(it.toUri(), petlink.android.core_ui.R.drawable.add_image_icon)
+                    }
+                    model.drawable != null -> image.setDrawableImage(model.drawable)
+                    else -> image.setDrawableImage(
+                        itemView.context.getDrawable(petlink.android.core_ui.R.drawable.add_image_icon)
+                    )
+                }
                 model.clickListener?.let { image.setOnClickListener { it() } }
             }
         }

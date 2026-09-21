@@ -27,7 +27,6 @@
     <string name="this_field_cannot_be_empty">This field cannot be empty!</string>
     <string name="community">Community</string>
     <string name="calendar">Calendar</string>
-    <string name="map">Map</string>
     <string name="profile">Profile</string>
     <string name="useful">Useful</string>
     <string name="news">News</string>
@@ -45,6 +44,7 @@
     <string name="my_groups">My groups</string>
     <string name="owner">Owner</string>
     <string name="not_subscribed_to_any_news_groups_yet">You are not subscribed to any groups yet!</string>
+    <string name="no_such_groups_yet">There are no such groups yet</string>
     <string name="search">Search…</string>
     <string name="nothing_found_for_query">Nothing found for query:</string>
     <string name="about_group">About group</string>
@@ -110,8 +110,6 @@
     <string name="notification_souns">Notification sound</string>
     <string name="event_details">Event details</string>
     <string name="all">All</string>
-    <string name="my_marks">My marks</string>
-    <string name="google_marks">Google-marks</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="sign_in">Sign in</string>

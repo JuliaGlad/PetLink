@@ -2,7 +2,6 @@ package petlink.android.feature_profile_ui_create_account.fragment
 
 import android.app.Activity
 import android.app.DatePickerDialog
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.text.InputType
@@ -12,12 +11,8 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.viewModels
-import com.github.dhaval2404.imagepicker.ImagePicker
 import com.github.terrakok.cicerone.Router
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
@@ -28,6 +23,7 @@ import petlink.android.core_mvi.MviBaseFragment
 import petlink.android.core_mvi.MviStore
 import petlink.android.core_ui.R
 import petlink.android.core_ui.custom_view.LayoutAlignment
+import petlink.android.core_ui.image_picker.ImagePickerHelper
 import petlink.android.core_ui.delegates.items.autocomple_text_view.AutoCompleteTextDelegate
 import petlink.android.core_ui.delegates.items.autocomple_text_view.AutoCompleteTextDelegateItem
 import petlink.android.core_ui.delegates.items.autocomple_text_view.AutoCompleteTextModel
@@ -89,7 +85,7 @@ class CreateAccountFragment : MviBaseFragment<
     private var _binding: FragmentCreateAccountBinding? = null
     private val binding get() = _binding!!
 
-    private var photoPickerLauncher: ActivityResultLauncher<Intent>? = null
+    private val imagePicker = ImagePickerHelper(this)
     private val mainAdapter: MainAdapter by lazy { initMainAdapter() }
 
     private val screenArg: CreateAccountScreenArg? by lazy {
@@ -105,7 +101,6 @@ class CreateAccountFragment : MviBaseFragment<
         super.onCreate(savedInstanceState)
         val profileComponent = DaggerProfileComponent.factory().create(AppComponentHolder.appComponent)
         DaggerCreateAccountComponent.factory().create(profileComponent).inject(this)
-        photoPickerLauncher = initActivityResultLauncher()
     }
 
     override fun onCreateView(
@@ -180,7 +175,7 @@ class CreateAccountFragment : MviBaseFragment<
                 }
             }
 
-            CreateAccountEffect.LaunchImagePicker -> initImagePicker()
+            CreateAccountEffect.LaunchImagePicker -> pickAvatar()
             CreateAccountEffect.ShowDataDialog -> {
                 showDialog { date ->
                     updateDateTextInputLayout(date, mainAdapter)
@@ -538,39 +533,31 @@ class CreateAccountFragment : MviBaseFragment<
         datePickerDialog.show()
     }
 
-    private fun initActivityResultLauncher() = registerForActivityResult<Intent, ActivityResult>(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result: ActivityResult ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val photoResult = result.data
-            val currentActivityViewModel = (activity as CreateAccountActivity).viewModel
-            if (photoResult != null) {
-                val resultUri = photoResult.data.toString()
-                for (item in list) {
-                    if (item is AvatarDelegateItem) {
-                        val content = (item.content()) as AvatarModel
-                        with(content) {
-                            uri = resultUri
-                            drawable = null
-                        }
-                        mainAdapter.notifyItemChanged(list.indexOf(item))
-                    }
+    private fun applyPickedAvatar(resultUri: String) {
+        val currentActivityViewModel = (activity as CreateAccountActivity).viewModel
+        for (item in list) {
+            if (item is AvatarDelegateItem) {
+                val content = (item.content()) as AvatarModel
+                with(content) {
+                    uri = resultUri
+                    drawable = null
                 }
-                if (screenArg == CreateAccountScreenArg.PetDataArg) {
-                    currentActivityViewModel.petData.imageUri = resultUri
-                } else if (screenArg == CreateAccountScreenArg.OwnerDataArg) {
-                    currentActivityViewModel.ownerData.imageUri = resultUri
-                }
+                mainAdapter.notifyItemChanged(list.indexOf(item))
             }
+        }
+        if (screenArg == CreateAccountScreenArg.PetDataArg) {
+            currentActivityViewModel.petData.imageUri = resultUri
+        } else if (screenArg == CreateAccountScreenArg.OwnerDataArg) {
+            currentActivityViewModel.ownerData.imageUri = resultUri
         }
     }
 
-    private fun initImagePicker() {
-        ImagePicker.with(this)
-            .cropSquare()
-            .compress(512)
-            .maxResultSize(512, 512)
-            .createIntent { intent -> photoPickerLauncher?.launch(intent) }
+    private fun pickAvatar() {
+        imagePicker.ensurePermissions {
+            imagePicker.pick(cropWidth = 1f, cropHeight = 1f) { uri ->
+                applyPickedAvatar(uri.toString())
+            }
+        }
     }
 
     private fun getProgress(currentStep: Int, allSteps: Int) =

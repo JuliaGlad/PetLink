@@ -1,17 +1,21 @@
- package petlink.android.core_ui.custom_view.comment.reply
+package petlink.android.core_ui.custom_view.comment.reply
 
 import android.content.Context
 import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.content.withStyledAttributes
 import petlink.android.core_ui.R
-import petlink.android.core_ui.custom_view.comment.CommentView
+import petlink.android.core_ui.custom_view.comment.CommentView.Companion.HIGHLIGHT_PADDING
 import petlink.android.core_ui.custom_view.comment.CommentView.Companion.REPLY_PADDING
+import petlink.android.core_ui.custom_view.comment.PHOTO_HEIGHT_DP
+import petlink.android.core_ui.custom_view.comment.bindCommentPhotos
 import petlink.android.core_ui.custom_view.round_avatar.ShapeableImageView
 
 class CommentReplyView @JvmOverloads constructor(
@@ -29,19 +33,25 @@ class CommentReplyView @JvmOverloads constructor(
     private lateinit var likesIcon: ImageView
     private lateinit var repliesIcon: ImageView
     private lateinit var replyToTextView: TextView
+    private lateinit var photosScroll: HorizontalScrollView
 
     private var isLiked: Boolean = false
-    private var likesCount = -1
+    private var likesCount = 0
     private val replies: MutableList<CommentReplyView> = mutableListOf()
     private var replyTo = NONE
     private var name = NONE
     private var message = NONE
 
-    fun addReplies(replyView: CommentReplyView){
+    fun addReplies(replyView: CommentReplyView) {
         replies.add(replyView)
 
-        val verticalPadding = (REPLY_PADDING*resources.displayMetrics.density).toInt()
-        replyView.setPadding(0, verticalPadding, 0, 0)
+        val verticalPadding = (REPLY_PADDING * resources.displayMetrics.density).toInt()
+        replyView.setPadding(
+            replyView.paddingLeft,
+            maxOf(replyView.paddingTop, verticalPadding),
+            replyView.paddingRight,
+            replyView.paddingBottom
+        )
 
         addView(replyView)
         repliesTextView.text = replies.size.toString()
@@ -56,17 +66,14 @@ class CommentReplyView @JvmOverloads constructor(
     }
 
     fun setLikesCount(value: Int) {
-        if (value != likesCount) {
-            likesCount = value
-            likesTextView.text = value.toString()
-        }
+        likesCount = value
+        likesTextView.text = value.toString()
     }
 
     fun setMessage(value: String) {
-        if (value != message) {
-            message = value
-            messageTextView.text = value
-        }
+        message = value
+        messageTextView.text = value
+        messageTextView.visibility = if (value.isBlank()) GONE else VISIBLE
     }
 
     fun setName(value: String) {
@@ -76,15 +83,50 @@ class CommentReplyView @JvmOverloads constructor(
         }
     }
 
-    fun setReplyTo(value: String){
-        if (value != replyTo){
+    fun setOnLikeClick(listener: () -> Unit) {
+        likesIcon.setOnClickListener { listener() }
+    }
+
+    fun setOnReplyClick(listener: () -> Unit) {
+        repliesIcon.setOnClickListener { listener() }
+        repliesTextView.setOnClickListener { listener() }
+    }
+
+    fun setAvatar(uri: String) {
+        if (uri.isNotEmpty()) {
+            avatarView.setImageUri(android.net.Uri.parse(uri), R.drawable.avatar_owner_no_image)
+        }
+    }
+
+    fun setReplyTo(value: String) {
+        if (value != replyTo) {
             replyTo = value
             replyToTextView.text = value
         }
     }
 
+    fun setPhotos(photos: List<String>, onPhotoClick: ((String) -> Unit)? = null) {
+        photosScroll.bindCommentPhotos(photos, onPhotoClick)
+        requestLayout()
+    }
+
+    fun setHighlighted(highlighted: Boolean) {
+        val pad = if (highlighted) {
+            (HIGHLIGHT_PADDING * resources.displayMetrics.density).toInt()
+        } else {
+            0
+        }
+        setPadding(pad, pad, pad, pad)
+        background = if (highlighted) {
+            ContextCompat.getDrawable(context, R.drawable.bg_reply_highlight)
+        } else {
+            null
+        }
+    }
+
     init {
         LayoutInflater.from(context).inflate(R.layout.comment_reply_layout, this, true)
+        photosScroll = findViewById(R.id.comment_photos)
         context.withStyledAttributes(attributeSet, R.styleable.CommentView) {
             initNameTextView()
             initReplyToTextView()
@@ -94,6 +136,10 @@ class CommentReplyView @JvmOverloads constructor(
             initLikesIcon()
             initAvatarView()
             repliesIcon = findViewById(R.id.icon_reply)
+            likesIcon.isClickable = true
+            likesIcon.isFocusable = true
+            repliesIcon.isClickable = true
+            repliesIcon.isFocusable = true
             avatarView = findViewById(R.id.avatar_view)
         }
     }
@@ -108,10 +154,12 @@ class CommentReplyView @JvmOverloads constructor(
 
         val maxTextWidth =
             MeasureSpec.getSize(widthMeasureSpec) - paddingLeft - paddingRight - avatarView.measuredWidth - SPACING
-        val childMaxWidthSpec = MeasureSpec.makeMeasureSpec(maxTextWidth, MeasureSpec.AT_MOST)
+        val childMaxWidthSpec = MeasureSpec.makeMeasureSpec(maxTextWidth.coerceAtLeast(0), MeasureSpec.AT_MOST)
 
         nameTextView.measure(childMaxWidthSpec, heightMeasureSpec)
-        messageTextView.measure(childMaxWidthSpec, heightMeasureSpec)
+        if (messageTextView.visibility != GONE) {
+            messageTextView.measure(childMaxWidthSpec, heightMeasureSpec)
+        }
 
         val remainingWidth = maxTextWidth - nameTextView.measuredWidth - SPACING
         val replyToMaxWidthSpec = MeasureSpec.makeMeasureSpec(
@@ -119,6 +167,8 @@ class CommentReplyView @JvmOverloads constructor(
             MeasureSpec.AT_MOST
         )
         replyToTextView.measure(replyToMaxWidthSpec, heightMeasureSpec)
+
+        val photosHeight = measurePhotos(maxTextWidth, heightMeasureSpec)
 
         var repliesHeight = 0
         var repliesWidth = 0
@@ -128,18 +178,27 @@ class CommentReplyView @JvmOverloads constructor(
             repliesWidth = maxOf(repliesWidth, it.measuredWidth)
         }
 
+        val messageHeight = if (messageTextView.visibility != GONE) messageTextView.measuredHeight else 0
+        val messageWidth = if (messageTextView.visibility != GONE) messageTextView.measuredWidth else 0
+        val photosWidth = if (photosScroll.visibility != GONE) photosScroll.measuredWidth else 0
         var actualWidth = resolveSize(
             paddingLeft + paddingRight + avatarView.measuredWidth + maxOf(
-                nameTextView.measuredWidth+replyToTextView.measuredWidth+SPACING, messageTextView.measuredWidth
+                nameTextView.measuredWidth + replyToTextView.measuredWidth + SPACING,
+                messageWidth,
+                photosWidth
             ) + SPACING,
             widthMeasureSpec
         )
         if (repliesWidth > actualWidth) actualWidth = repliesWidth
+        val headerHeight = maxOf(nameTextView.measuredHeight, replyToTextView.measuredHeight)
+        val contentHeight = headerHeight + photosHeight +
+            (if (messageTextView.visibility != GONE) LINE_SPACING + messageHeight else 0) +
+            LINE_SPACING + likesIcon.measuredHeight
         val actualHeight = resolveSize(
             paddingTop + paddingBottom + maxOf(
                 avatarView.measuredHeight,
-                maxOf(nameTextView.measuredHeight, replyToTextView.measuredHeight) + messageTextView.measuredHeight
-            ) + likesIcon.measuredHeight + repliesHeight + LINE_SPACING,
+                contentHeight
+            ) + repliesHeight,
             heightMeasureSpec
         )
         setMeasuredDimension(actualWidth, actualHeight)
@@ -166,36 +225,48 @@ class CommentReplyView @JvmOverloads constructor(
         val replyToBottom = paddingTop + replyToTextView.measuredHeight
         replyToTextView.layout(replyToLeft, paddingTop, replyToRight, replyToBottom)
 
-        val messageLeft = avatarRight + SPACING
-        val messageRight = messageLeft + messageTextView.measuredWidth
-        val messageTop = nameBottom + LINE_SPACING
-        val messageBottom = messageTop + messageTextView.measuredHeight
-        messageTextView.layout(messageLeft, messageTop, messageRight, messageBottom)
+        var contentBottom = maxOf(nameBottom, replyToBottom)
+        if (photosScroll.visibility != GONE) {
+            val photosTop = contentBottom + LINE_SPACING
+            val photosBottom = photosTop + photosScroll.measuredHeight
+            val photosRight = nameLeft + photosScroll.measuredWidth
+            photosScroll.layout(nameLeft, photosTop, photosRight, photosBottom)
+            contentBottom = photosBottom
+        }
+
+        if (messageTextView.visibility != GONE) {
+            val messageLeft = avatarRight + SPACING
+            val messageRight = messageLeft + messageTextView.measuredWidth
+            val messageTop = contentBottom + LINE_SPACING
+            val messageBottom = messageTop + messageTextView.measuredHeight
+            messageTextView.layout(messageLeft, messageTop, messageRight, messageBottom)
+            contentBottom = messageBottom
+        }
 
         val likeIconLeft = avatarRight + SPACING
         val likeIconRight = likeIconLeft + likesIcon.measuredWidth
-        val likeIconTop = messageBottom + LINE_SPACING
+        val likeIconTop = contentBottom + LINE_SPACING
         val likeIconBottom = likeIconTop + likesIcon.measuredHeight
         likesIcon.layout(likeIconLeft, likeIconTop, likeIconRight, likeIconBottom)
 
         val likesTextLeft = likeIconRight + ICON_SPACING
         val likesTextRight = likesTextLeft + likesTextView.measuredWidth
         val likesTextTop =
-            messageBottom + LINE_SPACING + (likesIcon.measuredHeight - likesTextView.measuredHeight) / 2
+            likeIconTop + (likesIcon.measuredHeight - likesTextView.measuredHeight) / 2
         val likesTextBottom = likesTextTop + likesTextView.measuredHeight
         likesTextView.layout(likesTextLeft, likesTextTop, likesTextRight, likesTextBottom)
 
         val repliesIconLeft = likesTextRight + COUNTERS_SPACING
         val repliesIconRight = repliesIconLeft + repliesIcon.measuredWidth
-        val repliesIconTop = messageBottom + LINE_SPACING
+        val repliesIconTop = likeIconTop
         val repliesIconBottom = repliesIconTop + repliesIcon.measuredHeight
         repliesIcon.layout(repliesIconLeft, repliesIconTop, repliesIconRight, repliesIconBottom)
 
         val repliesTextLeft = repliesIconRight + ICON_SPACING
         val repliesTextRight = repliesTextLeft + repliesTextView.measuredWidth
         val repliesTextTop =
-            messageBottom + LINE_SPACING + (repliesIcon.measuredHeight - repliesTextView.measuredHeight) / 2
-        val repliesTextBottom = repliesTextTop + repliesIcon.measuredHeight
+            likeIconTop + (repliesIcon.measuredHeight - repliesTextView.measuredHeight) / 2
+        val repliesTextBottom = repliesTextTop + repliesTextView.measuredHeight
         repliesTextView.layout(repliesTextLeft, repliesTextTop, repliesTextRight, repliesTextBottom)
 
         var prevReplyHeight = likeIconBottom
@@ -212,6 +283,16 @@ class CommentReplyView @JvmOverloads constructor(
         return MarginLayoutParams(context, attrs)
     }
 
+    private fun measurePhotos(maxWidth: Int, heightMeasureSpec: Int): Int {
+        if (photosScroll.visibility == GONE) return 0
+        val photosWidthSpec = MeasureSpec.makeMeasureSpec(maxWidth.coerceAtLeast(0), MeasureSpec.EXACTLY)
+        val photosHeightSpec = MeasureSpec.makeMeasureSpec(
+            (PHOTO_HEIGHT_DP * resources.displayMetrics.density).toInt(),
+            MeasureSpec.EXACTLY
+        )
+        photosScroll.measure(photosWidthSpec, photosHeightSpec)
+        return photosScroll.measuredHeight + LINE_SPACING
+    }
 
     private fun TypedArray.initReplyToTextView() {
         replyTo = getString(R.styleable.CommentView_replyTo) ?: NONE
@@ -219,14 +300,13 @@ class CommentReplyView @JvmOverloads constructor(
         replyToTextView.text = replyTo
     }
 
-
     private fun TypedArray.initRepliesTextView() {
         repliesTextView = findViewById(R.id.replies_count)
         repliesTextView.text = replies.size.toString()
     }
 
     private fun TypedArray.initLikesTextView() {
-        likesCount = getInt(R.styleable.CommentView_likes_count, -1)
+        likesCount = getInt(R.styleable.CommentView_likes_count, 0)
         likesTextView = findViewById(R.id.likes_count)
         likesTextView.text = likesCount.toString()
     }
@@ -258,7 +338,6 @@ class CommentReplyView @JvmOverloads constructor(
         likesIcon = findViewById(R.id.icon_like)
         checkIsLiked(isLiked)
     }
-
 
     private fun checkIsLiked(value: Boolean) {
         val likeDrawable = if (value) R.drawable.ic_like_fill

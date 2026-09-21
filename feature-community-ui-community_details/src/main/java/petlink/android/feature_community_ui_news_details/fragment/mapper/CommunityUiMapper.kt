@@ -8,6 +8,7 @@ fun NewsCommunityFullDomainModel.toUi() = CommunityUiModel(
     title = title,
     description = description,
     subscribersCount = subscribers.size,
+    subscriberIds = subscribers,
     role = role,
     avatar = avatar,
     background = background,

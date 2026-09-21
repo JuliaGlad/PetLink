@@ -9,7 +9,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_arrow_back"
-        android:background="@color/transparent"
+        android:background="@drawable/ripple_round"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="4dp"
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -21,12 +24,24 @@
         android:layout_height="0dp"
         android:layout_marginBottom="20dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:layoutAnimation="@anim/layout_animation_list"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/next_button"
         app:layout_constraintVertical_bias="0.0" />
+
+    <include
+        android:id="@+id/loading_screen"
+        layout="@layout/loading_screen"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/next_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/arrow_back" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/next_button"
@@ -43,7 +58,7 @@
 
     <ProgressBar
         android:id="@+id/loader"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         android:indeterminateTint="@color/white"
         android:translationZ="2dp"

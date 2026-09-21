@@ -10,13 +10,11 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
-import com.github.dhaval2404.imagepicker.ImagePicker
 import com.github.terrakok.cicerone.Router
 import com.google.android.material.tabs.TabLayout
 import petlink.android.core_di.app.AppComponentHolder
@@ -30,6 +28,12 @@ import petlink.android.core_ui.delegates.items.button_primary_variant.PrimaryBut
 import petlink.android.core_ui.delegates.items.description_button.DescriptionButtonDelegate
 import petlink.android.core_ui.delegates.items.description_button.DescriptionButtonDelegateItem
 import petlink.android.core_ui.delegates.items.description_button.DescriptionButtonModel
+import petlink.android.core_ui.delegates.items.empty_posts.EmptyPostsDelegate
+import petlink.android.core_ui.delegates.items.empty_posts.EmptyPostsDelegateItem
+import petlink.android.core_ui.delegates.items.empty_posts.EmptyPostsModel
+import petlink.android.core_ui.delegates.items.post.PostDelegate
+import petlink.android.core_ui.delegates.items.post.PostDelegateItem
+import petlink.android.core_ui.delegates.items.post.PostModel
 import petlink.android.core_ui.delegates.items.profile_avatars.ProfileAvatarsDelegate
 import petlink.android.core_ui.delegates.items.profile_avatars.ProfileAvatarsDelegateItem
 import petlink.android.core_ui.delegates.items.profile_avatars.ProfileAvatarsModel
@@ -39,9 +43,14 @@ import petlink.android.core_ui.delegates.items.tabs.TabItemModel
 import petlink.android.core_ui.delegates.items.tabs.TabModel
 import petlink.android.core_ui.delegates.main.DelegateItem
 import petlink.android.core_ui.delegates.main.MainAdapter
+import petlink.android.core_ui.image_picker.ImagePickerHelper
 import petlink.android.core_ui.R
+import petlink.android.core_ui.photo_preview.showPhotoPreview
+import petlink.android.feature_profile_domain.model.user_account.UserPostDomain
 import petlink.android.feature_profile_ui_main.MainProfileId
 import petlink.android.feature_profile_ui_main.OnFragmentInteractionListener
+import petlink.android.feature_community_ui_create_post.CreatePostActivity
+import petlink.android.feature_community_ui_create_post.comments.UserPostCommentsBottomSheet
 import petlink.android.feature_profile_ui_main.databinding.FragmentProfileBinding
 import petlink.android.feature_profile_ui_main.main_fragment.main.di.DaggerProfileMainComponent
 import petlink.android.feature_profile_ui_main.main_fragment.main.model.OwnerMainDataUi
@@ -65,14 +74,17 @@ class ProfileFragment : MviBaseFragment<
 
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
-    private var addCoverImageLauncher: ActivityResultLauncher<Intent>? = null
+    private val imagePicker = ImagePickerHelper(this)
     private val mainAdapter: MainAdapter = MainAdapter()
     private val items: MutableList<DelegateItem> = mutableListOf()
+    private var isPostsTab = false
+    private val viewedPostIds = mutableSetOf<String>()
 
     private var listener: OnFragmentInteractionListener? = null
 
     private lateinit var editProfileActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var settingsActivityResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var createPostLauncher: ActivityResultLauncher<Intent>
 
     @Inject
     lateinit var localDI: ProfileLocalDI
@@ -97,9 +109,9 @@ class ProfileFragment : MviBaseFragment<
         super.onCreate(savedInstanceState)
         val profileComponent = DaggerProfileComponent.factory().create(AppComponentHolder.appComponent)
         DaggerProfileMainComponent.factory().create(profileComponent).inject(this)
-        addCoverImageLauncher = initCoverImageLauncher()
         editProfileActivityResultLauncher = initEditProfileImageLauncher()
         settingsActivityResultLauncher = initSettingLauncher()
+        createPostLauncher = initCreatePostLauncher()
     }
 
     private fun initSettingLauncher(): ActivityResultLauncher<Intent> = registerForActivityResult(
@@ -142,31 +154,23 @@ class ProfileFragment : MviBaseFragment<
             property.set(receiver, newValue)
         }
     }
-    private fun initCoverImageLauncher() = registerForActivityResult<Intent, ActivityResult>(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result: ActivityResult ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val photoResult = result.data
-            if (photoResult != null) {
-                val uri = photoResult.data.toString()
-                store.sendIntent(ProfileIntent.UpdateBackground(uri))
-                for (i in items) {
-                    if (i is ProfileAvatarsDelegateItem) {
-                        val content = i.content() as ProfileAvatarsModel
-                        content.backgroundImage = uri
-                        mainAdapter.notifyItemChanged(items.indexOf(i))
-                    }
-                }
+    private fun applyCover(uri: String) {
+        store.sendIntent(ProfileIntent.UpdateBackground(uri))
+        for (i in items) {
+            if (i is ProfileAvatarsDelegateItem) {
+                val content = i.content() as ProfileAvatarsModel
+                content.backgroundImage = uri
+                mainAdapter.notifyItemChanged(items.indexOf(i))
             }
         }
     }
 
-    private fun initImagePicker() {
-        ImagePicker.with(this)
-            .crop(16f, 11f)
-            .compress(512)
-            .maxResultSize(512, 1024)
-            .createIntent { intent -> addCoverImageLauncher?.launch(intent) }
+    private fun pickCover() {
+        imagePicker.ensurePermissions {
+            imagePicker.pick(cropWidth = 16f, cropHeight = 11f, maxHeight = 1024) { uri ->
+                applyCover(uri.toString())
+            }
+        }
     }
 
     override fun onCreateView(
@@ -191,9 +195,12 @@ class ProfileFragment : MviBaseFragment<
                     errorScreen.root.visibility = GONE
                 }
                 with(state.value.data) {
-                    initMainAdapter()
-                    initRecycler(background, petData, ownerData)
+                    if (items.isEmpty()) {
+                        initMainAdapter()
+                        initRecycler(background, petData, ownerData)
+                    }
                 }
+                if (isPostsTab) showPosts(state.posts)
             }
             is LceState.Error -> {
                 with(binding) {
@@ -221,7 +228,8 @@ class ProfileFragment : MviBaseFragment<
             ProfileEffect.NavigateToSettings -> {
                 startActivityForResult(uri = "app://profile/settings", launcher = settingsActivityResultLauncher)
             }
-            ProfileEffect.ShowPosts -> showPosts()
+            ProfileEffect.ShowPosts -> showPosts(store.uiState.value.posts)
+            ProfileEffect.OpenCreatePost -> openCreatePost()
         }
     }
 
@@ -247,6 +255,8 @@ class ProfileFragment : MviBaseFragment<
             addDelegate(TabDelegate())
             addDelegate(DescriptionButtonDelegate())
             addDelegate(PrimaryButtonVariantDelegate())
+            addDelegate(PostDelegate())
+            addDelegate(EmptyPostsDelegate())
         }
     }
 
@@ -260,7 +270,7 @@ class ProfileFragment : MviBaseFragment<
                         ownerName = ownerData.ownerName,
                         ownerImage = ownerData.imageUri,
                         backgroundImage = background,
-                        addImageClickListener = { initImagePicker() }
+                        addImageClickListener = { pickCover() }
                     )
                 ),
                 TabDelegateItem(
@@ -278,8 +288,11 @@ class ProfileFragment : MviBaseFragment<
                         tabSelectedListener = object : TabLayout.OnTabSelectedListener {
                             override fun onTabSelected(tab: TabLayout.Tab?) {
                                 if (tab?.id == MANAGEMENT_ID) {
+                                    isPostsTab = false
                                     addManagementButtons()
                                 } else if (tab?.id == POSTS_ID) {
+                                    isPostsTab = true
+                                    store.sendIntent(ProfileIntent.LoadUserPosts)
                                     store.sendEffect(ProfileEffect.ShowPosts)
                                 }
                             }
@@ -297,7 +310,7 @@ class ProfileFragment : MviBaseFragment<
             ))
         items.addAll(getManagementButtons())
         binding.recyclerView.adapter = mainAdapter
-        mainAdapter.submitList(items)
+        mainAdapter.submitList(items.toList())
     }
 
     private fun getManagementButtons() = listOf<DelegateItem>(
@@ -364,45 +377,109 @@ class ProfileFragment : MviBaseFragment<
     )
 
     private fun addManagementButtons() {
-        val newItems = getManagementButtons()
-        val itemsToRemove = mutableListOf<DelegateItem>()
-        var startRemoveIndex: Int = -1
-        for (delegate in items) {
-            if (delegate is PrimaryButtonVariantDelegateItem) {
-                if (startRemoveIndex == -1) startRemoveIndex = items.indexOf(delegate)
-                itemsToRemove.add(delegate)
-            } else if (items.indexOf(delegate) > startRemoveIndex && startRemoveIndex != -1) {
-                itemsToRemove.add(delegate)
-            }
-        }
-        items.removeAll(itemsToRemove)
-        mainAdapter.notifyItemRangeRemoved(startRemoveIndex, itemsToRemove.size)
-        items.addAll(newItems)
-        mainAdapter.notifyItemRangeInserted(startRemoveIndex, newItems.size)
+        replaceTabContent(getManagementButtons())
     }
 
-    private fun showPosts() {
-        //Add posts in params, THIS method after getting post from db
-        val newItems = listOf<DelegateItem>(
-            PrimaryButtonVariantDelegateItem(
-                PrimaryButtonVariantModel(
-                    title = getString(R.string.create),
-                    click = { TODO("Navigate to Post creation") }
-                )
+    private fun showPosts(posts: List<UserPostDomain>) {
+        val createButton = PrimaryButtonVariantDelegateItem(
+            PrimaryButtonVariantModel(
+                title = getString(R.string.create_post),
+                click = { store.sendEffect(ProfileEffect.OpenCreatePost) }
             )
         )
-        val itemsToRemove = mutableListOf<DelegateItem>()
-        var startRemoveIndex: Int = -1
-        for (delegate in items) {
-            if (delegate is DescriptionButtonDelegateItem) {
-                if (startRemoveIndex == -1) startRemoveIndex = items.indexOf(delegate)
-                itemsToRemove.add(delegate)
+        val content = if (posts.isEmpty()) {
+            listOf(
+                createButton,
+                EmptyPostsDelegateItem(
+                    EmptyPostsModel(text = getString(R.string.there_are_no_posts_yet))
+                )
+            )
+        } else {
+            listOf(createButton) + posts.map { post -> getPostDelegateItem(post) }
+        }
+        replaceTabContent(content)
+    }
+
+    private fun replaceTabContent(newItems: List<DelegateItem>) {
+        val startIndex = TAB_CONTENT_START_INDEX
+        if (items.size > startIndex) {
+            items.subList(startIndex, items.size).clear()
+        }
+        items.addAll(newItems)
+        mainAdapter.submitList(items.toList())
+    }
+
+    private fun getPostDelegateItem(post: UserPostDomain): PostDelegateItem {
+        val avatars = (items.firstOrNull() as? ProfileAvatarsDelegateItem)?.content() as? ProfileAvatarsModel
+        return PostDelegateItem(
+            PostModel(
+                postId = post.id,
+                title = post.title,
+                description = post.description,
+                photos = post.photos,
+                communityTitle = avatars?.ownerName.orEmpty(),
+                communityAvatar = avatars?.ownerImage.orEmpty(),
+                communityType = getString(R.string.posts),
+                likesCount = post.likesCount,
+                likedByMe = post.likedByMe,
+                commentsCount = post.commentsCount,
+                viewsCount = post.viewsCount,
+                onLikeClick = { item -> updatePostLike(item) },
+                onCommentClick = { item -> showComments(item.postId) },
+                onViewed = { item -> updatePostViews(item.postId) },
+                onPhotoClick = { uri -> showPhotoPreview(uri) }
+            )
+        )
+    }
+
+    private fun openCreatePost() {
+        val intent = Intent(Intent.ACTION_VIEW, CreatePostActivity.URI.toUri()).apply {
+            putExtra(CreatePostActivity.IS_USER_POST_ARG, true)
+        }
+        createPostLauncher.launch(intent)
+    }
+
+    private fun initCreatePostLauncher() = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            store.sendIntent(ProfileIntent.LoadUserPosts)
+        }
+    }
+
+    private fun updatePostLike(model: PostModel) {
+        if (model.postId.isBlank()) return
+        model.likedByMe = !model.likedByMe
+        model.likesCount = (model.likesCount + if (model.likedByMe) 1 else -1).coerceAtLeast(0)
+        store.uiState.value.posts.firstOrNull { it.id == model.postId }?.let { post ->
+            post.likedByMe = model.likedByMe
+            post.likesCount = model.likesCount
+        }
+        notifyPostChanged(model.postId)
+        store.sendIntent(ProfileIntent.TogglePostLike(model.postId))
+    }
+
+    private fun updatePostViews(postId: String) {
+        if (postId.isBlank() || !viewedPostIds.add(postId)) return
+        store.sendIntent(ProfileIntent.MarkPostViewed(postId))
+    }
+
+    private fun showComments(postId: String) {
+        if (postId.isBlank()) return
+        val sheet = UserPostCommentsBottomSheet.newInstance(userId = "", postId = postId)
+        sheet.onCommentAdded = {
+            store.sendIntent(ProfileIntent.CommentAdded(postId))
+        }
+        sheet.show(childFragmentManager, UserPostCommentsBottomSheet.TAG)
+    }
+
+    private fun notifyPostChanged(postId: String) {
+        items.forEachIndexed { index, item ->
+            if (item is PostDelegateItem && (item.content() as PostModel).postId == postId) {
+                mainAdapter.notifyItemChanged(index)
+                return
             }
         }
-        items.removeAll(itemsToRemove)
-        mainAdapter.notifyItemRangeRemoved(startRemoveIndex, itemsToRemove.size)
-        items.addAll(newItems)
-        mainAdapter.notifyItemRangeInserted(startRemoveIndex, newItems.size)
     }
 
     override fun onDestroy() {
@@ -413,6 +490,7 @@ class ProfileFragment : MviBaseFragment<
     companion object {
         const val POSTS_ID = 1
         const val MANAGEMENT_ID = 2
+        private const val TAB_CONTENT_START_INDEX = 2
         const val MY_DATA_BOTTOM_SHEET = "MyDataBottomSheetTAG"
         const val OWNER_IMAGE = "OwnerImageExtra"
         const val PET_IMAGE = "PetImageExtra"

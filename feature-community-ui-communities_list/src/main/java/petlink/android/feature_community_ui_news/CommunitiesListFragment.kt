@@ -19,6 +19,9 @@ import petlink.android.core_di.community.component.DaggerCommunityComponent
 import petlink.android.core_mvi.LceState
 import petlink.android.core_mvi.MviBaseFragment
 import petlink.android.core_mvi.MviStore
+import petlink.android.core_ui.delegates.items.empty_posts.EmptyPostsDelegate
+import petlink.android.core_ui.delegates.items.empty_posts.EmptyPostsDelegateItem
+import petlink.android.core_ui.delegates.items.empty_posts.EmptyPostsModel
 import petlink.android.core_ui.delegates.items.group_item.GroupDelegateItem
 import petlink.android.core_ui.delegates.items.group_item.GroupItemDelegate
 import petlink.android.core_ui.delegates.items.group_item.GroupItemModel
@@ -30,6 +33,9 @@ import petlink.android.core_ui.delegates.items.text.subtitle.SubtitleTextDelegat
 import petlink.android.core_ui.delegates.items.text.subtitle.SubtitleTextModel
 import petlink.android.core_ui.delegates.main.DelegateItem
 import petlink.android.core_ui.delegates.main.MainAdapter
+import petlink.android.feature_community_core.AllSocialTypeTag
+import petlink.android.feature_community_core.CommunitiesTypeTag
+import petlink.android.feature_community_core.RoleInCommunityTag
 import petlink.android.feature_community_ui_news.databinding.FragmentNewsBinding
 import petlink.android.feature_community_ui_news.di.DaggerNewsComponent
 import petlink.android.feature_community_ui_news.di.NewsLocalDi
@@ -40,7 +46,6 @@ import petlink.android.feature_community_ui_news.mvi.CommunitiesListIntent
 import petlink.android.feature_community_ui_news.mvi.CommunitiesListPartialState
 import petlink.android.feature_community_ui_news.mvi.CommunitiesListState
 import petlink.android.feature_community_ui_news.mvi.CommunitiesListStoreFactory
-import petlink.android.feature_community_ui_news.tag.CommunitiesTypeTag
 import javax.inject.Inject
 
 class CommunitiesListFragment : MviBaseFragment<
@@ -54,19 +59,21 @@ class CommunitiesListFragment : MviBaseFragment<
 
     private val mainAdapter = MainAdapter()
     private val recyclerItems: MutableList<DelegateItem> = mutableListOf()
+    private var adapterInitialized = false
 
     @Inject
     lateinit var localDi: NewsLocalDi
 
-    private val communityType: CommunitiesTypeTag? by lazy {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) activity?.intent?.getParcelableExtra<CommunitiesTypeTag>(
+    private val communityType: AllSocialTypeTag? by lazy {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) activity?.intent?.getParcelableExtra<AllSocialTypeTag>(
             INTENT_TYPE_TAG,
-            CommunitiesTypeTag::class.java
+            AllSocialTypeTag::class.java
         )
         else activity?.intent?.getParcelableExtra(INTENT_TYPE_TAG)
     }
 
     private lateinit var createCommunityLauncher: ActivityResultLauncher<Intent>
+    private lateinit var communityDetailsLauncher: ActivityResultLauncher<Intent>
 
     override val store: MviStore<CommunitiesListPartialState, CommunitiesListIntent, CommunitiesListState, CommunitiesListEffect>
             by viewModels { CommunitiesListStoreFactory(localDi.reducer, localDi.actor) }
@@ -77,31 +84,58 @@ class CommunitiesListFragment : MviBaseFragment<
         DaggerNewsComponent.factory().create(communityComponent).inject(this)
 
         createCommunityLauncher = initCreateCommunityLauncher()
+        communityDetailsLauncher = initCommunityDetailsLauncher()
     }
+
+    private fun initCommunityDetailsLauncher(): ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                communityType?.let {
+                    store.sendIntent(CommunitiesListIntent.GetCommunitiesListCommunities(it))
+                }
+            }
+        }
 
     private fun initCreateCommunityLauncher(): ActivityResultLauncher<Intent> =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
             if (result.resultCode == Activity.RESULT_OK && result.data != null) {
-                var index: Int = -2
+                var indexForInsert: Int = -1
+                var indexForDeletion: Int = -1
                 for (i in recyclerItems) {
-                    if (i is SubtitleTextDelegateItem) {
-                        val model = i.content() as SubtitleTextModel
-                        if (model.id == MY_GROUP_ID) {
-                            index = recyclerItems.indexOf(i)
+                    when(i){
+                        is SubtitleTextDelegateItem -> {
+                            val model = i.content() as SubtitleTextModel
+                            if (model.id == MY_GROUP_ID) {
+                                indexForInsert = recyclerItems.indexOf(i)
+                            }
+                        }
+                        is ExtraSmallTextDelegateItem -> {
+                            val model = i.content() as ExtraSmallTextModel
+                            if (model.id == NO_MY_GROUP_ID) {
+                                indexForDeletion = recyclerItems.indexOf(i)
+                            }
                         }
                     }
                 }
-                val data = result.data!!
-                val delegateItem =
-                    if (communityType !is CommunitiesTypeTag.FriendsTag) createGroupDelegateItem(
-                        data
-                    )
-                    else TODO("Create friends element")
+                if (indexForDeletion != -1){
+                    recyclerItems.remove(recyclerItems[indexForDeletion])
+                    mainAdapter.notifyItemRemoved(indexForDeletion)
+                }
+                val data = result.data
+                data?.let {
+                    val delegateItem =
+                        if (communityType !is AllSocialTypeTag.FriendsTag) createGroupDelegateItem(
+                            data
+                        )
+                        else TODO("Create friends element")
 
-                recyclerItems.add(index + 1, delegateItem)
-                mainAdapter.notifyItemInserted(index + 1)
+                    recyclerItems.add(indexForInsert + 1, delegateItem)
+                    mainAdapter.notifyItemInserted(indexForInsert + 1)
+                }
             }
         }
 
@@ -120,7 +154,7 @@ class CommunitiesListFragment : MviBaseFragment<
                     store.sendEffect(
                         CommunitiesListEffect.NavigateToCommunityDetailsFragment(
                             id,
-                            OWNER
+                            RoleInCommunityTag.Owner
                         )
                     )
                 }
@@ -146,26 +180,34 @@ class CommunitiesListFragment : MviBaseFragment<
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
+
     private fun initHeader() {
         binding.header.iconBack.setOnClickListener { store.sendEffect(CommunitiesListEffect.NavigateBack) }
         when (communityType) {
-            CommunitiesTypeTag.ChatsTag -> setHeaderText(
+            AllSocialTypeTag.ChatsTag -> setHeaderText(
                 titleText = getString(petlink.android.core_ui.R.string.my_chats),
                 createEffect = CommunitiesListEffect.NavigateToCreateChatFragment
             )
 
-            CommunitiesTypeTag.FriendsTag -> setHeaderText(titleText = getString(petlink.android.core_ui.R.string.my_friends))
-            CommunitiesTypeTag.NewsTag -> setHeaderText(
+            AllSocialTypeTag.FriendsTag -> {
+                setHeaderText(titleText = getString(petlink.android.core_ui.R.string.friends))
+                binding.header.createButton.visibility = GONE
+            }
+            AllSocialTypeTag.NewsTag -> setHeaderText(
                 titleText = getString(petlink.android.core_ui.R.string.news_group),
                 createEffect = CommunitiesListEffect.NavigateToCreateNewsCommunityFragment
             )
 
-            CommunitiesTypeTag.PhotosTag -> setHeaderText(
+            AllSocialTypeTag.PhotosTag -> setHeaderText(
                 titleText = getString(petlink.android.core_ui.R.string.my_photo_groups),
                 createEffect = CommunitiesListEffect.NavigateToCreatePhotosCommunityFragment
             )
 
-            CommunitiesTypeTag.QuestionTag -> setHeaderText(
+            AllSocialTypeTag.QuestionTag -> setHeaderText(
                 titleText = getString(petlink.android.core_ui.R.string.my_discussion),
                 createEffect = CommunitiesListEffect.NavigateToCreateQuestionGroupFragment
             )
@@ -225,11 +267,16 @@ class CommunitiesListFragment : MviBaseFragment<
         other: List<NewsCommunityUiModel>
     ) {
         initAdapter()
+        recyclerItems.clear()
+        val isFriends = communityType is AllSocialTypeTag.FriendsTag
         recyclerItems.add(
             SubtitleTextDelegateItem(
                 SubtitleTextModel(
                     id = MY_GROUP_ID,
-                    title = getString(petlink.android.core_ui.R.string.my_groups)
+                    title = getString(
+                        if (isFriends) petlink.android.core_ui.R.string.my_friends
+                        else petlink.android.core_ui.R.string.my_groups
+                    )
                 )
             )
         )
@@ -237,39 +284,73 @@ class CommunitiesListFragment : MviBaseFragment<
             recyclerItems.add(
                 ExtraSmallTextDelegateItem(
                     ExtraSmallTextModel(
-                        text = getString(petlink.android.core_ui.R.string.not_subscribed_to_any_news_groups_yet)
+                        id = NO_MY_GROUP_ID,
+                        text = getString(
+                            if (isFriends) petlink.android.core_ui.R.string.you_dont_have_friends_yet
+                            else petlink.android.core_ui.R.string.not_subscribed_to_any_news_groups_yet
+                        )
                     )
                 )
             )
         } else {
-            recyclerItems.addAll(getGroupRecyclerItems(owned))
-            recyclerItems.addAll(getGroupRecyclerItems(subscribed))
+            recyclerItems.addAll(getGroupRecyclerItems(owned, isFriends))
+            recyclerItems.addAll(getGroupRecyclerItems(subscribed, isFriends))
         }
         recyclerItems.add(
             SubtitleTextDelegateItem(
                 SubtitleTextModel(
-                    title = getString(petlink.android.core_ui.R.string.other)
+                    title = getString(
+                        if (isFriends) petlink.android.core_ui.R.string.other_people
+                        else petlink.android.core_ui.R.string.other
+                    )
                 )
             )
         )
-        recyclerItems.addAll(getGroupRecyclerItems(other))
-        binding.recyclerView.adapter = mainAdapter
-        mainAdapter.submitList(recyclerItems)
+        if (other.isEmpty()) {
+            recyclerItems.add(
+                EmptyPostsDelegateItem(
+                    EmptyPostsModel(
+                        text = getString(
+                            if (isFriends) petlink.android.core_ui.R.string.no_such_users_yet
+                            else petlink.android.core_ui.R.string.no_such_groups_yet
+                        )
+                    )
+                )
+            )
+        } else {
+            recyclerItems.addAll(getGroupRecyclerItems(other, isFriends))
+        }
+        if (binding.recyclerView.adapter != mainAdapter) {
+            binding.recyclerView.adapter = mainAdapter
+        }
+        mainAdapter.submitList(recyclerItems.toList())
     }
 
-    private fun getGroupRecyclerItems(groupsList: List<NewsCommunityUiModel>): List<GroupDelegateItem> {
+    private fun getGroupRecyclerItems(
+        groupsList: List<NewsCommunityUiModel>,
+        isFriends: Boolean = false
+    ): List<GroupDelegateItem> {
         val result = mutableListOf<GroupDelegateItem>()
         groupsList.forEach {
             val item = with(it) {
-                val role =
-                    if (currentUserRole == SUBSCRIBER) getString(petlink.android.core_ui.R.string.subscribed_in_group)
-                    else if (currentUserRole == OWNER) getString(petlink.android.core_ui.R.string.owner)
-                    else "${it.subscribers.size}" + getString(petlink.android.core_ui.R.string.subscribers)
+                val status = if (isFriends) {
+                    resources.getQuantityString(
+                        petlink.android.core_ui.R.plurals.friends_count,
+                        subscribers.size,
+                        subscribers.size
+                    )
+                } else if (currentUserRole is RoleInCommunityTag.Subscribed) {
+                    getString(petlink.android.core_ui.R.string.subscribed_in_group)
+                } else if (currentUserRole is RoleInCommunityTag.Owner) {
+                    getString(petlink.android.core_ui.R.string.owner)
+                } else {
+                    "${it.subscribers.size}" + getString(petlink.android.core_ui.R.string.subscribers)
+                }
                 GroupDelegateItem(
                     GroupItemModel(
                         groupTitle = title,
                         imageUri = avatar,
-                        groupStatus = role,
+                        groupStatus = status,
                         onClick = {
                             store.sendEffect(
                                 CommunitiesListEffect.NavigateToCommunityDetailsFragment(
@@ -287,41 +368,41 @@ class CommunitiesListFragment : MviBaseFragment<
     }
 
     private fun initAdapter() {
+        if (adapterInitialized) return
         mainAdapter.addDelegate(GroupItemDelegate())
         mainAdapter.addDelegate(SubtitleTextDelegate())
         mainAdapter.addDelegate(ExtraSmallTextDelegate())
+        mainAdapter.addDelegate(EmptyPostsDelegate())
+        adapterInitialized = true
     }
 
     override fun resolveEffect(effect: CommunitiesListEffect) {
         when (effect) {
             CommunitiesListEffect.NavigateBack -> requireActivity().finish()
             is CommunitiesListEffect.NavigateToCommunityDetailsFragment -> when (communityType) {
-                CommunitiesTypeTag.ChatsTag -> startActivity(
+                AllSocialTypeTag.ChatsTag -> startActivity(
                     "app://community/chat_details",
                     effect.communityId
                 )
 
-                CommunitiesTypeTag.FriendsTag -> startActivity(
+                AllSocialTypeTag.FriendsTag -> startActivity(
                     "app://community/friend_details",
                     effect.communityId
                 )
 
-                CommunitiesTypeTag.NewsTag -> startActivityCommunityDetails(
+                AllSocialTypeTag.NewsTag -> startActivityCommunityDetails(
                     effect.communityId,
-                    effect.role,
-                    getString(petlink.android.core_ui.R.string.news)
+                    CommunitiesTypeTag.NewsTag
                 )
 
-                CommunitiesTypeTag.PhotosTag -> startActivityCommunityDetails(
+                AllSocialTypeTag.PhotosTag -> startActivityCommunityDetails(
                     effect.communityId,
-                    effect.role,
-                    getString(petlink.android.core_ui.R.string.pet_photos)
+                    CommunitiesTypeTag.PhotosTag
                 )
 
-                CommunitiesTypeTag.QuestionTag -> startActivityCommunityDetails(
+                AllSocialTypeTag.QuestionTag -> startActivityCommunityDetails(
                     effect.communityId,
-                    effect.role,
-                    getString(petlink.android.core_ui.R.string.question)
+                    CommunitiesTypeTag.QuestionTag
                 )
 
                 null -> throw Throwable(message = TYPE_NULL_ERROR)
@@ -354,18 +435,16 @@ class CommunitiesListFragment : MviBaseFragment<
 
     private fun startActivityCommunityDetails(
         communityId: String,
-        role: String,
-        communityType: String
+        communityType: CommunitiesTypeTag
     ) {
         val intent = Intent(
             Intent.ACTION_VIEW,
             "app://community/community_details".toUri()
         ).apply {
             putExtra(COMMUNITY_ID_ARG, communityId)
-            putExtra(ROLE_IN_COMMUNITY_ARG, role)
             putExtra(COMMUNITY_TYPE_ARG, communityType)
         }
-        requireActivity().startActivity(intent)
+        communityDetailsLauncher.launch(intent)
     }
 
     private fun startActivityForResult(
@@ -380,6 +459,7 @@ class CommunitiesListFragment : MviBaseFragment<
     }
 
     companion object {
+        const val NO_MY_GROUP_ID = 333
         const val TYPE_NULL_ERROR = "Community type cannot be NULL"
         const val INTENT_TYPE_TAG = "CommunitiesTypeTag"
         const val NEW_GROUP_ID_ARG = "NewGroupIdArg"
@@ -389,6 +469,9 @@ class CommunitiesListFragment : MviBaseFragment<
         const val COMMUNITY_ID_ARG = "CommunityIdArg"
         const val COMMUNITY_TYPE_ARG = "CommunityTypeArg"
         const val ROLE_IN_COMMUNITY_ARG = "RoleArg"
+        const val COMMUNITY_TYPE_NEWS = "news"
+        const val COMMUNITY_TYPE_PHOTOS = "photos"
+        const val COMMUNITY_TYPE_QUESTION = "question"
         const val NEWS_FRAGMENT_TAG = "NewsFragmentTag"
         const val SUBSCRIBER = "subscriber"
         const val OWNER = "owner"

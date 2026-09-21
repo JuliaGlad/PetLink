@@ -57,7 +57,6 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.retrofit.v2100)
     kapt(libs.dagger.compiler.v255)
-    implementation(libs.imagepicker)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

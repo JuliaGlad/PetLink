@@ -10,7 +10,8 @@
     android:minHeight="@dimen/calendar_day_min_height"
     android:padding="@dimen/calendar_day_padding"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    android:foreground="@drawable/ripple_rect">
 
     <View
         android:id="@+id/divider"

@@ -7,6 +7,7 @@ sealed interface CreateNewsCommunityIntent: MviIntent {
         val title: String,
         val description: String,
         val avatar: String,
-        val background: String
+        val background: String,
+        val type: petlink.android.feature_community_core.CommunitiesTypeTag
     ): CreateNewsCommunityIntent
 }

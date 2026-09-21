@@ -4,8 +4,6 @@ import android.content.Context
 import android.graphics.LinearGradient
 import android.graphics.Shader
 import android.util.AttributeSet
-import android.util.Log
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,7 +40,7 @@ class PostView @JvmOverloads constructor(
         set(value) {
             if (value != field) {
                 field = value
-                postImageView.setImageUri(field.toUri())
+                bindPostImage()
             }
         }
 
@@ -52,6 +50,8 @@ class PostView @JvmOverloads constructor(
                 field = value
                 postTitleView.text = field
             }
+            postTitleView.visibility =
+                if (value.isBlank() || value == EMPTY) View.GONE else View.VISIBLE
         }
     var postDescription: String = EMPTY
         set(value) {
@@ -59,40 +59,64 @@ class PostView @JvmOverloads constructor(
                 field = value
                 postDescriptionView.text = field
             }
+            val hasText = value.isNotBlank() && value != EMPTY
+            postDescriptionView.visibility = if (hasText) View.VISIBLE else View.GONE
+            descriptionExpanded = false
+            postDescriptionView.maxLines = 3
+            showAllTextButton.visibility =
+                if (hasText && value.length > 90) View.VISIBLE else View.GONE
         }
-    var likesCount: Int = 0
+
+    var showComments: Boolean = true
         set(value) {
             if (value != field) {
                 field = value
-                likesActionView.actionsCount = field
-                val imageId =
-                    if (value > 0) R.drawable.ic_like_fill
-                    else R.drawable.ic_like_no_fill
-                likesActionView.icon =
-                    ResourcesCompat.getDrawable(resources, imageId, context.theme)
+                commentActionView.visibility = if (value) View.VISIBLE else View.GONE
+                requestLayout()
             }
+        }
+
+    var showReply: Boolean = true
+        set(value) {
+            if (value != field) {
+                field = value
+                replyActionView.visibility = if (value) View.VISIBLE else View.GONE
+                requestLayout()
+            }
+        }
+
+    private var descriptionExpanded = false
+    var likesCount: Int = 0
+        set(value) {
+            field = value
+            likesActionView.actionsCount = field
+        }
+
+    var isLiked: Boolean = false
+        set(value) {
+            if (value == field) return
+            field = value
+            val imageId =
+                if (value) R.drawable.ic_like_fill
+                else R.drawable.ic_like_no_fill
+            likesActionView.icon =
+                ResourcesCompat.getDrawable(resources, imageId, context.theme)
         }
 
     var commentCount: Int = 0
         set(value) {
-            if (value != field) {
-                field = value
-                commentActionView.actionsCount = field
-            }
+            field = value
+            commentActionView.actionsCount = field
         }
     var replyCount: Int = 0
         set(value) {
-            if (value != field) {
-                field = value
-                replyActionView.actionsCount = field
-            }
+            field = value
+            replyActionView.actionsCount = field
         }
     var viewsCount: Int = 0
         set(value) {
-            if (value != field) {
-                field = value
-                viewsActionView.actionsCount = field
-            }
+            field = value
+            viewsActionView.actionsCount = field
         }
 
     fun addHashtag(title: String) {
@@ -122,6 +146,18 @@ class PostView @JvmOverloads constructor(
         initViewsActionView()
     }
 
+    fun setOnLikeClick(listener: () -> Unit) {
+        likesActionView.setOnClickListener { listener() }
+    }
+
+    fun setOnCommentClick(listener: () -> Unit) {
+        commentActionView.setOnClickListener { listener() }
+    }
+
+    fun setOnReplyClick(listener: () -> Unit) {
+        replyActionView.setOnClickListener { listener() }
+    }
+
     private fun initViewsActionView() {
         viewsActionView = findViewById<PostActionView>(R.id.view_icon)
         viewsActionView.actionsCount = viewsCount
@@ -131,7 +167,7 @@ class PostView @JvmOverloads constructor(
         likesActionView = findViewById<PostActionView>(R.id.likes_icon)
         likesActionView.actionsCount = likesCount
         val imageId =
-            if (likesCount > 0) R.drawable.ic_like_fill
+            if (isLiked) R.drawable.ic_like_fill
             else R.drawable.ic_like_no_fill
         likesActionView.icon = ResourcesCompat.getDrawable(resources, imageId, context.theme)
     }
@@ -151,7 +187,14 @@ class PostView @JvmOverloads constructor(
     }
 
     private fun initShowAllTextButton() {
-        showAllTextButton = findViewById<TextView>(R.id.show_all)
+        showAllTextButton = findViewById(R.id.show_all)
+        showAllTextButton.visibility = View.GONE
+        showAllTextButton.setOnClickListener {
+            descriptionExpanded = true
+            postDescriptionView.maxLines = Integer.MAX_VALUE
+            showAllTextButton.visibility = View.GONE
+            requestLayout()
+        }
         showAllTextButton.viewTreeObserver.addOnGlobalLayoutListener(object :
             ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
@@ -181,10 +224,19 @@ class PostView @JvmOverloads constructor(
 
     private fun initPostImageView() {
         postImageView = findViewById<ShapeableImageView>(R.id.post_image)
-        if (postUri != EMPTY) {
+        bindPostImage()
+    }
+
+    private fun bindPostImage() {
+        val hasImage = postUri.isNotBlank() && postUri != EMPTY
+        postImageView.visibility = if (hasImage) View.VISIBLE else View.GONE
+        if (hasImage) {
             postImageView.setImageUri(postUri.toUri())
         }
+        requestLayout()
     }
+
+    private fun hasPostImage(): Boolean = postImageView.visibility != View.GONE
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
@@ -193,14 +245,23 @@ class PostView @JvmOverloads constructor(
             measuredWidth - paddingRight - paddingLeft,
             widthMeasureSpec
         )
+        val imageBlock = if (hasPostImage()) {
+            postImageView.measuredHeight + VERTICAL_SPACING_18.dp()
+        } else {
+            0
+        }
+        val showAllBlock = if (showAllTextButton.visibility != View.GONE) {
+            showAllTextButton.measuredHeight + VERTICAL_SPACING_8.dp()
+        } else {
+            0
+        }
         val actualHeight = resolveSize(
-            postImageView.measuredHeight + postTitleView.measuredHeight + postDescriptionView.measuredHeight
-                    + hashtagsFlexbox.measuredHeight + maxOf(
+            imageBlock + visibleHeight(postTitleView) + visibleHeight(postDescriptionView)
+                    + showAllBlock + hashtagsFlexbox.measuredHeight + maxOf(
                 likesActionView.measuredHeight,
-                commentActionView.measuredHeight,
                 replyActionView.measuredHeight,
                 viewsActionView.measuredHeight
-            ) + VERTICAL_SPACING_4.dp() + VERTICAL_SPACING_8.dp() + VERTICAL_SPACING_18.dp()*3,
+            ) + VERTICAL_SPACING_4.dp() + VERTICAL_SPACING_8.dp() + VERTICAL_SPACING_18.dp() * 2,
             heightMeasureSpec
         )
         setMeasuredDimension(actualWidth, actualHeight)
@@ -213,63 +274,82 @@ class PostView @JvmOverloads constructor(
         p3: Int,
         p4: Int
     ) {
-        val (postImageLeft, postImageRight) = horizontalPosition(postImageView, paddingLeft)
-        val (postImageTop, postImageBottom) = verticalPosition(postImageView, paddingTop)
-        postImageView.layout(postImageLeft, postImageTop, postImageRight, postImageBottom)
+        var contentTop = paddingTop
+        if (hasPostImage()) {
+            val (postImageLeft, postImageRight) = horizontalPosition(postImageView, paddingLeft)
+            val (postImageTop, postImageBottom) = verticalPosition(postImageView, paddingTop)
+            postImageView.layout(postImageLeft, postImageTop, postImageRight, postImageBottom)
+            contentTop = postImageBottom + VERTICAL_SPACING_18.dp()
+        }
 
-        val (titleLeft, titleRight) = horizontalPosition(postTitleView, paddingLeft)
-        val (titleTop, titleBottom) = verticalPosition(postTitleView, postImageBottom+VERTICAL_SPACING_18.dp())
-        postTitleView.layout(titleLeft, titleTop, titleRight, titleBottom)
+        var nextTop = contentTop
+        if (postTitleView.visibility != View.GONE) {
+            val (titleLeft, titleRight) = horizontalPosition(postTitleView, paddingLeft)
+            val (titleTop, titleBottom) = verticalPosition(postTitleView, nextTop)
+            postTitleView.layout(titleLeft, titleTop, titleRight, titleBottom)
+            nextTop = titleBottom + VERTICAL_SPACING_8.dp()
+        }
 
-        val (descriptionLeft, descriptionRight) = horizontalPosition(postDescriptionView)
-        val (descriptionTop, descriptionBottom) = verticalPosition(
-            postDescriptionView,
-            titleBottom+VERTICAL_SPACING_8.dp()
-        )
-        postDescriptionView.layout(
-            descriptionLeft,
-            descriptionTop,
-            descriptionRight,
-            descriptionBottom
-        )
+        if (postDescriptionView.visibility != View.GONE) {
+            val (descriptionLeft, descriptionRight) = horizontalPosition(postDescriptionView)
+            val (descriptionTop, descriptionBottom) = verticalPosition(postDescriptionView, nextTop)
+            postDescriptionView.layout(
+                descriptionLeft,
+                descriptionTop,
+                descriptionRight,
+                descriptionBottom
+            )
+            nextTop = descriptionBottom
+        }
+
+        if (showAllTextButton.visibility != View.GONE) {
+            nextTop += VERTICAL_SPACING_8.dp()
+            val (showLeft, showRight) = horizontalPosition(showAllTextButton, paddingLeft)
+            val (showTop, showBottom) = verticalPosition(showAllTextButton, nextTop)
+            showAllTextButton.layout(showLeft, showTop, showRight, showBottom)
+            nextTop = showBottom
+        }
 
         val (hashtagLeft, hashtagRight) = horizontalPosition(hashtagsFlexbox, paddingLeft)
         val (hashtagTop, hashtagBottom) = verticalPosition(
             hashtagsFlexbox,
-            descriptionBottom+VERTICAL_SPACING_4.dp()
+            nextTop + VERTICAL_SPACING_4.dp()
         )
         hashtagsFlexbox.layout(hashtagLeft, hashtagTop, hashtagRight, hashtagBottom)
 
+        val actionsTop = hashtagBottom + VERTICAL_SPACING_18.dp()
         val (likesLeft, likesRight) = horizontalPosition(likesActionView, paddingLeft)
-        val (likesTop, likesBottom) = verticalPosition(
-            likesActionView,
-            hashtagBottom+VERTICAL_SPACING_18.dp()
-        )
+        val (likesTop, likesBottom) = verticalPosition(likesActionView, actionsTop)
         likesActionView.layout(likesLeft, likesTop, likesRight, likesBottom)
 
-        val (commentLeft, commentRight) = horizontalPosition(
-            commentActionView,
-            likesRight + SPACING.dp()
-        )
-        val (commentTop, commentBottom) = verticalPosition(
-            likesActionView,
-            hashtagBottom+VERTICAL_SPACING_18.dp()
-        )
-        commentActionView.layout(commentLeft, commentTop, commentRight, commentBottom)
+        var afterLikes = likesRight
+        if (commentActionView.visibility != View.GONE) {
+            val (commentLeft, commentRight) = horizontalPosition(
+                commentActionView,
+                afterLikes + SPACING.dp()
+            )
+            val (commentTop, commentBottom) = verticalPosition(commentActionView, actionsTop)
+            commentActionView.layout(commentLeft, commentTop, commentRight, commentBottom)
+            afterLikes = commentRight
+        }
 
-        val (replyLeft, replyRight) = horizontalPosition(
-            replyActionView,
-            commentRight + SPACING.dp()
-        )
-        val (replyTop, replyBottom) = verticalPosition(replyActionView, hashtagBottom+VERTICAL_SPACING_18.dp())
-        replyActionView.layout(replyLeft, replyTop, replyRight, replyBottom)
+        if (replyActionView.visibility != View.GONE) {
+            val (replyLeft, replyRight) = horizontalPosition(
+                replyActionView,
+                afterLikes + SPACING.dp()
+            )
+            val (replyTop, replyBottom) = verticalPosition(replyActionView, actionsTop)
+            replyActionView.layout(replyLeft, replyTop, replyRight, replyBottom)
+        }
 
         val viewsRight = measuredWidth - paddingRight
         val viewsLeft = viewsRight - viewsActionView.measuredWidth
-        val (viewsTop, viewsBottom) = verticalPosition(viewsActionView, hashtagBottom+VERTICAL_SPACING_18.dp())
-
+        val (viewsTop, viewsBottom) = verticalPosition(viewsActionView, actionsTop)
         viewsActionView.layout(viewsLeft, viewsTop, viewsRight, viewsBottom)
     }
+
+    private fun visibleHeight(view: View): Int =
+        if (view.visibility == View.GONE) 0 else view.measuredHeight
 
     private fun horizontalPosition(view: View, prevSize: Int = 0): Pair<Int, Int> {
         val left = prevSize

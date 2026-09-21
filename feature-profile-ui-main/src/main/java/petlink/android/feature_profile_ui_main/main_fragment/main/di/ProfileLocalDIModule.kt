@@ -3,6 +3,9 @@ package petlink.android.feature_profile_ui_main.main_fragment.main.di
 import dagger.Module
 import dagger.Provides
 import petlink.android.feature_profile_domain.usecase.user_account.GetUserMainDataDomainUseCase
+import petlink.android.feature_profile_domain.usecase.user_account.GetUserPostsUseCase
+import petlink.android.feature_profile_domain.usecase.user_account.MarkUserPostViewedUseCase
+import petlink.android.feature_profile_domain.usecase.user_account.ToggleUserPostLikeUseCase
 import petlink.android.feature_profile_domain.usecase.user_account.UpdateBackgroundUseCase
 import petlink.android.feature_profile_ui_main.main_fragment.main.mvi.ProfileLocalDI
 
@@ -13,10 +16,15 @@ class ProfileLocalDIModule {
     @Provides
     fun provideProfileLocalDI(
         getUserDataUseCase: GetUserMainDataDomainUseCase,
-        updateBackgroundUseCase: UpdateBackgroundUseCase
+        updateBackgroundUseCase: UpdateBackgroundUseCase,
+        getUserPostsUseCase: GetUserPostsUseCase,
+        toggleUserPostLikeUseCase: ToggleUserPostLikeUseCase,
+        markUserPostViewedUseCase: MarkUserPostViewedUseCase
     ): ProfileLocalDI = ProfileLocalDI(
-        getUserDataUseCase,
-        updateBackgroundUseCase
+        getUserDataUseCase = getUserDataUseCase,
+        updateBackgroundUseCase = updateBackgroundUseCase,
+        getUserPostsUseCase = getUserPostsUseCase,
+        toggleUserPostLikeUseCase = toggleUserPostLikeUseCase,
+        markUserPostViewedUseCase = markUserPostViewedUseCase
     )
-
 }

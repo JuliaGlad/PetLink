@@ -3,13 +3,13 @@ package petlink.android.feature_community_ui_main.recycler.item
 import android.graphics.LinearGradient
 import android.graphics.Shader.TileMode
 import android.graphics.drawable.GradientDrawable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import petlink.android.core_ui.playPressAnimation
 import petlink.android.feature_community_ui_main.databinding.RecyclerMenuItemBinding
 
 class MenuItemAdapter : ListAdapter<
@@ -68,7 +68,10 @@ class MenuItemAdapter : ListAdapter<
                     ContextCompat.getColor(itemView.context, model.bgEndColor)
                 )
                 item.background = drawable
-                item.setOnClickListener { model.clickListener() }
+                item.setOnClickListener {
+                    item.playPressAnimation()
+                    model.clickListener()
+                }
             }
         }
     }

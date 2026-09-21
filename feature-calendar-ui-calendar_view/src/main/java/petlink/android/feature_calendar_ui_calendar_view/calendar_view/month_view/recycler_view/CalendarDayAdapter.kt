@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import petlink.android.core_ui.R
 import petlink.android.core_ui.custom_view.calendar_event.CalendarEventTheme
+import petlink.android.core_ui.playPressAnimation
 import petlink.android.feature_calendar_ui_calendar_view.calendar_view.month_view.recycler_view.CalendarDayAdapter.ViewHolder
 import petlink.android.feature_calendar_ui_calendar_view.databinding.RecyclerViewCalendarDayBinding
 import java.util.Calendar
@@ -42,10 +43,35 @@ class CalendarDayAdapter : ListAdapter<CalendarDayModel, ViewHolder>(CalendarDay
             with(binding) {
                 day.text = model.day
                 events.removeAllViews()
-                if (model.day.isNotEmpty() && Calendar.getInstance().get(Calendar.DAY_OF_MONTH) == model.day.toInt()){
-                    binding.day.background = ResourcesCompat.getDrawable(itemView.resources, R.drawable.bg_calendar_today, itemView.context.theme)
-                    day.setTextColor(ResourcesCompat.getColor(itemView.resources, R.color.white, itemView.context.theme))
+                val today = Calendar.getInstance()
+                val isToday = model.day.isNotEmpty()
+                        && today.get(Calendar.DAY_OF_MONTH) == model.day.toInt()
+                        && today.get(Calendar.MONTH) + 1 == model.month
+                        && today.get(Calendar.YEAR) == model.year
+                if (isToday) {
+                    binding.day.background = ResourcesCompat.getDrawable(
+                        itemView.resources,
+                        R.drawable.bg_calendar_today,
+                        itemView.context.theme
+                    )
+                    day.setTextColor(
+                        ResourcesCompat.getColor(
+                            itemView.resources,
+                            R.color.white,
+                            itemView.context.theme
+                        )
+                    )
                     day.typeface = ResourcesCompat.getFont(itemView.context, R.font.roboto_bold)
+                } else {
+                    day.background = null
+                    day.setTextColor(
+                        ResourcesCompat.getColor(
+                            itemView.resources,
+                            R.color.black,
+                            itemView.context.theme
+                        )
+                    )
+                    day.typeface = ResourcesCompat.getFont(itemView.context, R.font.roboto_regular)
                 }
                 if (model.events.isNotEmpty()) {
                     val density = binding.root.resources.displayMetrics.density
@@ -78,7 +104,12 @@ class CalendarDayAdapter : ListAdapter<CalendarDayModel, ViewHolder>(CalendarDay
                             binding.events.addView(dot)
                         }
                 }
-                binding.item.setOnClickListener { model.clickListener?.let { click -> click() } }
+                binding.item.setOnClickListener {
+                    model.clickListener?.let { click ->
+                        binding.item.playPressAnimation()
+                        click()
+                    }
+                }
             }
 
         }

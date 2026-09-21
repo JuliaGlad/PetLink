@@ -4,35 +4,40 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.viewModels
-import com.github.dhaval2404.imagepicker.ImagePicker
+import androidx.lifecycle.lifecycleScope
 import com.github.terrakok.cicerone.Router
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
 import petlink.android.core_di.app.AppComponentHolder.appComponent
 import petlink.android.core_di.community.component.DaggerCommunityComponent
 import petlink.android.core_mvi.MviBaseFragment
 import petlink.android.core_mvi.MviStore
 import petlink.android.core_ui.R
+import petlink.android.core_ui.image_picker.ImagePickerHelper
 import petlink.android.core_ui.delegates.items.avatar.AvatarDelegate
 import petlink.android.core_ui.delegates.items.avatar.AvatarDelegateItem
 import petlink.android.core_ui.delegates.items.avatar.AvatarModel
 import petlink.android.core_ui.delegates.items.cover.CoverDelegate
 import petlink.android.core_ui.delegates.items.cover.CoverDelegateItem
 import petlink.android.core_ui.delegates.items.cover.CoverModel
+import petlink.android.core_ui.delegates.items.group_item.GroupDelegateItem
 import petlink.android.core_ui.delegates.items.group_item.GroupItemDelegate
+import petlink.android.core_ui.delegates.items.group_item.GroupItemModel
 import petlink.android.core_ui.delegates.items.progress_bar.ProgressDelegate
 import petlink.android.core_ui.delegates.items.progress_bar.ProgressDelegateItem
 import petlink.android.core_ui.delegates.items.progress_bar.ProgressModel
+import petlink.android.core_ui.delegates.items.text.extra_small.ExtraSmallTextDelegate
+import petlink.android.core_ui.delegates.items.text.extra_small.ExtraSmallTextDelegateItem
+import petlink.android.core_ui.delegates.items.text.extra_small.ExtraSmallTextModel
 import petlink.android.core_ui.delegates.items.text.title.TitleTextDelegate
 import petlink.android.core_ui.delegates.items.text.title.TitleTextDelegateItem
 import petlink.android.core_ui.delegates.items.text.title.TitleTextModel
@@ -41,6 +46,9 @@ import petlink.android.core_ui.delegates.items.text_input_layout.TextInputLayout
 import petlink.android.core_ui.delegates.items.text_input_layout.TextInputLayoutModel
 import petlink.android.core_ui.delegates.main.DelegateItem
 import petlink.android.core_ui.delegates.main.MainAdapter
+import petlink.android.core_ui.playPressAnimation
+import petlink.android.feature_community_domain.usecase.GetFriendsUseCase
+import petlink.android.feature_community_domain.usecase.GetOtherUsersUseCase
 import petlink.android.feature_community_ui_create_community.activity.CreateNewsCommunityActivity
 import petlink.android.feature_community_ui_create_community.databinding.FragmentCreateNewsCommunityBinding
 import petlink.android.feature_community_ui_create_community.fragment.di.DaggerCreateNewsCommunityComponent
@@ -70,9 +78,13 @@ class CreateNewsCommunityFragment : MviBaseFragment<
     @Inject
     lateinit var localDi: CreateNewsCommunityLocalDI
 
-    private var avatarPhotoPickerLauncher: ActivityResultLauncher<Intent>? = null
+    @Inject
+    lateinit var getFriendsUseCase: GetFriendsUseCase
 
-    private var coverPhotoPickerLauncher: ActivityResultLauncher<Intent>? = null
+    @Inject
+    lateinit var getOtherUsersUseCase: GetOtherUsersUseCase
+
+    private val imagePicker = ImagePickerHelper(this)
 
     private val screenArg: CreateNewsCommunityScreenArg? by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) arguments?.getParcelable(
@@ -99,55 +111,35 @@ class CreateNewsCommunityFragment : MviBaseFragment<
         super.onCreate(savedInstanceState)
         val communityComponent = DaggerCommunityComponent.factory().create(appComponent)
         DaggerCreateNewsCommunityComponent.factory().create(communityComponent).inject(this)
-        avatarPhotoPickerLauncher = initAvatarActivityResultLauncher()
-        coverPhotoPickerLauncher = initCoverActivityResultLauncher()
     }
 
-    private fun initAvatarActivityResultLauncher(): ActivityResultLauncher<Intent>? =
-        registerForActivityResult<Intent, ActivityResult>(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result: ActivityResult ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val photoResult = result.data
-                val activityViewModel = (activity as CreateNewsCommunityActivity).viewModel
-                if (photoResult != null) {
-                    val uri: String = photoResult.data.toString()
-                    activityViewModel.visualsModel.avatar = uri
-                    for (i in recyclerItems) {
-                        if (i is AvatarDelegateItem) {
-                            val model = i.content() as AvatarModel
-                            model.uri = uri
-                            model.drawable = null
-                            mainAdapter.notifyItemChanged(recyclerItems.indexOf(i))
-                            break
-                        }
-                    }
-                }
+    private fun applyAvatar(uri: String) {
+        val activityViewModel = (activity as CreateNewsCommunityActivity).viewModel
+        activityViewModel.visualsModel.avatar = uri
+        for (i in recyclerItems) {
+            if (i is AvatarDelegateItem) {
+                val model = i.content() as AvatarModel
+                model.uri = uri
+                model.drawable = null
+                mainAdapter.notifyItemChanged(recyclerItems.indexOf(i))
+                break
             }
         }
+    }
 
-    private fun initCoverActivityResultLauncher(): ActivityResultLauncher<Intent>? =
-        registerForActivityResult<Intent, ActivityResult>(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result: ActivityResult ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val photoResult = result.data
-                val activityViewModel = (activity as CreateNewsCommunityActivity).viewModel
-                if (photoResult != null) {
-                    val uri: String = photoResult.data.toString()
-                    activityViewModel.visualsModel.background = uri
-                    for (i in recyclerItems) {
-                        if (i is CoverDelegateItem) {
-                            val model = i.content() as CoverModel
-                            model.uri = uri
-                            model.drawable = null
-                            mainAdapter.notifyItemChanged(recyclerItems.indexOf(i))
-                            break
-                        }
-                    }
-                }
+    private fun applyCover(uri: String) {
+        val activityViewModel = (activity as CreateNewsCommunityActivity).viewModel
+        activityViewModel.visualsModel.background = uri
+        for (i in recyclerItems) {
+            if (i is CoverDelegateItem) {
+                val model = i.content() as CoverModel
+                model.uri = uri
+                model.drawable = null
+                mainAdapter.notifyItemChanged(recyclerItems.indexOf(i))
+                break
             }
         }
+    }
 
 
     override fun onCreateView(
@@ -173,6 +165,7 @@ class CreateNewsCommunityFragment : MviBaseFragment<
     private fun initNextButton() {
         with(binding.nextButton) {
             setOnClickListener {
+                playPressAnimation()
                 screenArg?.let {
                     when (it) {
                         CreateNewsCommunityScreenArg.MainInfoArg -> {
@@ -240,6 +233,7 @@ class CreateNewsCommunityFragment : MviBaseFragment<
 
                     CreateNewsCommunityScreenArg.ParticipantsArg -> {
                         addDelegate(GroupItemDelegate())
+                        addDelegate(ExtraSmallTextDelegate())
                     }
 
                     CreateNewsCommunityScreenArg.VisualsArg -> {
@@ -251,6 +245,7 @@ class CreateNewsCommunityFragment : MviBaseFragment<
         }
 
     private fun initRecycler() {
+        val activityViewModel = (activity as CreateNewsCommunityActivity).viewModel
         fun initMainInfoRecycler(): List<DelegateItem> = listOf(
             ProgressDelegateItem(ProgressModel(progress = getProgress(currentStep = 1))),
             TitleTextDelegateItem(TitleTextModel(title = getString(R.string.title))),
@@ -259,18 +254,20 @@ class CreateNewsCommunityFragment : MviBaseFragment<
                     id = TITLE_ID,
                     hint = getString(R.string.title),
                     canBeEmpty = false,
+                    defaultValue = activityViewModel.mainInfo.title,
                     error = getString(R.string.this_field_cannot_be_empty),
                     textChangedListener = { char ->
-                        (activity as CreateNewsCommunityActivity).viewModel.mainInfo.title = char
+                        activityViewModel.mainInfo.title = char
                     }
                 )),
             TitleTextDelegateItem(TitleTextModel(title = getString(R.string.description))),
             TextInputLayoutDelegateItem(
                 TextInputLayoutModel(
-                    hint = getString(R.string.description),
-                    defaultValue = (activity as CreateNewsCommunityActivity).viewModel.mainInfo.description,
+                    hint = getString(R.string.description_optional),
+                    defaultValue = activityViewModel.mainInfo.description,
+                    inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE,
                     textChangedListener = { char ->
-                        (activity as CreateNewsCommunityActivity).viewModel.mainInfo.description = char
+                        activityViewModel.mainInfo.description = char
                     }
                 )),
         )
@@ -280,6 +277,7 @@ class CreateNewsCommunityFragment : MviBaseFragment<
             TitleTextDelegateItem(TitleTextModel(title = getString(R.string.avatar))),
             AvatarDelegateItem(
                 AvatarModel(
+                    uri = activityViewModel.visualsModel.avatar.ifBlank { null },
                     drawable = ResourcesCompat.getDrawable(
                         resources,
                         R.drawable.add_image_icon,
@@ -292,6 +290,7 @@ class CreateNewsCommunityFragment : MviBaseFragment<
             TitleTextDelegateItem(TitleTextModel(title = getString(R.string.cover))),
             CoverDelegateItem(
                 CoverModel(
+                    uri = activityViewModel.visualsModel.background,
                     drawable = ResourcesCompat.getDrawable(
                         resources,
                         R.drawable.add_cover,
@@ -303,9 +302,25 @@ class CreateNewsCommunityFragment : MviBaseFragment<
                 ))
         )
 
+        fun addPersonButton(): GroupDelegateItem =
+            GroupDelegateItem(
+                GroupItemModel(
+                    id = ADD_PERSON_ID,
+                    groupTitle = getString(R.string.add_person),
+                    groupStatus = "",
+                    placeholder = ResourcesCompat.getDrawable(
+                        resources,
+                        R.drawable.ic_add_circle,
+                        context?.theme
+                    ),
+                    onClick = { loadOtherParticipants() }
+                )
+            )
+
         fun initParticipantsInfoRecycler(): List<DelegateItem> = listOf(
             ProgressDelegateItem(ProgressModel(progress = getProgress(currentStep = 3))),
-            TitleTextDelegateItem(TitleTextModel(title = getString(R.string.add_participants)))
+            TitleTextDelegateItem(TitleTextModel(title = getString(R.string.add_participants))),
+            addPersonButton()
         )
         if (screenArg != null) {
             val items =
@@ -316,7 +331,7 @@ class CreateNewsCommunityFragment : MviBaseFragment<
                     }
 
                     CreateNewsCommunityScreenArg.ParticipantsArg -> {
-                        binding.nextButton.text = getString(R.string.finish)
+                        binding.nextButton.text = getString(R.string.create)
                         initParticipantsInfoRecycler()
                     }
 
@@ -327,9 +342,98 @@ class CreateNewsCommunityFragment : MviBaseFragment<
 
                     null -> emptyList()
                 }
+            recyclerItems.clear()
             recyclerItems.addAll(items)
             binding.recyclerView.adapter = mainAdapter
-            mainAdapter.submitList(recyclerItems)
+            mainAdapter.submitList(recyclerItems.toList())
+            binding.recyclerView.scheduleLayoutAnimation()
+            if (screenArg is CreateNewsCommunityScreenArg.ParticipantsArg) {
+                loadFriends()
+            }
+        }
+    }
+
+    private fun participantsInsertIndex(): Int =
+        recyclerItems.indexOfFirst {
+            (it.content() as? GroupItemModel)?.id == ADD_PERSON_ID
+        }.takeIf { it >= 0 } ?: recyclerItems.size
+
+    private fun loadFriends() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            binding.loadingScreen.root.visibility = VISIBLE
+            runCatching { getFriendsUseCase.invoke() }
+                .onSuccess { friends ->
+                    val insertAt = participantsInsertIndex()
+                    recyclerItems.removeAll { it is ExtraSmallTextDelegateItem }
+                    if (friends.isEmpty()) {
+                        recyclerItems.add(
+                            insertAt,
+                            ExtraSmallTextDelegateItem(
+                                ExtraSmallTextModel(
+                                    text = getString(R.string.you_dont_have_friends_yet)
+                                )
+                            )
+                        )
+                    } else {
+                        friends.forEachIndexed { index, friend ->
+                            recyclerItems.add(
+                                insertAt + index,
+                                GroupDelegateItem(
+                                    GroupItemModel(
+                                        groupTitle = friend.title,
+                                        imageUri = friend.avatar,
+                                        groupStatus = getString(R.string.frinds),
+                                        onClick = {}
+                                    )
+                                )
+                            )
+                        }
+                    }
+                    mainAdapter.submitList(recyclerItems.toList())
+                }
+                .onFailure {
+                    val insertAt = participantsInsertIndex()
+                    recyclerItems.removeAll { it is ExtraSmallTextDelegateItem }
+                    recyclerItems.add(
+                        insertAt,
+                        ExtraSmallTextDelegateItem(
+                            ExtraSmallTextModel(
+                                text = getString(R.string.you_dont_have_friends_yet)
+                            )
+                        )
+                    )
+                    mainAdapter.submitList(recyclerItems.toList())
+                }
+            binding.loadingScreen.root.visibility = GONE
+        }
+    }
+
+    private fun loadOtherParticipants() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            binding.loadingScreen.root.visibility = VISIBLE
+            runCatching { getOtherUsersUseCase.invoke() }
+                .onSuccess { users ->
+                    recyclerItems.removeAll { it is ExtraSmallTextDelegateItem }
+                    val insertAt = participantsInsertIndex()
+                    val existingTitles = recyclerItems.mapNotNull {
+                        (it.content() as? GroupItemModel)?.groupTitle
+                    }.toSet()
+                    users.filter { it.title !in existingTitles }.forEachIndexed { index, user ->
+                        recyclerItems.add(
+                            insertAt + index,
+                            GroupDelegateItem(
+                                GroupItemModel(
+                                    groupTitle = user.title,
+                                    imageUri = user.avatar,
+                                    groupStatus = getString(R.string.add_person),
+                                    onClick = {}
+                                )
+                            )
+                        )
+                    }
+                    mainAdapter.submitList(recyclerItems.toList())
+                }
+            binding.loadingScreen.root.visibility = GONE
         }
     }
 
@@ -337,8 +441,8 @@ class CreateNewsCommunityFragment : MviBaseFragment<
         when (effect) {
             is CreateNewsCommunityEffect.LaunchImagePicker -> {
                 with(effect) {
-                    if (tag == AVATAR_TAG) initAvatarImagePicker()
-                    else if (tag == BACKGROUND_TAG) initBackgroundImagePicker()
+                    if (tag == AVATAR_TAG) pickAvatar()
+                    else if (tag == BACKGROUND_TAG) pickCover()
                 }
             }
 
@@ -356,7 +460,8 @@ class CreateNewsCommunityFragment : MviBaseFragment<
                                 title = mainInfo.title,
                                 description = mainInfo.description,
                                 avatar = visualsModel.avatar,
-                                background = visualsModel.background
+                                background = visualsModel.background,
+                                type = communityType
                             )
                         )
                     }
@@ -388,20 +493,20 @@ class CreateNewsCommunityFragment : MviBaseFragment<
         }
     }
 
-    private fun initBackgroundImagePicker() {
-        ImagePicker.with(this)
-            .crop(380f, 210f)
-            .compress(512)
-            .maxResultSize(512, 512)
-            .createIntent { intent -> coverPhotoPickerLauncher?.launch(intent) }
+    private fun pickCover() {
+        imagePicker.ensurePermissions {
+            imagePicker.pick(cropWidth = 380f, cropHeight = 210f) { uri ->
+                applyCover(uri.toString())
+            }
+        }
     }
 
-    private fun initAvatarImagePicker() {
-        ImagePicker.with(this)
-            .cropSquare()
-            .compress(512)
-            .maxResultSize(512, 512)
-            .createIntent { intent -> avatarPhotoPickerLauncher?.launch(intent) }
+    private fun pickAvatar() {
+        imagePicker.ensurePermissions {
+            imagePicker.pick(cropWidth = 1f, cropHeight = 1f) { uri ->
+                applyAvatar(uri.toString())
+            }
+        }
     }
 
     private fun getProgress(currentStep: Int, allSteps: Int = 3) =
@@ -412,6 +517,7 @@ class CreateNewsCommunityFragment : MviBaseFragment<
         const val NEW_GROUP_TITLE_ARG = "NewGroupTitleArg"
         const val NEW_GROUP_AVATAR_ARG = "NewGroupAvatarArg"
         const val TITLE_ID = 33
+        const val ADD_PERSON_ID = 10001
         const val CREATE_NEWS_COMMUNITY_TAG = "CreateNewsCommunity"
         const val ARG = "ScreenArg"
         const val AVATAR_TAG = "Avatar"

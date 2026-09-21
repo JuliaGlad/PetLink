@@ -1,5 +1,6 @@
 package petlink.android.feature_community_data.mapper
 
+import petlink.android.feature_community_core.RoleInCommunityTag
 import petlink.android.feature_community_data.dto.NewsCommunityDto
 import petlink.android.feature_community_data.local_source.NewsCommunityEntity
 
@@ -10,7 +11,7 @@ fun NewsCommunityEntity.toDto() =
         subscribers = subscribers,
         description = description,
         avatar = avatar,
-        role = "none",
+        role = RoleInCommunityTag.Unsubscribed,
         ownerId = ownerId,
         background = background
     )

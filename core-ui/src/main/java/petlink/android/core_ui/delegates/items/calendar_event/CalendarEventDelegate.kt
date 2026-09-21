@@ -1,12 +1,12 @@
 package petlink.android.core_ui.delegates.items.calendar_event
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import petlink.android.core_ui.databinding.DelegateCalendarEventBinding
 import petlink.android.core_ui.delegates.main.AdapterDelegate
 import petlink.android.core_ui.delegates.main.DelegateItem
+import petlink.android.core_ui.playPressAnimation
 
 class CalendarEventDelegate : AdapterDelegate {
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
@@ -36,7 +36,10 @@ class CalendarEventDelegate : AdapterDelegate {
                 eventDateText = "${model.time} ${model.eventDate}"
                 eventTheme = model.theme
                 isNotificationOn = model.isNotificationOn
-                setOnClickListener { model.clickListener() }
+                setOnClickListener {
+                    playPressAnimation()
+                    model.clickListener()
+                }
             }
         }
     }

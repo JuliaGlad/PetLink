@@ -54,7 +54,6 @@ dependencies {
     implementation(libs.retrofit.v2100)
     implementation(libs.dagger)
     kapt(libs.dagger.compiler.v255)
-    implementation(libs.imagepicker)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

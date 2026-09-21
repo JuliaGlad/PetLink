@@ -1,0 +1,3 @@
+package petlink.android.feature_community_data.repository
+
+interface PhotosCommunityRepository : CommunityGroupsRepository

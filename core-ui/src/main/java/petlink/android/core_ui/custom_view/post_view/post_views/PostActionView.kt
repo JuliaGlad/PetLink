@@ -37,7 +37,7 @@ class PostActionView @JvmOverloads constructor(
             }
         }
 
-    var actionsCount: Int = -1
+    var actionsCount: Int = 0
         set(value) {
             if (value != field) {
                 field = value
@@ -66,11 +66,13 @@ class PostActionView @JvmOverloads constructor(
                 )
             }
         }
+        isClickable = true
+        isFocusable = true
     }
 
     private fun TypedArray.initActionCountTextView() {
         actionCountTextView = findViewById<TextView>(R.id.action_count)
-        actionsCount = getInt(R.styleable.PostActionView_action_count, -1)
+        actionsCount = getInt(R.styleable.PostActionView_action_count, 0)
         actionCountTextView.text = actionsCount.toString()
     }
 

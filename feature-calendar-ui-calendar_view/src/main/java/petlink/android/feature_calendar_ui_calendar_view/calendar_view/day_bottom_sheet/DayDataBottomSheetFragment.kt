@@ -15,7 +15,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
-import com.github.terrakok.cicerone.Router
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.Timestamp
@@ -34,7 +33,6 @@ import petlink.android.feature_calendar_ui_calendar_view.calendar_view.day_botto
 import petlink.android.feature_calendar_ui_calendar_view.calendar_view.day_bottom_sheet.mvi.DayDataPartialState
 import petlink.android.feature_calendar_ui_calendar_view.calendar_view.day_bottom_sheet.mvi.DayDataState
 import petlink.android.feature_calendar_ui_calendar_view.calendar_view.day_bottom_sheet.mvi.DayDataStoreFactory
-import petlink.android.feature_calendar_ui_calendar_view.calendar_view.day_bottom_sheet.navigation.DayDataScreens
 import petlink.android.feature_calendar_ui_calendar_view.calendar_view.day_bottom_sheet.recycler_view.DayEventAdapter
 import petlink.android.feature_calendar_ui_calendar_view.calendar_view.day_bottom_sheet.recycler_view.DayEventModel
 import petlink.android.feature_calendar_ui_calendar_view.calendar_view.month_view.model.CalendarEventWithTimestampUiModel
@@ -63,9 +61,6 @@ class DayDataBottomSheetFragment : MviBaseBottomSheetDialogFragment<
 
     @Inject
     lateinit var localDI: DayDataLocalDI
-
-    @Inject
-    lateinit var router: Router
 
     private val recyclerItems: MutableList<DayEventModel> = mutableListOf()
     private val adapter: DayEventAdapter = DayEventAdapter()
@@ -154,7 +149,13 @@ class DayDataBottomSheetFragment : MviBaseBottomSheetDialogFragment<
 
     override fun resolveEffect(effect: DayDataEffect) {
         when (effect) {
-            DayDataEffect.OpenAddEventActivity -> router.navigateTo(DayDataScreens.addEvent(date))
+            DayDataEffect.OpenAddEventActivity -> {
+                val intent = Intent(
+                    Intent.ACTION_VIEW,
+                    "app://calendar/add_event?event_date=$date".toUri()
+                )
+                addEventActivityResultLauncher.launch(intent)
+            }
 
             is DayDataEffect.OpenEventDetailsActivity -> {
                 with(effect) {

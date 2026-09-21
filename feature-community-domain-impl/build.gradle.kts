@@ -34,6 +34,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":feature-community-core"))
     implementation(project(":feature-community-data"))
     implementation(project(":feature-community-domain"))
     implementation(libs.dagger)

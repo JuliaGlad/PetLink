@@ -16,12 +16,12 @@ class NewsCommunityLocalSourceImpl @Inject constructor(
         return communities.map { it.toDto() }.toList()
     }
 
-    override suspend fun addSubscriber(communityId: String){
-        NewsCommunityProvider(newsCommunityDatabase).addSubscriber(communityId)
+    override suspend fun addSubscriber(communityId: String, userId: String){
+        NewsCommunityProvider(newsCommunityDatabase).addSubscriber(communityId, userId)
     }
 
-    override suspend fun removeSubscriber(communityId: String){
-        NewsCommunityProvider(newsCommunityDatabase).removeSubscriber(communityId)
+    override suspend fun removeSubscriber(communityId: String, userId: String){
+        NewsCommunityProvider(newsCommunityDatabase).removeSubscriber(communityId, userId)
     }
 
     override suspend fun insertNewsCommunity(

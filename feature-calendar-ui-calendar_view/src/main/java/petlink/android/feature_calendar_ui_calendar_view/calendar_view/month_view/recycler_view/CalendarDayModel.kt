@@ -6,6 +6,8 @@ import kotlin.random.Random
 data class CalendarDayModel(
     val id: Int = Random.nextInt(),
     val day: String,
+    val year: Int = 0,
+    val month: Int = 0,
     var events: List<CalendarEventWithTimestampUiModel>,
     val clickListener: (() -> Unit)? = null
 )
