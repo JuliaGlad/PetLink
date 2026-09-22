@@ -121,12 +121,14 @@ class DayDataBottomSheetFragment : MviBaseBottomSheetDialogFragment<
                     loading.root.visibility = GONE
                     error.root.visibility = GONE
                 }
-                initRecycler(state.value.data.events)
+                showEvents(state.value.data.events)
             }
 
             is LceState.Error -> {
                 with(binding) {
                     loading.root.visibility = GONE
+                    emptyScreen.root.visibility = GONE
+                    recyclerView.visibility = GONE
                     error.root.visibility = VISIBLE
                     Log.e(DAY_DATA_BOTTOM_SHEET_TAG, state.value.throwable.message.toString())
                 }
@@ -136,6 +138,8 @@ class DayDataBottomSheetFragment : MviBaseBottomSheetDialogFragment<
                 with(binding) {
                     loading.root.visibility = VISIBLE
                     error.root.visibility = GONE
+                    emptyScreen.root.visibility = GONE
+                    recyclerView.visibility = GONE
                 }
             }
         }
@@ -173,15 +177,44 @@ class DayDataBottomSheetFragment : MviBaseBottomSheetDialogFragment<
         }
     }
 
+    private fun showEvents(items: List<CalendarEventUiModel>) {
+        if (items.isEmpty()) {
+            showEmptyScreen()
+            recyclerItems.clear()
+            adapter.submitList(emptyList())
+            return
+        }
+        hideEmptyScreen()
+        initRecycler(items)
+    }
+
+    private fun showEmptyScreen() {
+        with(binding) {
+            recyclerView.visibility = GONE
+            emptyScreen.root.visibility = VISIBLE
+            emptyScreen.errorText.text =
+                getString(petlink.android.core_ui.R.string.there_are_no_events_yet)
+        }
+    }
+
+    private fun hideEmptyScreen() {
+        with(binding) {
+            emptyScreen.root.visibility = GONE
+            recyclerView.visibility = VISIBLE
+        }
+    }
+
     private fun initRecycler(items: List<CalendarEventUiModel>) {
+        recyclerItems.clear()
         items.forEach { recyclerItems.add(it.getDayEventModel()) }
-        binding.recyclerView.adapter = adapter
-        adapter.submitList(recyclerItems)
+        if (binding.recyclerView.adapter == null) {
+            binding.recyclerView.adapter = adapter
+        }
+        adapter.submitList(recyclerItems.toList())
     }
 
     private fun CalendarEventUiModel.getDayEventModel(): DayEventModel {
-        val eventTheme =
-            CalendarEventTheme.entries.filter { it.value.id == theme.toInt() }[0]
+        val eventTheme = CalendarEventTheme.fromId(theme)
         return DayEventModel(
             eventId = id,
             title = title,
@@ -205,12 +238,11 @@ class DayDataBottomSheetFragment : MviBaseBottomSheetDialogFragment<
     }
 
     private fun Intent.updateCalendarEvent(eventId: String) {
-        val title = getStringExtra(TITLE_ARG).toString()
-        val time = getStringExtra(TIME_ARG).toString()
-        val themeId = getStringExtra(THEME_ARG)?.toInt()
-        val theme =
-            CalendarEventTheme.entries.filter { it.value.id == themeId }[0]
-        val date = getStringExtra(DATE_ARG).toString()
+        val title = getStringExtra(TITLE_ARG).orEmpty()
+        val time = getStringExtra(TIME_ARG).orEmpty()
+        val themeId = getStringExtra(THEME_ARG)?.toIntOrNull()
+        val theme = CalendarEventTheme.fromId(themeId)
+        val date = getStringExtra(DATE_ARG).orEmpty()
         val isNotificationOn = getBooleanExtra(NOTIFICATION_ON_ARG, false)
         recyclerItems.forEach { item ->
             val index = recyclerItems.indexOf(item)
@@ -234,9 +266,9 @@ class DayDataBottomSheetFragment : MviBaseBottomSheetDialogFragment<
     private fun deleteEventFromRecycler(eventId: String) {
         for (item in recyclerItems) {
             if (item.eventId == eventId) {
-                val index = recyclerItems.indexOf(item)
                 recyclerItems.remove(item)
-                adapter.notifyItemRemoved(index)
+                adapter.submitList(recyclerItems.toList())
+                if (recyclerItems.isEmpty()) showEmptyScreen()
                 break
             }
         }
@@ -247,13 +279,14 @@ class DayDataBottomSheetFragment : MviBaseBottomSheetDialogFragment<
             if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.let {
                     with(it) {
-                        val id = getStringExtra(ID_ARG).toString()
-                        val title = getStringExtra(TITLE_ARG).toString()
-                        val time = getStringExtra(TIME_ARG).toString()
-                        val themeId = getStringExtra(THEME_ARG)?.toInt()
-                        val theme = CalendarEventTheme.entries.filter { it.value.id == themeId }[0]
-                        val date = getStringExtra(DATE_ARG).toString()
+                        val id = getStringExtra(ID_ARG).orEmpty()
+                        val title = getStringExtra(TITLE_ARG).orEmpty()
+                        val time = getStringExtra(TIME_ARG).orEmpty()
+                        val themeId = getStringExtra(THEME_ARG)?.toIntOrNull()
+                        val theme = CalendarEventTheme.fromId(themeId)
+                        val date = getStringExtra(DATE_ARG).orEmpty()
                         val isNotificationOn = getBooleanExtra(NOTIFICATION_ON_ARG, false)
+                        hideEmptyScreen()
                         recyclerItems.add(
                             0,
                             DayEventModel(
@@ -270,19 +303,19 @@ class DayDataBottomSheetFragment : MviBaseBottomSheetDialogFragment<
                                             title = title,
                                             date = date,
                                             time = time,
-                                            theme = themeId.toString(),
+                                            theme = theme.value.id.toString(),
                                             isNotificationOn = isNotificationOn
                                         )
                                     )
                                 }
                             ))
-                        adapter.notifyItemInserted(0)
+                        adapter.submitList(recyclerItems.toList())
                         addItemToNewItemsList(
                             eventId = id,
                             title = title,
                             eventDate = date,
                             time = time,
-                            themeId = themeId,
+                            themeId = theme.value.id,
                             isNotificationOn = isNotificationOn
                         )
                     }
@@ -320,7 +353,7 @@ class DayDataBottomSheetFragment : MviBaseBottomSheetDialogFragment<
             if (result.resultCode == Activity.RESULT_OK) {
                 if (result.data != null) {
                     val data = result.data!!
-                    val eventId = data.getStringExtra(ID_ARG).toString()
+                    val eventId = data.getStringExtra(ID_ARG).orEmpty()
                     val action = data.getParcelableExtra<EditEventAction>(ACTION_ID_ARG)
                     action?.let {
                         when (it) {

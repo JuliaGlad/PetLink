@@ -152,8 +152,13 @@ class MonthViewFragment : MviBaseFragment<
             set(year, month - 1, 1)
         }
 
-        val firstDayOfWeek = temp.get(Calendar.DAY_OF_WEEK) - 1
-        repeat(firstDayOfWeek) {
+        val firstDayOfWeek = temp.get(Calendar.DAY_OF_WEEK)
+        val leadingEmptyDays = if (firstDayOfWeek == Calendar.SUNDAY) {
+            DAYS_IN_WEEK - 1
+        } else {
+            firstDayOfWeek - Calendar.MONDAY
+        }
+        repeat(leadingEmptyDays) {
             result.add(
                 CalendarDayModel(
                     day = "",
@@ -164,14 +169,15 @@ class MonthViewFragment : MviBaseFragment<
 
         val daysInMonth = temp.getActualMaximum(Calendar.DAY_OF_MONTH)
         for (day in 1..daysInMonth) {
+            val formattedDate = formatDate(year, month, day)
             val dayEvents = events.filter { event ->
                 val date = event.timestamp.toDate()
                 val calendar = Calendar.getInstance().apply { time = date }
-                calendar.get(Calendar.YEAR) == year &&
+                val matchesTimestamp = calendar.get(Calendar.YEAR) == year &&
                         calendar.get(Calendar.MONTH) == month - 1 &&
                         calendar.get(Calendar.DAY_OF_MONTH) == day
+                matchesTimestamp || event.date == formattedDate
             }
-            val formattedDate = formatDate(year, month, day)
             result.add(
                 CalendarDayModel(
                     day = day.toString(),
@@ -188,7 +194,7 @@ class MonthViewFragment : MviBaseFragment<
     }
 
     private fun formatDate(year: Int, month: Int, day: Int): String =
-        String.format(Locale.getDefault(), "%d-%02d-%02d", year, month, day)
+        String.format(Locale.US, "%d-%02d-%02d", year, month, day)
 
     private fun addNewItemsToRecycler(date: String, items: List<CalendarEventWithTimestampUiModel>) {
         recyclerItems.forEach { item ->
@@ -224,6 +230,7 @@ class MonthViewFragment : MviBaseFragment<
         const val DAY_DATA_BOTTOM_SHEET = "DayDataBottomSheet"
         const val ARG_YEAR = "YearArg"
         const val ARG_MONTH = "MonthArg"
+        private const val DAYS_IN_WEEK = 7
     }
 
 }

@@ -13,5 +13,6 @@ data class TextInputLayoutModel(
     var error: String = "",
     val canBeEmpty: Boolean = true,
     val editable: Boolean = true,
-    val textChangedListener: ((String) -> Unit)? = null
+    val textChangedListener: ((String) -> Unit)? = null,
+    val valueFormatter: ((String) -> String)? = null
 )

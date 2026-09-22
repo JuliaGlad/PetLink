@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import petlink.android.core_ui.custom_view.calendar_event.formatCalendarEventDate
 import petlink.android.core_ui.databinding.RecyclerItemCalendarEventBinding
 import petlink.android.core_ui.playPressAnimation
 
@@ -38,7 +39,7 @@ class CalendarEventAdapter : ListAdapter<
         fun bind(model: CalendarEventModel) {
             with(binding.item) {
                 eventTitle = model.title
-                eventDateText = "${model.time} ${model.eventDate}"
+                eventDateText = formatCalendarEventDate(model.eventDate)
                 eventTheme = model.theme
                 isNotificationOn = model.isNotificationOn
                 model.clickListener?.let { click ->

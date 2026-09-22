@@ -16,7 +16,7 @@ fun CalendarEventDomainModel.toUi() =
         id = id,
         title = title,
         date = date,
-        theme = theme.toInt(),
+        theme = theme.toIntOrNull() ?: 0,
         time = time,
         isNotificationOn = isNotificationOn
     )

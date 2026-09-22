@@ -49,10 +49,16 @@ class TextInputLayoutDelegate : AdapterDelegate {
                     })
                 }
                 setOnFocusChangeListener { _, hasFocus ->
-                    binding.textInputLayout.error = if (hasFocus) {
-                        null
+                    if (hasFocus) {
+                        binding.textInputLayout.error = null
                     } else {
-                        validateError(text.toString(), model)
+                        val current = text.toString()
+                        val formatted = model.valueFormatter?.invoke(current) ?: current
+                        if (formatted != current) {
+                            setText(formatted)
+                            setSelection(formatted.length)
+                        }
+                        binding.textInputLayout.error = validateError(formatted, model)
                     }
                 }
                 if (model.endIconMode == TextInputLayout.END_ICON_PASSWORD_TOGGLE) {

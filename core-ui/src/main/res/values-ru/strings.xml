@@ -115,7 +115,8 @@
     <string name="calendar_description">Откройте календарь, чтобы добавить и посмотреть свои события</string>
     <string name="birthday">День рождения</string>
     <string name="events_history">История событий</string>
-    <string name="you_dont_have_any_events_yet">У вас пока что нет событий</string>
+    <string name="you_dont_have_any_events_yet">У вас пока что не было событий</string>
+    <string name="there_are_no_events_yet">Пока что нет событий</string>
     <string name="there_are_no_posts_yet">Пока что нет постов</string>
     <string name="date">Дата</string>
     <string name="change_date">Сменить дату</string>

@@ -74,5 +74,10 @@ enum class CalendarEventTheme(val value: EventTheme) {
             titleTextColor = R.color.dark_orange,
             descriptionTextColor = R.color.medium_orange
         )
-    )
+    );
+
+    companion object {
+        fun fromId(id: Int?): CalendarEventTheme =
+            entries.find { it.value.id == id } ?: GREEN
+    }
 }

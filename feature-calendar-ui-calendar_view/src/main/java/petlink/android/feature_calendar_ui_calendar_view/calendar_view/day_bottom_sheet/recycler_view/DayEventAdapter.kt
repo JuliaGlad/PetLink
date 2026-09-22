@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import petlink.android.core_ui.custom_view.calendar_event.formatCalendarEventDate
 import petlink.android.feature_calendar_ui_calendar_view.databinding.RecyclerViewDayEventBinding
 
 class DayEventAdapter : ListAdapter<DayEventModel, DayEventAdapter.ViewHolder>(DayEventItemCallBack()) {
@@ -32,7 +33,7 @@ class DayEventAdapter : ListAdapter<DayEventModel, DayEventAdapter.ViewHolder>(D
         fun bind(model: DayEventModel) {
             with(binding.item) {
                 eventTitle = model.title
-                eventDateText = "${model.time} ${model.eventDate}"
+                eventDateText = formatCalendarEventDate(model.eventDate)
                 eventTheme = model.theme
                 isNotificationOn = model.isNotificationOn
                 setOnClickListener { model.clickListener() }
