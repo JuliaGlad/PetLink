@@ -82,8 +82,7 @@ class CalendarDayAdapter : ListAdapter<CalendarDayModel, ViewHolder>(CalendarDay
                     model.events
                         .take(maxDots)
                         .forEach { event ->
-                            val eventTheme =
-                                CalendarEventTheme.entries.filter { it.value.id == event.theme.toInt() }[0]
+                            val eventTheme = CalendarEventTheme.fromId(event.theme.toIntOrNull())
 
                             val dot = View(binding.root.context).apply {
                                 val size = dotSize

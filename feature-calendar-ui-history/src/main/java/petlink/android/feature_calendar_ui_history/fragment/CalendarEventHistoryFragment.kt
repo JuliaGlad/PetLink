@@ -79,13 +79,25 @@ class CalendarEventHistoryFragment : MviBaseFragment<
                 with(binding) {
                     loading.root.visibility = GONE
                     error.root.visibility = GONE
+                    val events = state.value.data.events
+                    if (events.isEmpty()) {
+                        recyclerView.visibility = GONE
+                        emptyScreen.root.visibility = VISIBLE
+                        emptyScreen.errorText.text =
+                            getString(petlink.android.core_ui.R.string.you_dont_have_any_events_yet)
+                    } else {
+                        emptyScreen.root.visibility = GONE
+                        recyclerView.visibility = VISIBLE
+                        initRecyclerView(events)
+                    }
                 }
-                initRecyclerView(state.value.data.events)
             }
 
             is LceState.Error -> {
                 with(binding) {
                     loading.root.visibility = GONE
+                    emptyScreen.root.visibility = GONE
+                    recyclerView.visibility = GONE
                     error.root.visibility = VISIBLE
                     Log.e(CALENDAR_EVENT_HISTORY_TAG, state.value.throwable.message.toString())
                 }
@@ -95,6 +107,8 @@ class CalendarEventHistoryFragment : MviBaseFragment<
                 with(binding) {
                     loading.root.visibility = VISIBLE
                     error.root.visibility = GONE
+                    emptyScreen.root.visibility = GONE
+                    recyclerView.visibility = GONE
                 }
             }
         }
@@ -105,11 +119,10 @@ class CalendarEventHistoryFragment : MviBaseFragment<
         val items = mutableListOf<CalendarEventModel>()
         events.forEach { item ->
             with(item) {
-                val theme = CalendarEventTheme.entries.filter { it.value.id == theme }[0]
                 items.add(
                     CalendarEventModel(
                         title = title,
-                        theme = theme,
+                        theme = CalendarEventTheme.fromId(theme),
                         eventDate = date,
                         time = time,
                         isNotificationOn = isNotificationOn

@@ -2,6 +2,7 @@ package petlink.android.feature_calendar_data_impl.repository
 
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +18,7 @@ import petlink.android.feature_calendar_domain.model.CalendarEventWithTimeStampD
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneId
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
@@ -28,27 +30,31 @@ class CalendarRepositoryImpl @Inject constructor(
 ) : CalendarRepository {
     override suspend fun getEventsByDate(date: String): List<CalendarEventDomainModel> {
         return withContext(Dispatchers.IO) {
-            val snapshot = auth.currentUser?.uid?.let { uid ->
-                store.collection(USER_COLLECTION)
-                    .document(uid)
-                    .collection(CALENDAR_EVENT)
-                    .whereEqualTo(EVENT_DATE, date)
+            val uid = auth.currentUser?.uid ?: return@withContext emptyList()
+            val collection = store.collection(USER_COLLECTION)
+                .document(uid)
+                .collection(CALENDAR_EVENT)
+            val eventsById = linkedMapOf<String, CalendarEventDomainModel>()
+
+            collection.whereEqualTo(EVENT_DATE, date)
+                .get()
+                .await()
+                .documents
+                .mapNotNull { it.toCalendarEventDto()?.toDomain() }
+                .forEach { event -> eventsById[event.id] = event }
+
+            parseDayRange(date)?.let { (startTimestamp, endTimestamp) ->
+                collection.whereGreaterThanOrEqualTo(EVENT_DATE_TIME_STAMP, startTimestamp)
+                    .whereLessThan(EVENT_DATE_TIME_STAMP, endTimestamp)
                     .get()
                     .await()
+                    .documents
+                    .mapNotNull { it.toCalendarEventDto()?.toDomain() }
+                    .forEach { event -> eventsById.putIfAbsent(event.id, event) }
             }
-            snapshot?.documents?.map { document ->
-                CalendarEventDto(
-                    id = document.id,
-                    title = document.getString(EVENT_TITLE).toString(),
-                    date = document.get(EVENT_DATE).toString(),
-                    theme = document.get(EVENT_THEME).toString(),
-                    time = document.get(EVENT_TIME).toString(),
-                    timestamp = document.getTimestamp(EVENT_DATE_TIME_STAMP)!!,
-                    isNotificationOn = document.getBoolean(IS_NOTIFICATION_ON) == true
-                ).toDomain()
-            }?.toList() ?: emptyList()
-        }
 
+            eventsById.values.toList()
+        }
     }
 
     override suspend fun addEvent(
@@ -60,16 +66,14 @@ class CalendarRepositoryImpl @Inject constructor(
         isNotificationOn: Boolean
     ): String {
         return withContext(Dispatchers.IO) {
-            val sdf = SimpleDateFormat(DATE_FORMAT, Locale.getDefault())
-            val parsedDate: Date = sdf.parse(dateForTimestamp)!!
-
+            val parsedDate = parseDate(dateForTimestamp) ?: parseDate(date)
             val id = auth.currentUser?.uid?.let { uid ->
                 val event = hashMapOf(
                     EVENT_TITLE to title,
                     EVENT_DATE to date,
                     EVENT_TIME to time,
                     EVENT_THEME to theme,
-                    EVENT_DATE_TIME_STAMP to Timestamp(parsedDate),
+                    EVENT_DATE_TIME_STAMP to Timestamp(parsedDate ?: Date()),
                     IS_NOTIFICATION_ON to isNotificationOn
                 )
                 val eventId = store.collection(USER_COLLECTION)
@@ -99,13 +103,10 @@ class CalendarRepositoryImpl @Inject constructor(
                 .toInstant()
             val startTimestamp = Timestamp(Date.from(startOfMonth))
 
-            val startOfNextMonth = startOfMonth
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate()
+            val startOfNextMonth = LocalDate.of(year, month, 1)
                 .plusMonths(1)
                 .atStartOfDay(ZoneId.systemDefault())
                 .toInstant()
-
             val endTimestamp = Timestamp(Date.from(startOfNextMonth))
 
             val snapshot = auth.currentUser?.uid?.let { uid ->
@@ -117,17 +118,9 @@ class CalendarRepositoryImpl @Inject constructor(
                     .get()
                     .await()
             }
-            snapshot?.documents?.map { document ->
-                CalendarEventDto(
-                    id = document.id,
-                    title = document.getString(EVENT_TITLE).toString(),
-                    date = document.get(EVENT_DATE).toString(),
-                    theme = document.get(EVENT_THEME).toString(),
-                    time = document.get(EVENT_TIME).toString(),
-                    timestamp = document.getTimestamp(EVENT_DATE_TIME_STAMP)!!,
-                    isNotificationOn = document.getBoolean(IS_NOTIFICATION_ON) == true
-                ).toTimeStampDomain()
-            }?.toList() ?: emptyList()
+            snapshot?.documents?.mapNotNull { document ->
+                document.toCalendarEventDto()?.toTimeStampDomain()
+            } ?: emptyList()
         }
     }
 
@@ -149,17 +142,9 @@ class CalendarRepositoryImpl @Inject constructor(
 
                     query.get().await()
                 }
-                snapshot?.documents?.map { document ->
-                    CalendarEventDto(
-                        id = document.id,
-                        title = document.getString(EVENT_TITLE).toString(),
-                        date = document.get(EVENT_DATE).toString(),
-                        theme = document.get(EVENT_THEME).toString(),
-                        time = document.get(EVENT_TIME).toString(),
-                        timestamp = document.getTimestamp(EVENT_DATE_TIME_STAMP)!!,
-                        isNotificationOn = document.getBoolean(IS_NOTIFICATION_ON) == true
-                    ).toDomain()
-                }?.toList() ?: emptyList()
+                snapshot?.documents?.mapNotNull { document ->
+                    document.toCalendarEventDto()?.toDomain()
+                } ?: emptyList()
             } else local
         }
     }
@@ -188,6 +173,7 @@ class CalendarRepositoryImpl @Inject constructor(
     ) {
         withContext(Dispatchers.IO) {
             auth.currentUser?.uid?.let { uid ->
+                val parsedDate = parseDate(dateForTimestamp) ?: parseDate("$date $time") ?: parseDate(date)
                 updateEventDataFields(
                     uid,
                     eventId,
@@ -195,6 +181,8 @@ class CalendarRepositoryImpl @Inject constructor(
                         EVENT_TITLE to title,
                         EVENT_DATE to date,
                         EVENT_THEME to theme,
+                        EVENT_TIME to time,
+                        EVENT_DATE_TIME_STAMP to parsedDate?.let { Timestamp(it) },
                         IS_NOTIFICATION_ON to isNotificationOn
                     )
                 )
@@ -209,17 +197,19 @@ class CalendarRepositoryImpl @Inject constructor(
                     .document(uid)
                 val calendarEventDocument = userDocument.collection(CALENDAR_EVENT).document(eventId)
                 val eventDocumentSnapshot = calendarEventDocument.get().await()
+                val eventDto = eventDocumentSnapshot.toCalendarEventDto() ?: return@let
 
                 userDocument
                     .collection(CALENDAR_EVENT_HISTORY)
                     .document(eventId)
                     .set(
                         hashMapOf(
-                            EVENT_TITLE to eventDocumentSnapshot.getString(EVENT_TITLE),
-                            EVENT_DATE to eventDocumentSnapshot.getString(EVENT_DATE),
-                            EVENT_TIME to eventDocumentSnapshot.getString(EVENT_TIME),
-                            EVENT_THEME to eventDocumentSnapshot.getString(EVENT_THEME),
-                            IS_NOTIFICATION_ON to eventDocumentSnapshot.getBoolean(IS_NOTIFICATION_ON)
+                            EVENT_TITLE to eventDto.title,
+                            EVENT_DATE to eventDto.date,
+                            EVENT_TIME to eventDto.time,
+                            EVENT_THEME to eventDto.theme,
+                            EVENT_DATE_TIME_STAMP to eventDto.timestamp,
+                            IS_NOTIFICATION_ON to eventDto.isNotificationOn
                         )
                     ).await()
 
@@ -237,17 +227,9 @@ class CalendarRepositoryImpl @Inject constructor(
                     .get()
                     .await()
             }
-            snapshot?.documents?.map { document ->
-                CalendarEventDto(
-                    id = document.id,
-                    title = document.getString(EVENT_TITLE).toString(),
-                    date = document.get(EVENT_DATE).toString(),
-                    theme = document.get(EVENT_THEME).toString(),
-                    time = document.get(EVENT_TIME).toString(),
-                    timestamp = document.getTimestamp(EVENT_DATE_TIME_STAMP)!!,
-                    isNotificationOn = document.getBoolean(IS_NOTIFICATION_ON) == true
-                ).toDomain()
-            }?.toList() ?: emptyList()
+            snapshot?.documents?.mapNotNull { document ->
+                document.toCalendarEventDto()?.toDomain()
+            } ?: emptyList()
         }
     }
 
@@ -268,6 +250,48 @@ class CalendarRepositoryImpl @Inject constructor(
         }
     }
 
+    private fun DocumentSnapshot.toCalendarEventDto(): CalendarEventDto? =
+        runCatching {
+            val date = readString(EVENT_DATE)
+            val time = readString(EVENT_TIME)
+            CalendarEventDto(
+                id = id,
+                title = readString(EVENT_TITLE),
+                date = date,
+                theme = readString(EVENT_THEME).ifEmpty { DEFAULT_THEME },
+                time = time,
+                timestamp = getTimestamp(EVENT_DATE_TIME_STAMP) ?: Timestamp(parseDate("$date $time") ?: parseDate(date) ?: Date()),
+                isNotificationOn = getBoolean(IS_NOTIFICATION_ON) == true
+            )
+        }.getOrNull()
+
+    private fun DocumentSnapshot.readString(field: String): String {
+        getString(field)?.takeUnless { it == NULL_STRING }?.let { return it }
+        val value = get(field) ?: return ""
+        return value.toString().takeUnless { it == NULL_STRING }.orEmpty()
+    }
+
+    private fun parseDate(value: String): Date? {
+        if (value.isBlank() || value == NULL_STRING) return null
+        return DATE_PATTERNS.firstNotNullOfOrNull { pattern ->
+            runCatching { SimpleDateFormat(pattern, Locale.US).parse(value.trim()) }.getOrNull()
+        }
+    }
+
+    private fun parseDayRange(date: String): Pair<Timestamp, Timestamp>? {
+        val parsedDate = parseDate(date) ?: return null
+        val calendar = Calendar.getInstance().apply {
+            time = parsedDate
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        val startOfDay = calendar.time
+        calendar.add(Calendar.DAY_OF_MONTH, 1)
+        return Timestamp(startOfDay) to Timestamp(calendar.time)
+    }
+
     companion object {
         const val EVENT_TIME = "EventTime"
         const val DATE_FORMAT = "yyyy-MM-dd HH:mm"
@@ -279,5 +303,8 @@ class CalendarRepositoryImpl @Inject constructor(
         const val EVENT_DATE_TIME_STAMP = "EvenDateTimeStamp"
         const val EVENT_DATE = "EventDate"
         const val IS_NOTIFICATION_ON = "IsNotificationOn"
+        private const val DEFAULT_THEME = "0"
+        private const val NULL_STRING = "null"
+        private val DATE_PATTERNS = listOf(DATE_FORMAT, "yyyy-MM-dd")
     }
 }

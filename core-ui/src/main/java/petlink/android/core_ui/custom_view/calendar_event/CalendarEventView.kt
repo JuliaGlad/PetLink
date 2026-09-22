@@ -56,15 +56,17 @@ class CalendarEventView @JvmOverloads constructor(
 
     var eventDateText: String = ""
         set(value) {
-            if (value != field){
-                field = value
+            val normalizedValue = value.takeUnless { it == NULL_VALUE }.orEmpty()
+            if (normalizedValue != field){
+                field = normalizedValue
                 eventDateTextView.text = field
             }
         }
     var eventTitle: String = ""
         set(value) {
-            if (value != field){
-                field = value
+            val normalizedValue = value.takeUnless { it == NULL_VALUE }.orEmpty()
+            if (normalizedValue != field){
+                field = normalizedValue
                 eventTitleTextView.text = field
             }
         }
@@ -104,7 +106,7 @@ class CalendarEventView @JvmOverloads constructor(
 
     private fun TypedArray.initDescription() {
         eventDateTextView = findViewById(R.id.event_date)
-        eventDateText = getString(R.styleable.CalendarEventView_event_date).toString()
+        eventDateText = getString(R.styleable.CalendarEventView_event_date).orEmpty()
         eventDateTextView.text = eventDateText
         eventDateTextView.setTextColor(
             ResourcesCompat.getColor(resources, eventTheme.value.descriptionTextColor, context.theme)
@@ -113,7 +115,7 @@ class CalendarEventView @JvmOverloads constructor(
 
     private fun TypedArray.initTitle() {
         eventTitleTextView = findViewById(R.id.event_title)
-        eventTitle = getString(R.styleable.CalendarEventView_event_title).toString()
+        eventTitle = getString(R.styleable.CalendarEventView_event_title).orEmpty()
         eventTitleTextView.text = eventTitle
         eventTitleTextView.setTextColor(
             ResourcesCompat.getColor(resources, eventTheme.value.titleTextColor, context.theme)
@@ -172,6 +174,7 @@ class CalendarEventView @JvmOverloads constructor(
     companion object{
         const val SPACING_HORIZONTAL = 14
         const val SPACING_VERTICAL = 8
+        private const val NULL_VALUE = "null"
     }
 
 }

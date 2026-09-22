@@ -59,6 +59,7 @@ class CalendarMainFragment : MviBaseFragment<
 
     private val mainAdapter: MainAdapter = MainAdapter()
     val recyclerItems = mutableListOf<DelegateItem>()
+    private var adapterInitialized = false
 
     @Inject
     lateinit var localDI: CalendarMainLocalDI
@@ -84,7 +85,7 @@ class CalendarMainFragment : MviBaseFragment<
             if (result.resultCode == Activity.RESULT_OK) {
                 if (result.data != null){
                     val data = result.data!!
-                    val eventId = data.getStringExtra(ID_ARG).toString()
+                    val eventId = data.getStringExtra(ID_ARG).orEmpty()
                     val action = data.getParcelableExtra<EditEventAction>(ACTION_ID_ARG)
                     action?.let {
                         when(it){
@@ -101,12 +102,12 @@ class CalendarMainFragment : MviBaseFragment<
             if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.let {
                     with(it) {
-                        val id = getStringExtra(ID_ARG).toString()
-                        val title = getStringExtra(TITLE_ARG).toString()
-                        val time = getStringExtra(TIME_ARG).toString()
-                        val themeId = getStringExtra(THEME_ARG)?.toInt()
-                        val theme = CalendarEventTheme.entries.filter { it.value.id == themeId }[0]
-                        val date = getStringExtra(DATE_ARG).toString()
+                        val id = getStringExtra(ID_ARG).orEmpty()
+                        val title = getStringExtra(TITLE_ARG).orEmpty()
+                        val time = getStringExtra(TIME_ARG).orEmpty()
+                        val themeId = getStringExtra(THEME_ARG)?.toIntOrNull()
+                        val theme = CalendarEventTheme.fromId(themeId)
+                        val date = getStringExtra(DATE_ARG).orEmpty()
                         val isNotificationOn = getBooleanExtra(NOTIFICATION_ON_ARG, false)
                         recyclerItems.add(
                             0,
@@ -119,7 +120,7 @@ class CalendarMainFragment : MviBaseFragment<
                                 isNotificationOn = isNotificationOn
                             )
                         )
-                        mainAdapter.notifyItemInserted(0)
+                        mainAdapter.submitList(recyclerItems.toList())
                     }
                 }
             }
@@ -180,7 +181,6 @@ class CalendarMainFragment : MviBaseFragment<
                     error.root.visibility = GONE
                     loading.root.visibility = GONE
                 }
-                initMainAdapter()
                 initRecycler(state.value.data.events)
             }
 
@@ -206,16 +206,21 @@ class CalendarMainFragment : MviBaseFragment<
     }
 
     private fun initRecycler(events: List<CalendarEventUiModel>) {
+        if (!adapterInitialized) {
+            initMainAdapter()
+            binding.recyclerView.adapter = mainAdapter
+            adapterInitialized = true
+        }
+        recyclerItems.clear()
         events.forEach { item ->
             with(item) {
-                val eventTheme = CalendarEventTheme.entries.filter { it.value.id == theme }[0]
                 recyclerItems.add(
                     getCalendarEventDelegateItem(
                         id = id,
                         title = title,
                         time = time,
                         date = date,
-                        eventTheme = eventTheme,
+                        eventTheme = CalendarEventTheme.fromId(theme),
                         isNotificationOn = isNotificationOn
                     )
                 )
@@ -250,8 +255,7 @@ class CalendarMainFragment : MviBaseFragment<
                 )
             )
         )
-        binding.recyclerView.adapter = mainAdapter
-        mainAdapter.submitList(recyclerItems)
+        mainAdapter.submitList(recyclerItems.toList())
     }
 
     private fun getCalendarEventDelegateItem(
@@ -294,12 +298,11 @@ class CalendarMainFragment : MviBaseFragment<
     }
 
     private fun Intent.updateCalendarEvent(eventId: String) {
-        val title = getStringExtra(TITLE_ARG).toString()
-        val time = getStringExtra(TIME_ARG).toString()
-        val themeId = getStringExtra(THEME_ARG)?.toInt()
-        val theme =
-            CalendarEventTheme.entries.filter { it.value.id == themeId }[0]
-        val date = getStringExtra(DATE_ARG).toString()
+        val title = getStringExtra(TITLE_ARG).orEmpty()
+        val time = getStringExtra(TIME_ARG).orEmpty()
+        val themeId = getStringExtra(THEME_ARG)?.toIntOrNull()
+        val theme = CalendarEventTheme.fromId(themeId)
+        val date = getStringExtra(DATE_ARG).orEmpty()
         val isNotificationOn = getBooleanExtra(NOTIFICATION_ON_ARG, false)
         recyclerItems.forEach { item ->
             if (item is CalendarEventDelegateItem) {
@@ -322,9 +325,8 @@ class CalendarMainFragment : MviBaseFragment<
         for (item in recyclerItems){
             if (item is CalendarEventDelegateItem) {
                 if ((item.content() as CalendarEventModel).eventId == eventId) {
-                    val index = recyclerItems.indexOf(item)
                     recyclerItems.remove(item)
-                    mainAdapter.notifyItemRemoved(index)
+                    mainAdapter.submitList(recyclerItems.toList())
                     break
                 }
             }

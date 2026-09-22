@@ -18,6 +18,8 @@ import petlink.android.core_mvi.MviStore
 import petlink.android.core_navigation.action.EditEventAction
 import petlink.android.core_ui.R
 import petlink.android.core_ui.custom_view.calendar_event.CalendarEventTheme
+import petlink.android.core_ui.custom_view.calendar_event.formatCalendarDateInput
+import petlink.android.core_ui.custom_view.calendar_event.formatCalendarTimeInput
 import petlink.android.core_ui.delegates.items.switch.NotificationSwitchDelegate
 import petlink.android.core_ui.delegates.items.switch.NotificationSwitchDelegateItem
 import petlink.android.core_ui.delegates.items.switch.NotificationSwitchModel
@@ -160,11 +162,12 @@ class EditEventFragment : MviBaseFragment<
                         TextInputLayoutModel(
                             id = DATE_TEXT_INPUT,
                             defaultValue = date,
-                            editable = false,
                             hint = getString(R.string.enter_event_date),
+                            editable = false,
                             textChangedListener = { value ->
                                 date = value
-                            }
+                            },
+                            valueFormatter = { value -> formatCalendarDateInput(value) }
                         )
                     ),
                     TextGradientDelegateItem(
@@ -189,7 +192,8 @@ class EditEventFragment : MviBaseFragment<
                             editable = false,
                             textChangedListener = { value ->
                                 time = value
-                            }
+                            },
+                            valueFormatter = { value -> formatCalendarTimeInput(value) }
                         )
                     ),
                     TextGradientDelegateItem(
@@ -217,7 +221,7 @@ class EditEventFragment : MviBaseFragment<
                                 CalendarEventTheme.CORAL,
                                 CalendarEventTheme.ORANGE
                             ),
-                            defaultChosenId = theme.toInt(),
+                            defaultChosenId = theme.toIntOrNull() ?: CalendarEventTheme.GREEN.value.id,
                             clickListener = { value ->
                                 theme = value.toString()
                             }
@@ -274,6 +278,8 @@ class EditEventFragment : MviBaseFragment<
     private fun initSaveButton() {
         binding.button.setOnClickListener {
             with(store.uiState.value.event) {
+                date = formatCalendarDateInput(date)
+                time = formatCalendarTimeInput(time)
                 store.sendIntent(
                     EditEventIntent.SaveEventData(
                         eventId = id,
@@ -356,11 +362,13 @@ class EditEventFragment : MviBaseFragment<
     private fun initDefaultUserData() {
         activity?.intent?.let { intent ->
             with(intent) {
-                val eventId = getStringExtra(ID_ARG).toString()
-                val title = getStringExtra(TITLE_ARG).toString()
-                val time = getStringExtra(TIME_ARG).toString()
-                val date = getStringExtra(DATE_ARG).toString()
-                val theme = getStringExtra(THEME_ARG).toString()
+                val eventId = extraOrEmpty(ID_ARG)
+                val title = extraOrEmpty(TITLE_ARG)
+                val time = extraOrEmpty(TIME_ARG)
+                val date = extraOrEmpty(DATE_ARG)
+                val theme = extraOrEmpty(THEME_ARG).ifEmpty {
+                    CalendarEventTheme.GREEN.value.id.toString()
+                }
                 val isNotificationOn = getBooleanExtra(NOTIFICATION_ON_ARG, false)
                 with(store.uiState.value.event) {
                     id = eventId
@@ -375,6 +383,9 @@ class EditEventFragment : MviBaseFragment<
         }
     }
 
+    private fun Intent.extraOrEmpty(key: String): String =
+        getStringExtra(key)?.takeUnless { it == NULL_VALUE }.orEmpty()
+
     private fun showDateDialog(getDate: (String) -> Unit) {
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)
@@ -385,9 +396,9 @@ class EditEventFragment : MviBaseFragment<
             requireContext(),
             R.style.GreenDatePickerDialogTheme,
             { _, selectedYear, selectedMonth, selectedDay ->
-                val dayFormatted = String.format(Locale.getDefault(), DATE_FORMAT, selectedDay)
+                val dayFormatted = String.format(Locale.US, DATE_FORMAT, selectedDay)
                 val monthFormatted =
-                    String.format(Locale.getDefault(), DATE_FORMAT, selectedMonth + 1)
+                    String.format(Locale.US, DATE_FORMAT, selectedMonth + 1)
                 val date = "$selectedYear-$monthFormatted-$dayFormatted"
                 getDate(date)
             },
@@ -452,6 +463,7 @@ class EditEventFragment : MviBaseFragment<
         const val DATE_ARG = "DateArg"
         const val NOTIFICATION_ON_ARG = "NotificationOnArg"
         const val DELETE_EVENT_DIALOG_TAG = "DeleteEventDialogTag"
+        private const val NULL_VALUE = "null"
     }
 
 }

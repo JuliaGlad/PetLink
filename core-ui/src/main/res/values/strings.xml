@@ -121,7 +121,8 @@
     <string name="calendar_description">Open calendar to view and add your events</string>
     <string name="birthday">Birthday</string>
     <string name="events_history">Events history</string>
-    <string name="you_dont_have_any_events_yet">You don`t have any events, yet!</string>
+    <string name="you_dont_have_any_events_yet">You haven`t had any events yet</string>
+    <string name="there_are_no_events_yet">There are no events yet</string>
     <string name="there_are_no_posts_yet">There are no posts yet</string>
     <string name="date">Date</string>
     <string name="change_date">Change date</string>

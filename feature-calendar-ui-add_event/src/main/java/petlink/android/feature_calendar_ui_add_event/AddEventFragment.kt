@@ -22,6 +22,8 @@ import petlink.android.core_mvi.MviBaseFragment
 import petlink.android.core_mvi.MviStore
 import petlink.android.core_ui.R
 import petlink.android.core_ui.custom_view.calendar_event.CalendarEventTheme
+import petlink.android.core_ui.custom_view.calendar_event.formatCalendarDateInput
+import petlink.android.core_ui.custom_view.calendar_event.formatCalendarTimeInput
 import petlink.android.core_ui.delegates.items.switch.NotificationSwitchDelegate
 import petlink.android.core_ui.delegates.items.switch.NotificationSwitchDelegateItem
 import petlink.android.core_ui.delegates.items.switch.NotificationSwitchModel
@@ -142,6 +144,8 @@ class AddEventFragment : MviBaseFragment<
         binding.button.setOnClickListener {
             store.sendIntent(AddEventIntent.Loading)
             with(store.uiState.value.newEventModel) {
+                date = formatCalendarDateInput(date)
+                time = formatCalendarTimeInput(time)
                 store.sendIntent(
                     AddEventIntent.AddEvent(
                         title = title,
@@ -183,10 +187,11 @@ class AddEventFragment : MviBaseFragment<
                         id = DATE_TEXT_INPUT,
                         hint = getString(R.string.enter_event_date),
                         defaultValue = date,
-                        editable = date.isEmpty(),
+                        editable = false,
                         textChangedListener = { value ->
                             store.uiState.value.newEventModel.date = value
-                        }
+                        },
+                        valueFormatter = { value -> formatCalendarDateInput(value) }
                     )
                 ),
                 TextGradientDelegateItem(
@@ -208,9 +213,11 @@ class AddEventFragment : MviBaseFragment<
                     TextInputLayoutModel(
                         id = TIME_TEXT_INPUT,
                         hint = getString(R.string.enter_event_time),
+                        editable = false,
                         textChangedListener = { value ->
                             store.uiState.value.newEventModel.time = value
-                        }
+                        },
+                        valueFormatter = { value -> formatCalendarTimeInput(value) }
                     )
                 ),
                 TextGradientDelegateItem(
@@ -272,9 +279,9 @@ class AddEventFragment : MviBaseFragment<
             requireContext(),
             R.style.GreenDatePickerDialogTheme,
             { _, selectedYear, selectedMonth, selectedDay ->
-                val dayFormatted = String.format(Locale.getDefault(), DATE_FORMAT, selectedDay)
+                val dayFormatted = String.format(Locale.US, DATE_FORMAT, selectedDay)
                 val monthFormatted =
-                    String.format(Locale.getDefault(), DATE_FORMAT, selectedMonth + 1)
+                    String.format(Locale.US, DATE_FORMAT, selectedMonth + 1)
                 val date = "$selectedYear-$monthFormatted-$dayFormatted"
                 getDate(date)
             },
@@ -382,7 +389,7 @@ class AddEventFragment : MviBaseFragment<
         time: String,
         dateForTimestamp: String
     ) {
-        val sdf = SimpleDateFormat(DATE_FORMAT_TIMESTAMP, Locale.getDefault())
+        val sdf = SimpleDateFormat(DATE_FORMAT_TIMESTAMP, Locale.US)
         val parsedDate: Date = sdf.parse(dateForTimestamp)!!
         val timestampMillis = Timestamp(parsedDate).seconds * 1000L
         val delay = timestampMillis - System.currentTimeMillis()
@@ -432,7 +439,7 @@ class AddEventFragment : MviBaseFragment<
         const val DATE_QUERY = "event_date"
         const val TIME_FORMAT = "%02d:%02d"
         const val DATE_FORMAT = "%02d"
-        const val ID_ARG = "IdArg"
+        const val ID_ARG = "IdTag"
         const val TITLE_ARG = "TitleArg"
         const val TIME_ARG = "TimeArg"
         const val THEME_ARG = "ThemeArg"
